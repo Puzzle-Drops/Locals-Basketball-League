@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LBL - Rules</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --bg-2: #0f1014;
+      --surface: #15171c;
+      --surface-2: #1b1e25;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f5f7;
+      --text-muted: #8b8f97;
+      --text-dim: #5b5e66;
+      --accent: #ff6b2b;
+      --accent-soft: rgba(255, 107, 43, 0.12);
+      --accent-ring: rgba(255, 107, 43, 0.35);
+      --positive: #22c55e;
+      --negative: #ef4444;
+      --amber: #fbbf24;
+    }
+
+    html, body { background: var(--bg); color: var(--text); }
+    body { font-family: 'Manrope', system-ui, sans-serif; font-feature-settings: "ss01", "cv11"; }
+
+    .display { font-family: 'Big Shoulders Display', sans-serif; letter-spacing: 0.01em; }
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    .court-bg {
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% -10%, rgba(255, 107, 43, 0.12), transparent 60%),
+        radial-gradient(ellipse 40% 30% at 90% 10%, rgba(255, 107, 43, 0.06), transparent 60%);
+    }
+
+    .grid-lines {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+      white-space: nowrap;
+    }
+    .pill.accent { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+    .pill.small {
+      padding: 3px 8px; font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    .logo {
+      width: 44px; height: 44px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 20px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .nav-link { color: var(--text-muted); position: relative; padding: 4px 0; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.active { color: var(--text); }
+    .nav-link.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+
+    .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 120ms ease, background 120ms ease;
+    }
+    .card:hover { border-color: var(--border-strong); }
+
+    /*
+      Section heading: big number on the left, title + content on the right.
+      Number is oversized display type, tinted very dim so it reads as a chapter
+      marker rather than competing with the title.
+    */
+    .section-block {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 768px) {
+      .section-block {
+        grid-template-columns: 120px 1fr;
+        gap: 40px;
+      }
+    }
+    .section-num {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 72px;
+      line-height: 0.85;
+      color: var(--text-dim);
+      letter-spacing: -0.02em;
+    }
+    @media (min-width: 768px) {
+      .section-num {
+        font-size: 96px;
+      }
+    }
+    .section-title {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 32px;
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 768px) {
+      .section-title {
+        font-size: 40px;
+      }
+    }
+
+    .prose { color: var(--text-muted); line-height: 1.7; font-size: 15px; }
+    .prose strong { color: var(--text); font-weight: 700; }
+    .prose p + p { margin-top: 14px; }
+
+    /* Bracket visualization cards */
+    .bracket-card { text-align: center; }
+    .bracket-seed {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+    .bracket-vs {
+      display: block;
+      margin: 8px 0;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+
+    section { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ========================== NAV ========================== -->
+  <nav class="sticky top-0 z-40 backdrop-blur-md bg-[var(--bg)]/85 border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);">
+          <span class="display font-black text-[13px] text-white leading-none">LBL</span>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="display font-black text-[15px] tracking-wider">LBL</span>
+          <span class="text-[9.5px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Locals Basketball League</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-7 text-sm font-semibold">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#">Standings</a>
+        <a class="nav-link" href="#">Teams</a>
+        <a class="nav-link" href="#">Players</a>
+        <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link active" href="#">Rules</a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="hidden sm:flex pill accent items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+          Season 1
+        </button>
+        <button class="h-9 w-9 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition" aria-label="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================== HERO ========================== -->
+  <section class="court-bg border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 pt-10 pb-10 relative overflow-hidden">
+      <div class="absolute inset-0 grid-lines opacity-60 pointer-events-none"></div>
+
+      <div class="relative">
+        <div class="stat-label mb-2">Official Rulebook</div>
+        <h1 class="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-4">RULES</h1>
+        <p class="text-[var(--text-muted)] text-base md:text-lg max-w-xl">How the Locals Basketball League works, from a single possession to the full season.</p>
+
+        <!-- Stacked stats: 4 lines, numbers right-aligned to a common column -->
+        <div class="mt-6 flex flex-col gap-2">
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl tabular w-8 text-right">4</span>
+            <span class="stat-label">Players</span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl tabular w-8 text-right">6</span>
+            <span class="stat-label">Teams</span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl tabular w-8 text-right">9</span>
+            <span class="stat-label">Series / Season</span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl tabular w-8 text-right">27</span>
+            <span class="stat-label">Games / Season</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== SECTION 01 — THE GAME ========================== -->
+  <section class="max-w-6xl mx-auto px-5 pt-14">
+    <div class="section-block">
+      <div class="section-num">01</div>
+      <div>
+        <h2 class="section-title">HOW A GAME IS PLAYED</h2>
+
+        <div class="flex flex-wrap gap-2 mb-5">
+          <span class="pill accent">Make It Take It</span>
+          <span class="pill">2s and 3s</span>
+          <span class="pill">First to 21</span>
+        </div>
+
+        <div class="prose max-w-2xl">
+          <p>
+            <strong>Make it, take it:</strong> the scoring team keeps possession. A stop is the only way to get the ball back.
+          </p>
+          <p>
+            Shots inside the arc are <strong>2 points</strong>, beyond the arc are <strong>3 points</strong>. First team to <strong>21</strong> wins the game. Play straight up, no win by 2.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== SECTION 02 — SERIES & SEASON ========================== -->
+  <!--
+    DEV NOTE: A "series" (aka "match") is 3 games. ALL 3 games are always played,
+    even after a team goes up 2-0. The match winner is whichever duo takes 2 or
+    more of the 3 games. Every game counts for PF, PA, +/-, and the games-won
+    record regardless of whether the series was already decided going in.
+    This is NOT "best-of-3" in the traditional sense; it's a fixed 3-game series.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-16">
+    <div class="section-block">
+      <div class="section-num">02</div>
+      <div>
+        <h2 class="section-title">SERIES & SEASON</h2>
+
+        <div class="prose max-w-2xl mb-6">
+          <p>
+            Every matchup is a <strong>3-game series</strong>. All three games are always played. A team up 2-0 still plays G3. The series (or "match") is won by whichever duo takes <strong>2 or more</strong> of the 3 games, but every game counts toward points, differential, and the games-won record.
+          </p>
+          <p>
+            A regular season runs <strong>3 weeks</strong>. Each week all 3 pairings play once, so every duo is in action every week. That's <strong>9 series</strong> per season, for <strong>27 games</strong> in a complete season.
+          </p>
+        </div>
+
+        <!-- Quick numeric breakdown -->
+        <div class="grid grid-cols-3 gap-3 max-w-xl">
+          <div class="card p-4">
+            <div class="display font-black text-3xl md:text-4xl leading-none tabular">3</div>
+            <div class="stat-label mt-2">Weeks</div>
+          </div>
+          <div class="card p-4">
+            <div class="display font-black text-3xl md:text-4xl leading-none tabular">9</div>
+            <div class="stat-label mt-2">Series</div>
+          </div>
+          <div class="card p-4">
+            <div class="display font-black text-3xl md:text-4xl leading-none tabular">27</div>
+            <div class="stat-label mt-2">Games</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== SECTION 03 — THE SIX DUOS ========================== -->
+  <section class="max-w-6xl mx-auto px-5 pt-16">
+    <div class="section-block">
+      <div class="section-num">03</div>
+      <div>
+        <h2 class="section-title">THE SIX DUOS</h2>
+
+        <div class="prose max-w-2xl mb-6">
+          <p>
+            Four players, six possible partnerships <span class="text-[var(--text-dim)]">(4 choose 2)</span>. Each duo is assigned a permanent NBA team name that sticks with them across every season.
+          </p>
+        </div>
+
+        <!-- 6-team grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <!-- Celtics -->
+          <div class="card p-4 flex items-center gap-3">
+            <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+            <div class="min-w-0">
+              <div class="display font-black text-base leading-none">CELTICS</div>
+              <div class="text-[11px] text-[var(--text-muted)] mt-1">Jacob & Daniel</div>
+            </div>
+          </div>
+          <!-- Lakers -->
+          <div class="card p-4 flex items-center gap-3">
+            <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+            <div class="min-w-0">
+              <div class="display font-black text-base leading-none">LAKERS</div>
+              <div class="text-[11px] text-[var(--text-muted)] mt-1">Jacob & Joseph</div>
+            </div>
+          </div>
+          <!-- Warriors -->
+          <div class="card p-4 flex items-center gap-3">
+            <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+            <div class="min-w-0">
+              <div class="display font-black text-base leading-none">WARRIORS</div>
+              <div class="text-[11px] text-[var(--text-muted)] mt-1">Jacob & Nathan</div>
+            </div>
+          </div>
+          <!-- Heat -->
+          <div class="card p-4 flex items-center gap-3">
+            <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+            <div class="min-w-0">
+              <div class="display font-black text-base leading-none">HEAT</div>
+              <div class="text-[11px] text-[var(--text-muted)] mt-1">Daniel & Joseph</div>
+            </div>
+          </div>
+          <!-- Bucks -->
+          <div class="card p-4 flex items-center gap-3">
+            <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            <div class="min-w-0">
+              <div class="display font-black text-base leading-none">BUCKS</div>
+              <div class="text-[11px] text-[var(--text-muted)] mt-1">Daniel & Nathan</div>
+            </div>
+          </div>
+          <!-- Suns -->
+          <div class="card p-4 flex items-center gap-3">
+            <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            <div class="min-w-0">
+              <div class="display font-black text-base leading-none">SUNS</div>
+              <div class="text-[11px] text-[var(--text-muted)] mt-1">Joseph & Nathan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== SECTION 04 — THE PAIRINGS ========================== -->
+  <!--
+    DEV NOTE: Only 3 matchups are ever valid across the 6 duos because a team
+    can't play a team that shares a player. Each duo has exactly one legal
+    opponent. These 3 fixed pairings (A, B, C) are played once per week.
+    Match-order within a week is captured by the "Match 1/2/3" display labels
+    on the Schedule page. This page just shows the structural pairings.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-16">
+    <div class="section-block">
+      <div class="section-num">04</div>
+      <div>
+        <h2 class="section-title">THE THREE PAIRINGS</h2>
+
+        <div class="prose max-w-2xl mb-6">
+          <p>
+            A duo can't play a duo that shares one of its players, which means each duo has exactly one legal opponent. That produces <strong>3 fixed pairings</strong> (A, B, and C), and every week all three play a 3-game series.
+          </p>
+          <p>
+            Every player ends up on the floor in every pairing, just in different partnerships. Across a week, all 4 players play 3 series.
+          </p>
+        </div>
+
+        <!-- 3 pairing cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+          <!-- Pair A: Lakers vs Bucks -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="pill small accent">Pairing A</span>
+              <span class="text-[10px] text-[var(--text-dim)] font-bold tracking-[0.12em] uppercase">3 Games</span>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
+                <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+                <div class="display font-black text-base leading-none">LAKERS</div>
+                <div class="text-[10px] text-[var(--text-muted)] text-center leading-tight">Jacob<br>Joseph</div>
+              </div>
+              <div class="display font-black text-sm text-[var(--text-dim)] tracking-[0.16em]">VS</div>
+              <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
+                <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+                <div class="display font-black text-base leading-none">BUCKS</div>
+                <div class="text-[10px] text-[var(--text-muted)] text-center leading-tight">Daniel<br>Nathan</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pair B: Celtics vs Suns -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="pill small accent">Pairing B</span>
+              <span class="text-[10px] text-[var(--text-dim)] font-bold tracking-[0.12em] uppercase">3 Games</span>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
+                <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+                <div class="display font-black text-base leading-none">CELTICS</div>
+                <div class="text-[10px] text-[var(--text-muted)] text-center leading-tight">Jacob<br>Daniel</div>
+              </div>
+              <div class="display font-black text-sm text-[var(--text-dim)] tracking-[0.16em]">VS</div>
+              <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
+                <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+                <div class="display font-black text-base leading-none">SUNS</div>
+                <div class="text-[10px] text-[var(--text-muted)] text-center leading-tight">Joseph<br>Nathan</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pair C: Warriors vs Heat -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="pill small accent">Pairing C</span>
+              <span class="text-[10px] text-[var(--text-dim)] font-bold tracking-[0.12em] uppercase">3 Games</span>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
+                <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+                <div class="display font-black text-base leading-none">WARRIORS</div>
+                <div class="text-[10px] text-[var(--text-muted)] text-center leading-tight">Jacob<br>Nathan</div>
+              </div>
+              <div class="display font-black text-sm text-[var(--text-dim)] tracking-[0.16em]">VS</div>
+              <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
+                <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+                <div class="display font-black text-base leading-none">HEAT</div>
+                <div class="text-[10px] text-[var(--text-muted)] text-center leading-tight">Daniel<br>Joseph</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== SECTION 05 — STANDINGS & STATS ========================== -->
+  <section class="max-w-6xl mx-auto px-5 pt-16">
+    <div class="section-block">
+      <div class="section-num">05</div>
+      <div>
+        <h2 class="section-title">STANDINGS & STATS</h2>
+
+        <div class="prose max-w-2xl mb-6">
+          <p>
+            Standings rank by <strong>games won</strong> in the default view. Toggle between <strong>games</strong> (every individual game counts) and <strong>matches</strong> (series-level W/L). When two duos are tied, the first tiebreaker is <strong>head-to-head match record</strong>. If still level, <strong>point differential</strong> decides.
+          </p>
+          <p>
+            Every stat is tracked at the team level. A team's point differential is its total points scored minus points allowed. <strong>Player-level points</strong> are computed as the team's points divided by two. Both teammates contribute to every bucket, so within a single game their individual lines mirror each other.
+          </p>
+          <p>
+            If a matchup can't be played, it's recorded as <strong>DNP</strong>. No wins, no losses, no points awarded for either side. The slot just sits empty in the schedule.
+          </p>
+        </div>
+
+        <!-- Tracked stats + tiebreaker order -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card p-5">
+            <div class="stat-label mb-3">Columns Tracked</div>
+            <div class="flex flex-wrap gap-2">
+              <span class="pill small">W / L</span>
+              <span class="pill small">PF</span>
+              <span class="pill small">PPG / PPM</span>
+              <span class="pill small">PA</span>
+              <span class="pill small">PAPG / PAPM</span>
+              <span class="pill small">+/-</span>
+              <span class="pill small">AVG/G</span>
+              <span class="pill small">Win%</span>
+            </div>
+          </div>
+
+          <div class="card p-5">
+            <div class="stat-label mb-3">Tiebreakers, in order</div>
+            <ol class="text-[14px] text-[var(--text-muted)] leading-relaxed space-y-1.5">
+              <li><span class="display font-black text-[var(--accent)] mr-2">1.</span>Head-to-head match record</li>
+              <li><span class="display font-black text-[var(--accent)] mr-2">2.</span>Point differential</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== SECTION 06 — PLAYOFFS ========================== -->
+  <!--
+    DEV NOTE: Playoffs are COMPUTED, not played live.
+
+      Seeding: top 4 teams from the regular-season standings.
+      Bracket:
+        Left  bracket: #1 vs #4
+        Right bracket: #2 vs #3
+        Championship : winner of left vs winner of right
+      Matchup resolution: compare the two teams' season +/- totals.
+        Higher +/- advances. Using +/- sidesteps the cross-pairing data gap
+        (every team has a +/- regardless of who they played in the regular
+        season).
+
+    IMPORTANT - NO DOUBLE-COUNTING: Playoff results must NOT add anything to
+    player or team stat totals. +/- is already computed from regular-season
+    games; displaying it on the playoff bracket is purely a view of existing
+    data, not new data.
+
+    LIVE PROJECTION: The Playoffs page shows the current projected bracket
+    based on standings at any moment during the regular season. It updates
+    as games are played. When the last regular-season series completes, the
+    bracket locks and the champion is declared.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-16 pb-16">
+    <div class="section-block">
+      <div class="section-num">06</div>
+      <div>
+        <h2 class="section-title">PLAYOFFS</h2>
+
+        <div class="prose max-w-2xl mb-6">
+          <p>
+            The <strong>top 4 teams</strong> from the regular-season standings advance to the playoffs. Seeding comes straight from the final rankings: <strong>#1 vs #4</strong> on the left side of the bracket, <strong>#2 vs #3</strong> on the right side. The two winners meet in the <strong>championship</strong>.
+          </p>
+          <p>
+            Playoff matchups aren't played live. Each matchup is decided by comparing the two teams' regular-season point differential (<strong>+/-</strong>). The team with the higher +/- advances. A result might look like Lakers +19 vs Celtics -1, sending Lakers through.
+          </p>
+          <p>
+            Because +/- is already tallied from regular-season games, playoff results <strong>don't add anything</strong> to team or player stat totals. No double counting.
+          </p>
+          <p>
+            The bracket is visible throughout the regular season as a live <strong>projection</strong>. It shows what would happen if the season ended today, and updates as games are played. When the final regular-season series wraps, the bracket locks and the champion is declared.
+          </p>
+        </div>
+
+        <!-- Bracket structure visualization -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Left bracket -->
+          <div class="card p-5 bracket-card">
+            <span class="pill small mb-3">Left Bracket</span>
+            <div class="mt-4">
+              <div class="bracket-seed">#1 SEED</div>
+              <span class="bracket-vs">VS</span>
+              <div class="bracket-seed">#4 SEED</div>
+            </div>
+          </div>
+
+          <!-- Championship -->
+          <div class="card p-5 bracket-card" style="border-color: var(--accent-ring); background: linear-gradient(180deg, var(--accent-soft), transparent);">
+            <span class="pill small accent mb-3">Championship</span>
+            <div class="mt-4">
+              <div class="bracket-seed">WINNER LEFT</div>
+              <span class="bracket-vs">VS</span>
+              <div class="bracket-seed">WINNER RIGHT</div>
+            </div>
+          </div>
+
+          <!-- Right bracket -->
+          <div class="card p-5 bracket-card">
+            <span class="pill small mb-3">Right Bracket</span>
+            <div class="mt-4">
+              <div class="bracket-seed">#2 SEED</div>
+              <span class="bracket-vs">VS</span>
+              <div class="bracket-seed">#3 SEED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== FOOTER ========================== -->
+  <footer class="border-t border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c);">
+          <span class="display font-black text-[11px] text-white leading-none">LBL</span>
+        </div>
+        <div class="leading-tight">
+          <div class="display font-black text-sm tracking-wider">LOCALS BASKETBALL LEAGUE</div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season 1</div>
+        </div>
+      </div>
+      <div class="text-[11px] text-[var(--text-dim)] uppercase tracking-wider font-semibold">
+        Jacob · Daniel · Joseph · Nathan
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
