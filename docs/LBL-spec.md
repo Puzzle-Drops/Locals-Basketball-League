@@ -14,7 +14,7 @@ Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
 - Make it take it
 - 2-pointers and 3-pointers
 - First to 21, win by 2
-- Each matchup is a best-of-3 series
+- Each matchup is a 3-game series. All 3 games are always played, even at 2-0. The series winner is whichever duo takes 2 or more games.
 
 **Season format:**
 - A season is 3 weeks
@@ -23,7 +23,7 @@ Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
 - "Week" is a logical label, not calendar time. A single "week" may span multiple real-world play sessions.
 
 **Standings tiebreakers:**
-1. Head-to-head match (series) record
+1. Head-to-head series record
 2. Point differential
 
 **DNP:** any series or game that doesn't get played is logged but awards no points and no wins.
@@ -32,7 +32,7 @@ Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
 
 ## Weekly Rotation
 
-Three unique pairings (each is one best-of-3 series):
+Three unique pairings (each plays one 3-game series per week):
 - **Pairing A**: Jacob & Joseph vs Daniel & Nathan (`matchup_id: 1`)
 - **Pairing B**: Jacob & Daniel vs Joseph & Nathan (`matchup_id: 2`)
 - **Pairing C**: Jacob & Nathan vs Daniel & Joseph (`matchup_id: 3`)
@@ -49,15 +49,15 @@ Weekly play order (rotates so no pairing is always rested or always tired):
 
 ---
 
-## Display labels (Match N)
+## Display labels (Series N)
 
-The UI labels each series as `Match 1`, `Match 2`, or `Match 3` based on **play order within its week**, NOT based on the pairing identity.
+The UI labels each series as `Series 1`, `Series 2`, or `Series 3` based on **play order within its week**, NOT based on the pairing identity.
 
 - `matchup_id` in the JSON is a fixed identifier for a specific pairing.
-- The display label `Match N` is derived from the series' index in its week (`index + 1`).
-- Example: Pairing A (Jacob+Joseph vs Daniel+Nathan) is labeled "Match 1" in Week 1 (first in play order), but "Match 3" in Week 2 (third in play order).
+- The display label `Series N` is derived from the series' index in its week (`index + 1`).
+- Example: Pairing A (Jacob+Joseph vs Daniel+Nathan) is labeled "Series 1" in Week 1 (first in play order), but "Series 3" in Week 2 (third in play order).
 
-Never derive "Match N" from `matchup_id`. It's the array index within the week, period.
+Never derive "Series N" from `matchup_id`. It's the array index within the week, period.
 
 ---
 
@@ -91,7 +91,7 @@ Player points may be decimals (21 becomes 10.5). Display to 1 decimal place. Hal
 ## Stats Tracked
 
 **Per duo (per-season + career):**
-- Series (match) record, game record. Both must be computable.
+- Series record, game record. Both must be computable.
 - Total points scored, allowed, differential
 - Avg margin per game, win % (series and games)
 - Head-to-head vs every other duo
@@ -103,7 +103,7 @@ Player points may be decimals (21 becomes 10.5). Display to 1 decimal place. Hal
 - Best/worst partner (by win%)
 - Blowouts (20+ margin), longest win streak
 
-**Standings display:** W/L defaults to **games** but the Standings view has a toggle to switch to **matches** (series record). Both views use the same tiebreaker rules.
+**Standings display:** W/L defaults to **games** but the Standings view has a toggle to switch to **series** (series record). Ranking is always by game wins regardless of the selected view; the toggle only swaps the displayed W/L and per-N stats.
 
 ---
 
@@ -187,7 +187,7 @@ Until decided, the Playoffs page on the site just shows "TBD."
 - **Team keys** use age-ordered player names joined by hyphen. Older player always first (`Jacob-Daniel`, `Daniel-Joseph`, `Joseph-Nathan`, etc.).
 - **Date** is optional per-game, purely cosmetic. Leave it out or set `null` if you don't care. Nothing depends on it. "Week" is the logical unit.
 - **Status**: `"completed"` | `"partial"` | `"dnp"`
-- **Match labels** are derived from the series' index in the week, not from `matchup_id`.
+- **Series labels** are derived from the series' index in the week, not from `matchup_id`.
 
 **Separate `teams.json`** holds the permanent duo to nickname map:
 
@@ -208,7 +208,7 @@ Until decided, the Playoffs page on the site just shows "TBD."
 Branded as **Locals Basketball League (LBL)** throughout.
 
 - **Home**: current season standings, latest results, current week
-- **Standings**: full duo table with games/matches toggle and tiebreakers applied
+- **Standings**: full duo table with games/series toggle and tiebreakers applied
 - **Teams**: one page per duo: roster, record, stats, game log
 - **Players**: one page per player: career + per-season stats, partner breakdowns
 - **Schedule**: season grid showing all 9 series and their status
