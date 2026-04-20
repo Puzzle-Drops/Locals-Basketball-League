@@ -70,6 +70,7 @@
       border: 1px solid var(--border);
       color: var(--text-muted);
       background: rgba(255,255,255,0.02);
+      white-space: nowrap;
     }
     .pill.dnp { color: var(--amber); border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.06); }
     .pill.accent { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
@@ -83,7 +84,6 @@
       flex-shrink: 0;
     }
 
-    /* mini logo for game cells */
     .logo-mini {
       width: 18px; height: 18px; border-radius: 999px;
       display: inline-flex; align-items: center; justify-content: center;
@@ -148,6 +148,29 @@
     }
     .vod-btn:hover { background: var(--accent); color: #fff; transform: scale(1.08); }
 
+    /* Segmented toggle (for Games/Matches view on Standings) */
+    .seg {
+      display: inline-flex; border-radius: 8px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      padding: 3px;
+    }
+    .seg-btn {
+      padding: 5px 12px; border-radius: 5px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); transition: all 120ms ease;
+      white-space: nowrap;
+    }
+    .seg-btn:hover { color: var(--text); }
+    .seg-btn.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--accent-ring);
+    }
+
+    /* Standings table mode swap */
+    .standings-table[data-mode="games"] .val-matches { display: none; }
+    .standings-table[data-mode="matches"] .val-games { display: none; }
+
     section { scroll-margin-top: 80px; }
   </style>
 </head>
@@ -204,7 +227,6 @@
           </h1>
         </div>
 
-        <!-- Season progress summary card -->
         <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 md:w-80 shrink-0">
           <div class="flex items-center justify-between mb-4">
             <span class="stat-label">Season Progress</span>
@@ -214,18 +236,9 @@
             <div class="h-full bg-[var(--accent)]" style="width: 22%"></div>
           </div>
           <div class="grid grid-cols-3 gap-3 text-center">
-            <div>
-              <div class="stat-value text-2xl tabular">6</div>
-              <div class="stat-label mt-0.5">Games</div>
-            </div>
-            <div>
-              <div class="stat-value text-2xl tabular">198</div>
-              <div class="stat-label mt-0.5">Points</div>
-            </div>
-            <div>
-              <div class="stat-value text-2xl tabular">10.3</div>
-              <div class="stat-label mt-0.5">Avg Margin</div>
-            </div>
+            <div><div class="stat-value text-2xl tabular">6</div><div class="stat-label mt-0.5">Games</div></div>
+            <div><div class="stat-value text-2xl tabular">198</div><div class="stat-label mt-0.5">Points</div></div>
+            <div><div class="stat-value text-2xl tabular">10.3</div><div class="stat-label mt-0.5">Avg Margin</div></div>
           </div>
         </div>
       </div>
@@ -244,7 +257,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-      <!-- ====== SCORECARD 1: Lakers beat Bucks 2-1 ====== -->
+      <!-- SCORECARD 1: Lakers beat Bucks 2-1 -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
@@ -254,7 +267,6 @@
           <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
         </header>
 
-        <!-- Team 1 (winner) -->
         <div class="flex items-center gap-3">
           <div class="team-bar" style="background: linear-gradient(180deg, #552583, #FDB927);"></div>
           <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
@@ -271,7 +283,6 @@
           </div>
         </div>
 
-        <!-- Team 2 (loser) -->
         <div class="flex items-center gap-3 mt-3 loser">
           <div class="team-bar" style="background: linear-gradient(180deg, #00471B, #EEE1C6);"></div>
           <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
@@ -285,15 +296,11 @@
           </div>
         </div>
 
-        <!-- Game strip: mini logos flanking each score -->
         <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
-          <!-- G1: Lakers 21, Bucks 0 -->
           <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
-              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </a>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
             </div>
             <div class="flex items-center justify-center gap-1.5 mt-1.5">
               <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
@@ -301,13 +308,10 @@
               <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
             </div>
           </div>
-          <!-- G2: Lakers 17, Bucks 21 -->
           <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
-              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </a>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
             </div>
             <div class="flex items-center justify-center gap-1.5 mt-1.5">
               <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
@@ -315,13 +319,10 @@
               <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
             </div>
           </div>
-          <!-- G3: Lakers 21, Bucks 19 -->
           <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
-              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </a>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
             </div>
             <div class="flex items-center justify-center gap-1.5 mt-1.5">
               <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
@@ -331,14 +332,12 @@
           </div>
         </div>
 
-        <!-- Expand affordance -->
         <div class="mt-4 flex items-center justify-end">
           <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
             Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
         </div>
 
-        <!-- Expandable: 3 stats -->
         <div class="expandable">
           <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
             <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 diff-pos">+19</div></div>
@@ -348,7 +347,7 @@
         </div>
       </article>
 
-      <!-- ====== SCORECARD 2: Suns over Celtics 2-1 ====== -->
+      <!-- SCORECARD 2: Suns over Celtics 2-1 -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
@@ -358,7 +357,6 @@
           <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
         </header>
 
-        <!-- Suns (winner) -->
         <div class="flex items-center gap-3">
           <div class="team-bar" style="background: linear-gradient(180deg, #E56020, #1D1160);"></div>
           <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
@@ -375,7 +373,6 @@
           </div>
         </div>
 
-        <!-- Celtics (loser) -->
         <div class="flex items-center gap-3 mt-3 loser">
           <div class="team-bar" style="background: linear-gradient(180deg, #007A33, #BA9653);"></div>
           <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
@@ -389,16 +386,11 @@
           </div>
         </div>
 
-        <!-- Game strip -->
         <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
-          <!-- Cards in M2 are Celtics (team1, left) vs Suns (team2, right) per data. -->
-          <!-- G1: Celtics 17, Suns 23 -->
           <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
-              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </a>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
             </div>
             <div class="flex items-center justify-center gap-1.5 mt-1.5">
               <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
@@ -406,13 +398,10 @@
               <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
             </div>
           </div>
-          <!-- G2: Celtics 22, Suns 5 -->
           <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
-              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </a>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
             </div>
             <div class="flex items-center justify-center gap-1.5 mt-1.5">
               <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
@@ -420,13 +409,10 @@
               <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
             </div>
           </div>
-          <!-- G3: Celtics 10, Suns 22 -->
           <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
-              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </a>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
             </div>
             <div class="flex items-center justify-center gap-1.5 mt-1.5">
               <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
@@ -451,7 +437,7 @@
         </div>
       </article>
 
-      <!-- ====== SCORECARD 3: DNP (same structure as played cards) ====== -->
+      <!-- SCORECARD 3: DNP -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
@@ -462,7 +448,6 @@
           <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
         </header>
 
-        <!-- Warriors -->
         <div class="flex items-center gap-3">
           <div class="team-bar" style="background: linear-gradient(180deg, #1D428A, #FFC72C);"></div>
           <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
@@ -476,7 +461,6 @@
           </div>
         </div>
 
-        <!-- Heat -->
         <div class="flex items-center gap-3 mt-3">
           <div class="team-bar" style="background: linear-gradient(180deg, #98002E, #F9A01B);"></div>
           <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
@@ -490,7 +474,6 @@
           </div>
         </div>
 
-        <!-- Game strip: DNP in each cell, no VOD icons -->
         <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
           <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
             <div class="flex items-center justify-between">
@@ -539,9 +522,9 @@
   <!-- ========================== STANDINGS + LEADERS ========================== -->
   <section class="max-w-6xl mx-auto px-5 py-8 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6">
 
-    <!-- STANDINGS (flex-based for mobile fit) -->
     <div>
-      <div class="flex items-end justify-between mb-6">
+      <!-- Title row with toggle -->
+      <div class="flex items-end justify-between mb-4 gap-3 flex-wrap">
         <div>
           <div class="stat-label mb-1">Season 1</div>
           <h2 class="display font-black text-3xl tracking-wide">STANDINGS</h2>
@@ -549,7 +532,16 @@
         <a href="#" class="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent)] uppercase tracking-[0.12em] transition">Full Table →</a>
       </div>
 
-      <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+      <!-- Games/Matches toggle -->
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-[0.12em] uppercase">View</span>
+        <div id="standingsToggle" class="seg" data-mode="games">
+          <button class="seg-btn active" data-mode="games">Games</button>
+          <button class="seg-btn" data-mode="matches">Matches</button>
+        </div>
+      </div>
+
+      <div id="standingsTable" class="standings-table bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden" data-mode="games">
         <!-- Header row -->
         <div class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 border-b border-[var(--border)] text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)]">
           <span class="w-5 sm:w-6"></span>
@@ -560,7 +552,7 @@
           <span class="w-11 sm:w-14 text-right">+/-</span>
         </div>
 
-        <!-- Row 1: Lakers 2-1 -->
+        <!-- Row 1: Lakers (games 2-1, matches 1-0) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5 border-b border-[var(--border)]">
           <span class="rank top w-5 sm:w-6">1</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -570,13 +562,13 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Joseph</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular">2</span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">59</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-pos">+19</span>
         </div>
 
-        <!-- Row 2: Suns 2-1 -->
+        <!-- Row 2: Suns (games 2-1, matches 1-0) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5 border-b border-[var(--border)]">
           <span class="rank w-5 sm:w-6">2</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -586,8 +578,8 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Joseph & Nathan</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular">2</span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">50</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-pos">+1</span>
         </div>
@@ -624,7 +616,7 @@
           <span class="w-11 sm:w-14 text-right display font-bold tabular text-[var(--text-dim)]">-</span>
         </div>
 
-        <!-- Row 5: Celtics 1-2 -->
+        <!-- Row 5: Celtics (games 1-2, matches 0-1) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5 border-b border-[var(--border)]">
           <span class="rank w-5 sm:w-6">5</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -634,13 +626,13 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Daniel</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular">2</span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">49</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-neg">-1</span>
         </div>
 
-        <!-- Row 6: Bucks 1-2 -->
+        <!-- Row 6: Bucks (games 1-2, matches 0-1) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
           <span class="rank w-5 sm:w-6">6</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -650,14 +642,14 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Daniel & Nathan</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular">2</span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">40</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-neg">-19</span>
         </div>
       </div>
 
-      <p class="text-[11px] text-[var(--text-dim)] mt-3">W/L are games. Tiebreakers: head-to-head series, then point differential.</p>
+      <p class="text-[11px] text-[var(--text-dim)] mt-3">Tiebreakers: head-to-head matches, then point differential.</p>
     </div>
 
     <!-- LEADERS -->
@@ -669,7 +661,6 @@
         </div>
       </div>
 
-      <!-- MVP Card -->
       <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 relative overflow-hidden mb-3">
         <div class="absolute -top-12 -right-12 w-40 h-40 rounded-full" style="background: radial-gradient(circle, var(--accent-soft), transparent 70%);"></div>
 
@@ -682,27 +673,17 @@
           <div class="avatar avatar-lg" style="background: linear-gradient(135deg, #ff6b2b, #a3471d);">J</div>
           <div class="flex-1 min-w-0">
             <div class="display font-black text-3xl leading-none">JOSEPH</div>
-            <div class="text-xs text-[var(--text-muted)] mt-1">Undefeated · 2-0 in series</div>
+            <div class="text-xs text-[var(--text-muted)] mt-1">Undefeated · 2-0 in matches</div>
           </div>
         </div>
 
         <div class="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[var(--border)] relative">
-          <div>
-            <div class="stat-label">+/-</div>
-            <div class="stat-value text-2xl mt-1 diff-pos tabular">+10.0</div>
-          </div>
-          <div>
-            <div class="stat-label">PPG</div>
-            <div class="stat-value text-2xl mt-1 tabular">9.1</div>
-          </div>
-          <div>
-            <div class="stat-label">Record</div>
-            <div class="stat-value text-2xl mt-1 tabular">4-2</div>
-          </div>
+          <div><div class="stat-label">+/-</div><div class="stat-value text-2xl mt-1 diff-pos tabular">+10.0</div></div>
+          <div><div class="stat-label">PPG</div><div class="stat-value text-2xl mt-1 tabular">9.1</div></div>
+          <div><div class="stat-label">Record</div><div class="stat-value text-2xl mt-1 tabular">4-2</div></div>
         </div>
       </div>
 
-      <!-- Player list -->
       <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
         <div class="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between">
           <span class="stat-label">Player +/-</span>
@@ -771,48 +752,56 @@
     </div>
 
     <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
-      <div class="flex items-center gap-3 mb-5">
+      <div class="mb-5">
         <span class="pill accent">Week 2</span>
-        <span class="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-wider">Rotation shifts · Match 2 plays first</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <!-- Match 1 in Week 2 = spec M2 pairing (Celtics vs Suns) -->
         <div class="bg-white/[0.02] border border-[var(--border)] rounded-lg p-4">
-          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">First Up · Match 2</div>
+          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">First Up · Match 1</div>
           <div class="flex items-center gap-2 mb-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
             <span class="display font-black text-base">CELTICS</span>
+            <span class="text-[11px] text-[var(--text-muted)] font-bold tabular">(1-2)</span>
           </div>
           <div class="text-[11px] text-[var(--text-muted)] font-bold my-1 ml-2">vs</div>
           <div class="flex items-center gap-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
             <span class="display font-black text-base">SUNS</span>
+            <span class="text-[11px] text-[var(--text-muted)] font-bold tabular">(2-1)</span>
           </div>
         </div>
 
+        <!-- Match 2 in Week 2 = spec M3 pairing (Warriors vs Heat) -->
         <div class="bg-white/[0.02] border border-[var(--border)] rounded-lg p-4">
-          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Second · Match 3</div>
+          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Second · Match 2</div>
           <div class="flex items-center gap-2 mb-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
             <span class="display font-black text-base">WARRIORS</span>
+            <span class="text-[11px] text-[var(--text-muted)] font-bold tabular">(0-0)</span>
           </div>
           <div class="text-[11px] text-[var(--text-muted)] font-bold my-1 ml-2">vs</div>
           <div class="flex items-center gap-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
             <span class="display font-black text-base">HEAT</span>
+            <span class="text-[11px] text-[var(--text-muted)] font-bold tabular">(0-0)</span>
           </div>
         </div>
 
+        <!-- Match 3 in Week 2 = spec M1 pairing (Lakers vs Bucks) -->
         <div class="bg-white/[0.02] border border-[var(--border)] rounded-lg p-4">
-          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Closing · Match 1</div>
+          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Closing · Match 3</div>
           <div class="flex items-center gap-2 mb-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
             <span class="display font-black text-base">LAKERS</span>
+            <span class="text-[11px] text-[var(--text-muted)] font-bold tabular">(2-1)</span>
           </div>
           <div class="text-[11px] text-[var(--text-muted)] font-bold my-1 ml-2">vs</div>
           <div class="flex items-center gap-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
             <span class="display font-black text-base">BUCKS</span>
+            <span class="text-[11px] text-[var(--text-muted)] font-bold tabular">(1-2)</span>
           </div>
         </div>
       </div>
@@ -839,10 +828,24 @@
   </footer>
 
   <script>
+    // Scorecard expand
     document.querySelectorAll('[data-expand]').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('a')) return;
+        if (e.target.closest('.seg-btn')) return;
         card.classList.toggle('expanded');
+      });
+    });
+
+    // Standings games/matches toggle
+    const toggle = document.getElementById('standingsToggle');
+    const table = document.getElementById('standingsTable');
+    toggle.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
+        toggle.dataset.mode = mode;
+        table.dataset.mode = mode;
+        toggle.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
       });
     });
   </script>

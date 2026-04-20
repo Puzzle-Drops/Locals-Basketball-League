@@ -89,14 +89,20 @@ There are exactly 6 duos. Hardcode this constant.
 - Display player points to 1 decimal place (21 becomes 10.5).
 - Never record "who scored what" individually. It's not tracked and shouldn't be invented.
 
-**Wins/Losses in standings are GAMES, not series.** A team that went 2-1 in a best-of-3 shows as 2W, 1L.
+**Match number labeling (display only).** The UI labels series as `Match 1`, `Match 2`, `Match 3` based on **play order within the week**, NOT on fixed pairing identity.
+- `matchup_id` in the JSON is a fixed identifier for a specific pairing (1 = Jacob+Joseph vs Daniel+Nathan, 2 = Jacob+Daniel vs Joseph+Nathan, 3 = Jacob+Nathan vs Daniel+Joseph).
+- The display label is `Match N`, where N is the series's index+1 within its week's `series` array.
+- Example: In Week 2, the play order is `[matchup_id: 2, matchup_id: 3, matchup_id: 1]`. The card for Jacob+Daniel vs Joseph+Nathan (matchup_id 2) displays as "Match 1" because it's played first. Lakers vs Bucks (matchup_id 1) displays as "Match 3" because it's played last.
+- Rule of thumb: compute `matchNumber = seriesIndex + 1` from the week's `series` array. Never derive it from `matchup_id`.
+
+**Standings W/L shows GAMES by default.** The Standings table must support a toggle between `Games` (game record, e.g. 2-1) and `Matches` (series record, e.g. 1-0). Default view is `Games`. Both use the same sort order (standings are ranked by wins in the selected view). When in `Matches` view, "W/L" still means wins/losses but counts series wins, not game wins.
 
 **Series status values:** `"completed"` | `"partial"` | `"dnp"`
 - DNP series award no wins and no points. Don't count them in averages.
 - Partial = some games played, series didn't finish. Count the played games; don't award a series winner unless the BO3 was mathematically decided.
 
 **Tiebreakers for standings:**
-1. Head-to-head series record
+1. Head-to-head match (series) record
 2. Point differential
 
 **Player order everywhere (display):** Jacob, Daniel, Joseph, Nathan (age order, oldest first).
@@ -127,7 +133,7 @@ Lives in `src/lib/stats.js`. All pure. No I/O, no DOM. UI components consume the
 Public functions:
 - `computeSeason(seasonJson)` returns `{ duoStats, h2h, playerStats, seriesIndex }`.
 - `computeCareer(seasonJsonArray)` returns `{ duoStats, playerStats, h2h, seriesIndex, perSeason }`.
-- `standings(duoStats, h2h)` returns decorated rows sorted by games won, then h2h within tied groups, then point diff.
+- `standings(duoStats, h2h, { mode: "games" | "matches" })` returns decorated rows sorted by wins in the selected mode, then h2h series, then point diff. Default mode is `"games"`.
 - `decorateDuo(key, raw)` / `decoratePlayer(name, raw)` add derived rates (diff, avg margin, ppg, papg, win%, +/-).
 - `partnerBreakdown(player, duoStats)` returns `{ entries, best, worst }` keyed by game win%.
 - `fmt1(n)` returns a string with 1 decimal place (used for halved player points).
@@ -151,6 +157,7 @@ Reference them by relative path. Team-key to logo mapping comes from `teams.json
 
 - Don't invent per-player scoring lines. Halved team points is the only individual scoring stat.
 - Don't alphabetize team keys.
+- Don't derive "Match N" labels from `matchup_id`. Use the series' index within its week.
 - Don't auto-compute "days since last game" or anything else tied to calendar dates. Dates don't drive logic.
 - Don't add authentication, backend, or a database. Data is static JSON edited directly in the repo.
 - Don't hardcode stats into components. Everything flows from the stat engine.

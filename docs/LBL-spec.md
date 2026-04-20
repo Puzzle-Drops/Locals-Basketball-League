@@ -23,7 +23,7 @@ Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
 - "Week" is a logical label, not calendar time. A single "week" may span multiple real-world play sessions.
 
 **Standings tiebreakers:**
-1. Head-to-head series record
+1. Head-to-head match (series) record
 2. Point differential
 
 **DNP:** any series or game that doesn't get played is logged but awards no points and no wins.
@@ -32,18 +32,32 @@ Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
 
 ## Weekly Rotation
 
+Three unique pairings (each is one best-of-3 series):
+- **Pairing A**: Jacob & Joseph vs Daniel & Nathan (`matchup_id: 1`)
+- **Pairing B**: Jacob & Daniel vs Joseph & Nathan (`matchup_id: 2`)
+- **Pairing C**: Jacob & Nathan vs Daniel & Joseph (`matchup_id: 3`)
+
+Weekly play order (rotates so no pairing is always rested or always tired):
+
 | Week | Series 1 | Series 2 | Series 3 |
 |------|----------|----------|----------|
-| 1    | M1       | M2       | M3       |
-| 2    | M2       | M3       | M1       |
-| 3    | M3       | M1       | M2       |
-
-Matchups (each is one best-of-3 series):
-- **M1**: Jacob & Joseph vs Daniel & Nathan
-- **M2**: Jacob & Daniel vs Joseph & Nathan
-- **M3**: Jacob & Nathan vs Daniel & Joseph
+| 1    | A        | B        | C        |
+| 2    | B        | C        | A        |
+| 3    | C        | A        | B        |
 
 **Season totals**: 9 series, up to 27 games. Each duo plays 3 series per season. Each player plays 9 series per season across their 3 possible partners.
+
+---
+
+## Display labels (Match N)
+
+The UI labels each series as `Match 1`, `Match 2`, or `Match 3` based on **play order within its week**, NOT based on the pairing identity.
+
+- `matchup_id` in the JSON is a fixed identifier for a specific pairing.
+- The display label `Match N` is derived from the series' index in its week (`index + 1`).
+- Example: Pairing A (Jacob+Joseph vs Daniel+Nathan) is labeled "Match 1" in Week 1 (first in play order), but "Match 3" in Week 2 (third in play order).
+
+Never derive "Match N" from `matchup_id`. It's the array index within the week, period.
 
 ---
 
@@ -77,7 +91,7 @@ Player points may be decimals (21 becomes 10.5). Display to 1 decimal place. Hal
 ## Stats Tracked
 
 **Per duo (per-season + career):**
-- Series record (W-L), game record (W-L). Standings display is by game record.
+- Series (match) record, game record. Both must be computable.
 - Total points scored, allowed, differential
 - Avg margin per game, win % (series and games)
 - Head-to-head vs every other duo
@@ -88,6 +102,8 @@ Player points may be decimals (21 becomes 10.5). Display to 1 decimal place. Hal
 - Avg points per game, avg points allowed per game
 - Best/worst partner (by win%)
 - Blowouts (20+ margin), longest win streak
+
+**Standings display:** W/L defaults to **games** but the Standings view has a toggle to switch to **matches** (series record). Both views use the same tiebreaker rules.
 
 ---
 
@@ -171,6 +187,7 @@ Until decided, the Playoffs page on the site just shows "TBD."
 - **Team keys** use age-ordered player names joined by hyphen. Older player always first (`Jacob-Daniel`, `Daniel-Joseph`, `Joseph-Nathan`, etc.).
 - **Date** is optional per-game, purely cosmetic. Leave it out or set `null` if you don't care. Nothing depends on it. "Week" is the logical unit.
 - **Status**: `"completed"` | `"partial"` | `"dnp"`
+- **Match labels** are derived from the series' index in the week, not from `matchup_id`.
 
 **Separate `teams.json`** holds the permanent duo to nickname map:
 
@@ -191,7 +208,7 @@ Until decided, the Playoffs page on the site just shows "TBD."
 Branded as **Locals Basketball League (LBL)** throughout.
 
 - **Home**: current season standings, latest results, current week
-- **Standings**: full duo table with tiebreakers applied (W/L shown as games)
+- **Standings**: full duo table with games/matches toggle and tiebreakers applied
 - **Teams**: one page per duo: roster, record, stats, game log
 - **Players**: one page per player: career + per-season stats, partner breakdowns
 - **Schedule**: season grid showing all 9 series and their status
