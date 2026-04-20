@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LBL - Playoffs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --bg-2: #0f1014;
+      --surface: #15171c;
+      --surface-2: #1b1e25;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f5f7;
+      --text-muted: #8b8f97;
+      --text-dim: #5b5e66;
+      --accent: #ff6b2b;
+      --accent-soft: rgba(255, 107, 43, 0.12);
+      --accent-ring: rgba(255, 107, 43, 0.35);
+      --positive: #22c55e;
+      --negative: #ef4444;
+      --amber: #fbbf24;
+    }
+
+    html, body { background: var(--bg); color: var(--text); }
+    body { font-family: 'Manrope', system-ui, sans-serif; font-feature-settings: "ss01", "cv11"; }
+
+    .display { font-family: 'Big Shoulders Display', sans-serif; letter-spacing: 0.01em; }
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    .court-bg {
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% -10%, rgba(255, 107, 43, 0.18), transparent 60%),
+        radial-gradient(ellipse 40% 30% at 90% 10%, rgba(255, 107, 43, 0.08), transparent 60%);
+    }
+
+    .grid-lines {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+      white-space: nowrap;
+    }
+    .pill.accent { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+    .pill.small { padding: 3px 8px; font-size: 10.5px; color: var(--text-muted); }
+    .pill.dnp {
+      padding: 1px 6px;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--amber);
+      border-color: rgba(251, 191, 36, 0.3);
+      background: rgba(251, 191, 36, 0.08);
+    }
+
+    .logo {
+      width: 40px; height: 40px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 18px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+    .logo.sm {
+      width: 32px; height: 32px; font-size: 14px;
+    }
+
+    .nav-link { color: var(--text-muted); position: relative; padding: 4px 0; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.active { color: var(--text); }
+    .nav-link.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+
+    .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    /* ================== LIVE DOT ================== */
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 rgba(255, 107, 43, 0.6);
+      animation: live-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes live-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255, 107, 43, 0.6); }
+      70%  { box-shadow: 0 0 0 8px rgba(255, 107, 43, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 107, 43, 0); }
+    }
+
+    /*
+      ================== BRACKET ==================
+      DOM order: semifinal-left, semifinal-right, championship.
+      On mobile (single column), the order stacks naturally as:
+        1. Left Bracket
+        2. Right Bracket
+        3. Championship  <- climactic finale at the bottom
+
+      On desktop (3 columns), explicit grid-column placement moves the
+      championship into the middle column while keeping left on column 1
+      and right on column 3.
+    */
+    .bracket {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 900px) {
+      .bracket {
+        grid-template-columns: 1fr 1.15fr 1fr;
+        gap: 28px;
+        align-items: center;
+      }
+      .semifinal-left  { grid-column: 1; grid-row: 1; }
+      .semifinal-right { grid-column: 3; grid-row: 1; }
+      .championship    { grid-column: 2; grid-row: 1; }
+    }
+
+    /* Semifinal column */
+    .semi-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .vs-divider {
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--text-dim);
+      font-weight: 700;
+      padding: 6px 0;
+      font-family: 'Big Shoulders Display', sans-serif;
+    }
+    .advances-note {
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .advances-note svg { flex-shrink: 0; }
+
+    /* Team card (semifinal) */
+    .team-card {
+      display: grid;
+      grid-template-columns: 28px 40px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      transition: border-color 200ms, background 200ms;
+    }
+    .team-card.winner {
+      border-color: var(--accent-ring);
+      background: linear-gradient(to right, var(--accent-soft), transparent 70%);
+    }
+    .team-card.loser { opacity: 0.55; }
+    .team-card .seed-badge {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+    .team-card.winner .seed-badge { color: var(--accent); }
+    .team-card .team-name {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .team-card .team-duo {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .team-card .team-score {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      min-width: 44px;
+      text-align: right;
+    }
+    .team-card.winner .team-score { color: var(--accent); }
+    .team-card.loser  .team-score { color: var(--text-muted); }
+
+    /* ================== CHAMPIONSHIP CARD ================== */
+    .championship-card {
+      padding: 20px;
+      border: 1px solid var(--accent-ring);
+      border-radius: 16px;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 107, 43, 0.14), transparent 70%),
+        var(--surface);
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+    .championship-card::before {
+      /* subtle top glow bar */
+      content: "";
+      position: absolute;
+      top: 0; left: 20%; right: 20%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--accent), transparent);
+      opacity: 0.5;
+    }
+
+    .mini-team {
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.25);
+      text-align: left;
+    }
+    .mini-team.winner {
+      border-color: var(--accent-ring);
+      background: var(--accent-soft);
+    }
+    .mini-team.loser { opacity: 0.5; }
+    .mini-team .name {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+    .mini-team .score {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+    .mini-team.winner .score { color: var(--accent); }
+    .mini-team.loser  .score { color: var(--text-muted); }
+
+    .champ-mini-vs {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--text-dim);
+      padding: 4px 0;
+    }
+
+    .projected-champion {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border-strong);
+    }
+    .projected-champion .pc-label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .projected-champion .pc-name {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 38px;
+      color: var(--accent);
+      line-height: 1;
+      letter-spacing: 0.03em;
+    }
+    .projected-champion .pc-duo {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* Trophy icon (SVG inline) */
+    .trophy-icon {
+      width: 14px; height: 14px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    section { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ========================== NAV ========================== -->
+  <!--
+    DEV NOTE: Phase 3 needs to add a "Playoffs" nav link to every page
+    (Home, Standings, Teams, Players, Schedule, Rules). Suggested position:
+    between Schedule and Rules, as shown here.
+  -->
+  <nav class="sticky top-0 z-40 backdrop-blur-md bg-[var(--bg)]/85 border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);">
+          <span class="display font-black text-[13px] text-white leading-none">LBL</span>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="display font-black text-[15px] tracking-wider">LBL</span>
+          <span class="text-[9.5px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Locals Basketball League</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#">Standings</a>
+        <a class="nav-link" href="#">Teams</a>
+        <a class="nav-link" href="#">Players</a>
+        <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link active" href="#">Playoffs</a>
+        <a class="nav-link" href="#">Rules</a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="hidden sm:flex pill accent items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+          Season 1
+        </button>
+        <button class="h-9 w-9 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition" aria-label="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================== HERO ========================== -->
+  <!--
+    DEV NOTE: The "Live Projection" pill is the critical status indicator.
+    Its state depends on whether the regular season has ended:
+      - Season active  -> "Live Projection" (pulsing dot, current copy)
+      - Season complete -> "Final" (static dot, different copy)
+    The rest of the page also needs to adapt: "Projected Champion" becomes
+    "Champion", "Lakers advances" remains accurate (just no longer "projected"),
+    etc. Phase 3 should thread a simple boolean like `seasonComplete` through.
+  -->
+  <section class="court-bg border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 pt-10 pb-10 relative overflow-hidden">
+      <div class="absolute inset-0 grid-lines opacity-60 pointer-events-none"></div>
+
+      <div class="relative">
+        <div class="stat-label mb-2">Season 1 · Week 1 of 3</div>
+        <h1 class="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-3">PLAYOFFS</h1>
+        <p class="text-[var(--text-muted)] text-base md:text-lg max-w-xl mb-5">
+          Top 4 teams, seeded by the standings. Matchups resolve on season point differential (+/-). The bracket updates live, then locks after Week 3.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="pill accent">
+            <span class="live-dot"></span>
+            Live Projection
+          </span>
+          <span class="pill small">Based on current standings</span>
+        </div>
+
+        <!-- Stacked hero stats -->
+        <div class="mt-6 flex flex-col gap-2">
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl w-8 text-right">4</span>
+            <span class="stat-label">Teams in Bracket</span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl w-8 text-right">3</span>
+            <span class="stat-label">Computed Matchups</span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl w-8 text-right text-[var(--accent)]">LAK</span>
+            <span class="stat-label">Current Projected Champion</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== BRACKET ========================== -->
+  <section class="max-w-6xl mx-auto px-5 pt-10 pb-8">
+
+    <!-- Intro row -->
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="display font-black text-2xl md:text-3xl leading-none tracking-wide">THE BRACKET</h2>
+      <span class="stat-label hidden sm:inline">Scroll to championship ↓</span>
+    </div>
+
+    <div class="bracket">
+
+      <!-- =========== LEFT SEMIFINAL (#1 vs #4) =========== -->
+      <div class="semifinal-left">
+        <div class="semi-header">
+          <span class="pill small">Left Bracket</span>
+          <span class="text-[10px] text-[var(--text-dim)] font-bold tracking-[0.12em] uppercase">#1 vs #4</span>
+        </div>
+
+        <!-- #1 Lakers (winner) -->
+        <div class="team-card winner">
+          <span class="seed-badge">#1</span>
+          <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="min-w-0">
+            <div class="team-name">LAKERS</div>
+            <div class="team-duo">Jacob · Joseph</div>
+          </div>
+          <div class="team-score tabular">+19</div>
+        </div>
+
+        <div class="vs-divider">VS</div>
+
+        <!-- #4 Heat (loser, DNP) -->
+        <div class="team-card loser">
+          <span class="seed-badge">#4</span>
+          <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+          <div class="min-w-0">
+            <div class="team-name">HEAT <span class="pill dnp">DNP</span></div>
+            <div class="team-duo">Daniel · Joseph</div>
+          </div>
+          <div class="team-score tabular">+0</div>
+        </div>
+
+        <div class="advances-note">
+          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
+          LAKERS advances (+19 vs +0)
+        </div>
+      </div>
+
+      <!-- =========== RIGHT SEMIFINAL (#2 vs #3) =========== -->
+      <div class="semifinal-right">
+        <div class="semi-header">
+          <span class="pill small">Right Bracket</span>
+          <span class="text-[10px] text-[var(--text-dim)] font-bold tracking-[0.12em] uppercase">#2 vs #3</span>
+        </div>
+
+        <!-- #2 Suns (winner) -->
+        <div class="team-card winner">
+          <span class="seed-badge">#2</span>
+          <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          <div class="min-w-0">
+            <div class="team-name">SUNS</div>
+            <div class="team-duo">Joseph · Nathan</div>
+          </div>
+          <div class="team-score tabular">+1</div>
+        </div>
+
+        <div class="vs-divider">VS</div>
+
+        <!-- #3 Warriors (loser, DNP) -->
+        <div class="team-card loser">
+          <span class="seed-badge">#3</span>
+          <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+          <div class="min-w-0">
+            <div class="team-name">WARRIORS <span class="pill dnp">DNP</span></div>
+            <div class="team-duo">Jacob · Nathan</div>
+          </div>
+          <div class="team-score tabular">+0</div>
+        </div>
+
+        <div class="advances-note">
+          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
+          SUNS advances (+1 vs +0)
+        </div>
+      </div>
+
+      <!-- =========== CHAMPIONSHIP (middle on desktop, bottom on mobile) =========== -->
+      <div class="championship">
+        <div class="championship-card">
+          <!-- Header -->
+          <div class="flex justify-center mb-4">
+            <span class="pill accent inline-flex items-center gap-1.5">
+              <svg class="trophy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                <path d="M4 22h16"/>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+              </svg>
+              Championship
+            </span>
+          </div>
+
+          <!-- Mini matchup -->
+          <div class="space-y-1">
+            <div class="mini-team winner">
+              <div class="logo sm" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <div class="name">LAKERS</div>
+              <div class="score tabular">+19</div>
+            </div>
+            <div class="champ-mini-vs">VS</div>
+            <div class="mini-team loser">
+              <div class="logo sm" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+              <div class="name">SUNS</div>
+              <div class="score tabular">+1</div>
+            </div>
+          </div>
+
+          <!-- Projected champion reveal -->
+          <div class="projected-champion">
+            <div class="pc-label">Projected Champion</div>
+            <div class="pc-name">LAKERS</div>
+            <div class="pc-duo">Jacob · Joseph</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================== HOW PLAYOFFS WORK ========================== -->
+  <section class="max-w-6xl mx-auto px-5 pt-6 pb-16">
+    <div class="card p-5 md:p-6">
+      <div class="flex items-start justify-between mb-4 gap-4">
+        <div>
+          <div class="stat-label mb-1">Reference</div>
+          <h3 class="display font-black text-xl md:text-2xl leading-none tracking-wide">HOW PLAYOFFS WORK</h3>
+        </div>
+        <a href="#" class="pill small hover:text-[var(--text)] transition">Full Rules →</a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-[14px] text-[var(--text-muted)] leading-relaxed">
+        <div class="flex items-start gap-3">
+          <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">01</span>
+          <div><strong class="text-[var(--text)]">Top 4 teams</strong> from the standings seed into the bracket. #5 and #6 miss out.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">02</span>
+          <div><strong class="text-[var(--text)]">#1 vs #4</strong> on the left, <strong class="text-[var(--text)]">#2 vs #3</strong> on the right. Winners meet in the championship.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">03</span>
+          <div>Matchups resolve by comparing each team's <strong class="text-[var(--text)]">season +/-</strong>. Higher +/- advances.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">04</span>
+          <div>Playoff results <strong class="text-[var(--text)]">don't add anything</strong> to team or player stats. +/- is already counted.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">05</span>
+          <div>The bracket is a <strong class="text-[var(--text)]">live projection</strong> during the season, updated as games are played.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">06</span>
+          <div>After the <strong class="text-[var(--text)]">final Week 3 series</strong>, the bracket locks and the champion is declared.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== FOOTER ========================== -->
+  <footer class="border-t border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c);">
+          <span class="display font-black text-[11px] text-white leading-none">LBL</span>
+        </div>
+        <div class="leading-tight">
+          <div class="display font-black text-sm tracking-wider">LOCALS BASKETBALL LEAGUE</div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season 1</div>
+        </div>
+      </div>
+      <div class="text-[11px] text-[var(--text-dim)] uppercase tracking-wider font-semibold">
+        Jacob · Daniel · Joseph · Nathan
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
