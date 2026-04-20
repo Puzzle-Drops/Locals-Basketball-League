@@ -244,6 +244,53 @@ a.pill.success:hover { color: var(--positive); }
 .standings-table[data-mode="games"] .val-series { display: none; }
 .standings-table[data-mode="series"] .val-games { display: none; }
 
+/* Standings table rows: CSS-driven bottom borders so re-sorting can't
+   leave a stray 1px line at the bottom. */
+.standings-table .standings-row {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.standings-table .standings-row:last-child { border-bottom: none; }
+.standings-table .standings-row:hover { background: var(--surface-hover); }
+
+/* Frozen left columns -- # + Team stay pinned during horizontal scroll. */
+.frozen-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--surface);
+  transition: background 120ms ease;
+  box-shadow: 1px 0 0 0 var(--border);
+}
+.standings-row:hover .frozen-col { background: var(--surface-hover); }
+
+/* Sortable column headers. Arrow only takes space when the column is
+   actually sorted, so default-state header text aligns flush with the
+   column values below. */
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 120ms;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+.sortable:hover { color: var(--text); }
+.sortable.sorted-asc,
+.sortable.sorted-desc { color: var(--text); }
+.sortable.sorted-asc::after,
+.sortable.sorted-desc::after {
+  margin-left: 4px;
+  font-size: 8px;
+  vertical-align: 1px;
+  color: var(--accent);
+}
+.sortable.sorted-asc::after { content: "▲"; }
+.sortable.sorted-desc::after { content: "▼"; }
+
 /* Roster On Team / Overall swap */
 .roster[data-mode="on-team"] .val-overall { display: none; }
 .roster[data-mode="overall"] .val-on-team { display: none; }

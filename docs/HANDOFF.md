@@ -15,10 +15,10 @@ ranking/playoff logic without reading the non-negotiable decisions section.
 Built so far:
 - Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` / `.game-bg` backdrops, `.week-divider`, `.pill.success`, `.game-cell` strip, `.crumb` breadcrumb, `.video-placeholder`, `.box-row`).
 - Reusable components in `src/components/`: `Layout` (sticky nav with Playoffs link + hamburger mobile menu), `Scorecard` (handles played, DNP, and upcoming variants with optional `records` prop), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNGs from `assets/` with gradient-and-initial fallback, multiple sizes), `Pill`, `ScrollManager` (smooth-scrolls to hash on cross-page nav, jumps to top otherwise).
-- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**, **Game Detail (05)**.
+- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**, **Game Detail (05)**, **Standings (06)**.
 
 Remaining:
-- Standings (06), Rules (07), Playoffs (08).
+- Rules (07), Playoffs (08).
 
 Data model note: series `status` now includes `"upcoming"` alongside `completed` / `partial` / `dnp`. Upcoming gets the same stat treatment as DNP (no wins, no points) but is rendered neutrally instead of with the amber DNP pill. `data/season1.json` Week 1 Series 3 was switched from `dnp` to `upcoming` since the league plans to play it.
 
@@ -215,11 +215,12 @@ Build it from `mockups/08-playoffs.html`. Sections, in order:
 3. The Bracket (2 semifinals + championship, desktop uses grid-column placement to put championship in middle)
 4. How Playoffs Work reference card
 
-### 5. Standings page row order -- DONE in stat engine
+### 5. Standings page row order -- DONE
 
 `sortDuosWithTiebreakers` in `src/lib/stats.js` ranks by game wins, then h2h
-series, then point diff. The Standings page mockup just needs to render in
-the order the engine produces. Page itself not yet rebuilt.
+series, then point diff. The Standings page (`src/pages/Standings.jsx`)
+renders in that order by default and includes a sortable header layer that
+lets the user re-sort by any column without changing the canonical ranking.
 
 ### 6. Rules page prose -- TODO (Rules page not yet built)
 
