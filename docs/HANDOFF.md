@@ -13,12 +13,12 @@ ranking/playoff logic without reading the non-negotiable decisions section.
 ## Phase 3 Status
 
 Built so far:
-- Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops, `.week-divider`, `.pill.success`).
-- Reusable components in `src/components/`: `Layout` (sticky nav with Playoffs link + hamburger mobile menu), `Scorecard` (handles played, DNP, and upcoming variants with optional `records` prop), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNGs from `assets/` with gradient-and-initial fallback, multiple sizes), `Pill`.
-- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**.
+- Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` / `.game-bg` backdrops, `.week-divider`, `.pill.success`, `.game-cell` strip, `.crumb` breadcrumb, `.video-placeholder`, `.box-row`).
+- Reusable components in `src/components/`: `Layout` (sticky nav with Playoffs link + hamburger mobile menu), `Scorecard` (handles played, DNP, and upcoming variants with optional `records` prop), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNGs from `assets/` with gradient-and-initial fallback, multiple sizes), `Pill`, `ScrollManager` (smooth-scrolls to hash on cross-page nav, jumps to top otherwise).
+- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**, **Game Detail (05)**.
 
 Remaining:
-- Game Detail (05), Standings (06), Rules (07), Playoffs (08).
+- Standings (06), Rules (07), Playoffs (08).
 
 Data model note: series `status` now includes `"upcoming"` alongside `completed` / `partial` / `dnp`. Upcoming gets the same stat treatment as DNP (no wins, no points) but is rendered neutrally instead of with the amber DNP pill. `data/season1.json` Week 1 Series 3 was switched from `dnp` to `upcoming` since the league plans to play it.
 
@@ -198,14 +198,12 @@ matches the other links. Mobile hamburger menu mirrors the same order.
 Mockup pass scrubbed every "BEST OF 3" pill to "3 GAMES". Scorecard component
 hardcodes "3 GAMES" in the header.
 
-### 3. Game Detail "clincher" label -- TODO (Game Detail page not yet built)
+### 3. Game Detail "clincher" label -- DONE
 
-Game Detail tags G3 as "Series clincher." Since G3 is always played, it's not
-always a clincher. Conditional logic:
-
-- If series was tied 1-1 going into this game -> `CLINCHER`
-- If series was already 2-0 going into this game -> `DEAD GAME` (or omit the label)
-- If this is G1 or G2 -> no clincher-style label
+`clincherInfo()` in `src/pages/GameDetail.jsx` implements the rule:
+- G1 / G2: no label (just margin + date in the context strip).
+- G3 with series 1-1 going in: `Series clincher · {Winner} won 2-1`.
+- G3 with series 2-0 going in: `Dead game · {Winner} clinched 2-0`.
 
 ### 4. Playoffs page is new -- TODO
 

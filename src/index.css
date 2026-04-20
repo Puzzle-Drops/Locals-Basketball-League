@@ -269,3 +269,85 @@ section { scroll-margin-top: 80px; }
   margin: 0 auto;
   max-width: 240px;
 }
+
+/* Game Detail hero -- both team colors layered subtly. Driven by
+   --game-c1 / --game-c2 CSS vars set inline by the page. */
+.game-bg {
+  background-image:
+    radial-gradient(ellipse 50% 50% at 15% 20%, var(--game-c1, rgba(255, 107, 43, 0.20)), transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 20%, var(--game-c2, rgba(255, 107, 43, 0.15)), transparent 60%);
+}
+
+/* Game Detail hero logo size */
+.logo-lg {
+  width: 56px; height: 56px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900; font-size: 24px;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.3), 0 0 0 1px var(--border-strong);
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: #1a1c22;
+}
+.logo-lg > img { width: 100%; height: 100%; object-fit: contain; display: block; padding: 4px; box-sizing: border-box; }
+
+/* Breadcrumb */
+.crumb-sep { color: var(--text-dim); margin: 0 6px; }
+.crumb { color: var(--text-muted); transition: color 120ms; }
+.crumb:hover { color: var(--text); }
+.crumb.current { color: var(--text); cursor: default; }
+
+/* VOD placeholder card */
+.video-placeholder {
+  background:
+    radial-gradient(ellipse at center, rgba(255, 107, 43, 0.08), transparent 70%),
+    #000;
+  border: 1px solid var(--border);
+}
+
+/* Series-strip cells on Game Detail */
+.game-cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color 120ms, background 120ms;
+  cursor: pointer;
+  display: block;
+}
+.game-cell:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.game-cell.current {
+  border-color: var(--accent-ring);
+  background: var(--accent-soft);
+  cursor: default;
+}
+.game-cell-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  gap: 12px;
+}
+.game-cell-label {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900; font-size: 16px; letter-spacing: 0.02em;
+}
+.game-cell-status {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; text-align: right; white-space: nowrap;
+  color: var(--text-muted);
+}
+.game-cell.current .game-cell-label,
+.game-cell.current .game-cell-status { color: var(--accent); }
+.game-cell-score {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.game-cell-score .score-text {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 700; font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  width: 56px; text-align: center;
+  line-height: 1;
+}
+
+.box-row { transition: background 120ms ease; }
+.box-row:hover { background: rgba(255,255,255,0.03); }

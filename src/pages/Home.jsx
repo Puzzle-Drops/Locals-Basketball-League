@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CURRENT_SEASON, TEAMS } from '../lib/data.js';
+import { CURRENT_SEASON, TEAMS, leagueLogo } from '../lib/data.js';
 import { computeSeason, standings, decoratePlayer, fmt1 } from '../lib/stats.js';
 import {
   PLAYERS, splitKey, teamGradient, scheduledSeriesForWeek, TOTAL_WEEKS,
@@ -69,20 +69,23 @@ export default function Home() {
     <>
       {/* HERO */}
       <section className="court-bg border-b border-[var(--border)]">
-        <div className="max-w-6xl mx-auto px-5 pt-10 pb-8 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-5 pt-8 pb-8 relative overflow-hidden">
           <div className="absolute inset-0 grid-lines opacity-60 pointer-events-none" />
 
           <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Pill variant="accent">Live Season</Pill>
-                <span className="text-[11px] tracking-[0.16em] uppercase text-[var(--text-muted)] font-semibold">
-                  Season {CURRENT_SEASON.season} · 2026
-                </span>
+            <div className="flex items-center gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <Pill variant="accent">Live Season</Pill>
+                  <span className="text-[11px] tracking-[0.16em] uppercase text-[var(--text-muted)] font-semibold">
+                    Season {CURRENT_SEASON.season} · 2026
+                  </span>
+                </div>
+                <h1 className="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide">
+                  WEEK {currentWeek} <span className="text-[var(--text-muted)] font-bold">OF {TOTAL_WEEKS}</span>
+                </h1>
               </div>
-              <h1 className="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide">
-                WEEK {currentWeek} <span className="text-[var(--text-muted)] font-bold">OF {TOTAL_WEEKS}</span>
-              </h1>
+              <img src={leagueLogo()} alt="LBL" className="h-24 md:h-32 w-auto object-contain shrink-0" />
             </div>
 
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 md:w-80 shrink-0">

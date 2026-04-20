@@ -28,9 +28,9 @@ Full rules and data model are in `docs/LBL-spec.md`. That document is the source
 
 **Phase 3 (in progress): Implement the design**
 - Design system ported from mockups to `src/index.css` (CSS vars, Big Shoulders + Manrope fonts, `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` component classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops).
-- Reusable components in `src/components/`: `Layout` (sticky nav + hamburger mobile menu), `Scorecard` (played / DNP / upcoming variants), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNG with gradient fallback, multiple sizes), `Pill` (default / accent / dnp / team variants).
-- Pages built: Home, Teams (index), TeamDetail, Players (index), PlayerDetail, Schedule.
-- Pages remaining: Game Detail (05), Standings (06), Rules (07), Playoffs (08).
+- Reusable components in `src/components/`: `Layout` (sticky nav + hamburger mobile menu), `Scorecard` (played / DNP / upcoming variants), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNG with gradient fallback, multiple sizes), `Pill` (default / accent / dnp / team / success variants), `ScrollManager` (route-change hash-scroll + top-of-page reset).
+- Pages built: Home, Teams (index), TeamDetail, Players (index), PlayerDetail, Schedule, Game Detail.
+- Pages remaining: Standings (06), Rules (07), Playoffs (08).
 
 ---
 
@@ -63,7 +63,7 @@ Locals-Basketball-League/
 ├── src/
 │   ├── lib/                  (constants.js, stats.js, data.js)
 │   ├── components/           (Layout, Scorecard, Seg, TeamLogo,
-│   │                          PlayerAvatar, Pill)
+│   │                          PlayerAvatar, Pill, ScrollManager)
 │   ├── pages/                (Home, Standings, Teams, TeamDetail, Players,
 │   │                          PlayerDetail, Schedule, GameDetail, Rules, Playoffs)
 │   ├── App.jsx, main.jsx, index.css

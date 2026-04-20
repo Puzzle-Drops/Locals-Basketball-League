@@ -128,17 +128,18 @@ export default function Schedule() {
 
               <div className="grid grid-cols-1 gap-4">
                 {w.seriesList.map((s, idx) => (
-                  <Scorecard
-                    key={s.matchup_id}
-                    series={s}
-                    weekNumber={w.week}
-                    seriesNumber={s.seriesNumber ?? idx + 1}
-                    records={
-                      !s.played && s.status !== 'dnp'
-                        ? { team1: recordFor(s.team1_key), team2: recordFor(s.team2_key) }
-                        : undefined
-                    }
-                  />
+                  <div key={s.matchup_id} id={`series-${w.week}-${s.matchup_id}`} className="scroll-mt-20">
+                    <Scorecard
+                      series={s}
+                      weekNumber={w.week}
+                      seriesNumber={s.seriesNumber ?? idx + 1}
+                      records={
+                        !s.played && s.status !== 'dnp'
+                          ? { team1: recordFor(s.team1_key), team2: recordFor(s.team2_key) }
+                          : undefined
+                      }
+                    />
+                  </div>
                 ))}
               </div>
             </section>
