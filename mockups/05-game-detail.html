@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LBL - Lakers 21-19 Bucks (G3)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --bg-2: #0f1014;
+      --surface: #15171c;
+      --surface-2: #1b1e25;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f5f7;
+      --text-muted: #8b8f97;
+      --text-dim: #5b5e66;
+      --accent: #ff6b2b;
+      --accent-soft: rgba(255, 107, 43, 0.12);
+      --accent-ring: rgba(255, 107, 43, 0.35);
+      --positive: #22c55e;
+      --positive-soft: rgba(34, 197, 94, 0.08);
+      --positive-ring: rgba(34, 197, 94, 0.35);
+      --negative: #ef4444;
+      --amber: #fbbf24;
+    }
+
+    html, body { background: var(--bg); color: var(--text); }
+    body { font-family: 'Manrope', system-ui, sans-serif; font-feature-settings: "ss01", "cv11"; }
+
+    .display { font-family: 'Big Shoulders Display', sans-serif; letter-spacing: 0.01em; }
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    /* Hero uses both team colors subtly */
+    .game-bg {
+      background-image:
+        radial-gradient(ellipse 50% 50% at 15% 20%, rgba(85, 37, 131, 0.25), transparent 60%),
+        radial-gradient(ellipse 50% 50% at 85% 20%, rgba(0, 71, 27, 0.22), transparent 60%);
+    }
+
+    .grid-lines {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 120ms ease, background 120ms ease;
+    }
+    .card:hover { border-color: var(--border-strong); }
+
+    .team-bar { width: 4px; border-radius: 999px; align-self: stretch; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 8px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.02);
+      white-space: nowrap;
+    }
+    .pill.accent { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+    .pill.success { color: var(--positive); border-color: var(--positive-ring); background: var(--positive-soft); }
+
+    .logo {
+      width: 40px; height: 40px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 18px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .logo-lg {
+      width: 56px; height: 56px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 24px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.3), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 32px; height: 32px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 800; font-size: 13px;
+      background: linear-gradient(135deg, #2a2d36, #1a1c22);
+      box-shadow: 0 0 0 1px var(--border-strong);
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .nav-link { color: var(--text-muted); position: relative; padding: 4px 0; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.active { color: var(--text); }
+    .nav-link.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+
+    .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+    .stat-value { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; line-height: 1; }
+
+    .diff-pos { color: var(--positive); }
+    .diff-neg { color: var(--negative); }
+
+    .winner { color: var(--text); }
+    .loser { color: var(--text-dim); }
+
+    section { scroll-margin-top: 80px; }
+
+    /* Breadcrumb separator */
+    .crumb-sep { color: var(--text-dim); margin: 0 6px; }
+    .crumb { color: var(--text-muted); transition: color 120ms; }
+    .crumb:hover { color: var(--text); }
+    .crumb.current { color: var(--text); cursor: default; }
+
+    /*
+      DEV NOTE: Video placeholder — in Phase 3 replace with a real YouTube iframe
+      <iframe src="https://www.youtube.com/embed/{VIDEO_ID}"
+              class="w-full aspect-video rounded-xl" frameborder="0" allowfullscreen></iframe>
+      Extract VIDEO_ID from the game's vod_url.
+    */
+    .video-placeholder {
+      background:
+        radial-gradient(ellipse at center, rgba(255, 107, 43, 0.08), transparent 70%),
+        #000;
+      border: 1px solid var(--border);
+    }
+
+    /* Series strip cells */
+    .game-cell {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: border-color 120ms, background 120ms;
+      cursor: pointer;
+    }
+    .game-cell:hover { border-color: var(--border-strong); background: var(--surface-2); }
+    .game-cell.current {
+      border-color: var(--accent-ring);
+      background: var(--accent-soft);
+      cursor: default;
+    }
+
+    /*
+      Series-cell grid: 3 columns with fixed widths on the edges so logos + score
+      stay at matching x-positions across every cell regardless of score width
+      (e.g. "21-0" vs "21-19") or status label length.
+    */
+    .game-cell-row {
+      display: grid;
+      grid-template-columns: 64px 1fr 64px;
+      align-items: center;
+      gap: 12px;
+    }
+    .game-cell-label { font-family: 'Big Shoulders Display', sans-serif; font-weight: 900; font-size: 16px; letter-spacing: 0.02em; }
+    .game-cell-status { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; text-align: right; white-space: nowrap; color: var(--text-muted); }
+    .game-cell.current .game-cell-label,
+    .game-cell.current .game-cell-status { color: var(--accent); }
+
+    .game-cell-score {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px;
+    }
+    .game-cell-score .score-text {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 700; font-size: 16px;
+      font-variant-numeric: tabular-nums;
+      width: 56px; text-align: center;
+      line-height: 1;
+    }
+
+    /* Box score row */
+    .box-row { transition: background 120ms ease; }
+    .box-row:hover { background: rgba(255,255,255,0.03); }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ========================== NAV ========================== -->
+  <nav class="sticky top-0 z-40 backdrop-blur-md bg-[var(--bg)]/85 border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);">
+          <span class="display font-black text-[13px] text-white leading-none">LBL</span>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="display font-black text-[15px] tracking-wider">LBL</span>
+          <span class="text-[9.5px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Locals Basketball League</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-7 text-sm font-semibold">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#">Standings</a>
+        <a class="nav-link" href="#">Teams</a>
+        <a class="nav-link" href="#">Players</a>
+        <a class="nav-link active" href="#">Schedule</a>
+        <a class="nav-link" href="#">Rules</a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="hidden sm:flex pill accent items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+          Season 1
+        </button>
+        <button class="h-9 w-9 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition" aria-label="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================== HERO ========================== -->
+  <section class="game-bg border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 pt-6 pb-10 relative overflow-hidden">
+      <div class="absolute inset-0 grid-lines opacity-40 pointer-events-none"></div>
+
+      <!-- Breadcrumb -->
+      <div class="relative text-[11px] font-bold tracking-[0.12em] uppercase mb-6">
+        <a href="#" class="crumb">Schedule</a>
+        <span class="crumb-sep">›</span>
+        <a href="#" class="crumb">Week 1</a>
+        <span class="crumb-sep">›</span>
+        <a href="#" class="crumb">Match 1</a>
+        <span class="crumb-sep">›</span>
+        <span class="crumb current">Game 3</span>
+      </div>
+
+      <!-- Pills row -->
+      <div class="relative flex flex-wrap items-center gap-2 mb-5">
+        <span class="pill">Week 1</span>
+        <span class="pill">Match 1</span>
+        <span class="pill accent">Game 3</span>
+        <span class="pill success">Final</span>
+      </div>
+
+      <!-- Teams + scores -->
+      <div class="relative grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-8">
+
+        <!-- Lakers (winner, left side) -->
+        <div class="flex items-center gap-4">
+          <div class="logo-lg" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-3xl md:text-4xl leading-none winner">LAKERS</span>
+              <span class="pill accent">Winner</span>
+            </div>
+            <div class="text-[11px] text-[var(--text-muted)] mt-1 truncate">Jacob & Joseph</div>
+          </div>
+        </div>
+
+        <!-- Score display -->
+        <div class="flex items-center gap-3 sm:gap-5 justify-center">
+          <div class="display font-black text-6xl md:text-7xl tabular winner leading-none">21</div>
+          <div class="display font-black text-4xl md:text-5xl tabular text-[var(--text-dim)] leading-none">-</div>
+          <div class="display font-black text-6xl md:text-7xl tabular loser leading-none">19</div>
+        </div>
+
+        <!-- Bucks (loser, right side): flex-row-reverse on ALL screens so logo is on the outside edge, mirroring Lakers -->
+        <div class="flex items-center gap-4 flex-row-reverse text-right">
+          <div class="logo-lg" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-3xl md:text-4xl leading-none loser">BUCKS</span>
+            <div class="text-[11px] text-[var(--text-dim)] mt-1 truncate">Daniel & Nathan</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game context strip -->
+      <div class="relative mt-6 pt-5 border-t border-[var(--border)] flex flex-wrap items-center gap-x-5 gap-y-2">
+        <div class="flex items-baseline gap-2">
+          <span class="display font-black text-xl tabular diff-pos">+2</span>
+          <span class="stat-label">Margin</span>
+        </div>
+        <span class="text-[var(--text-dim)]">·</span>
+        <div class="flex items-baseline gap-2">
+          <span class="text-sm font-bold">Series clincher</span>
+          <span class="stat-label">Lakers won 2-1</span>
+        </div>
+        <span class="text-[var(--text-dim)] hidden md:inline">·</span>
+        <div class="hidden md:flex items-baseline gap-2">
+          <span class="text-sm font-bold tabular">Apr 19, 2026</span>
+          <span class="stat-label">Played</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== VOD ========================== -->
+  <section class="max-w-6xl mx-auto px-5 pt-8">
+    <div class="flex items-end justify-between mb-4">
+      <div>
+        <div class="stat-label mb-1">Watch the Game</div>
+        <h2 class="display font-black text-2xl tracking-wide">VOD</h2>
+      </div>
+      <a href="https://google.com" class="text-[11px] font-bold text-[var(--text-muted)] hover:text-[var(--accent)] uppercase tracking-[0.12em] transition flex items-center gap-1.5">
+        Open on YouTube
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+
+    <!-- Video player (placeholder) -->
+    <div class="video-placeholder aspect-video rounded-xl relative overflow-hidden flex items-center justify-center">
+      <!-- Subtle grid backdrop -->
+      <div class="absolute inset-0 grid-lines opacity-30 pointer-events-none"></div>
+
+      <div class="relative flex flex-col items-center gap-4 text-center px-6">
+        <button class="w-20 h-20 rounded-full bg-[var(--accent)] hover:bg-[#ff8552] transition flex items-center justify-center shadow-[0_0_40px_rgba(255,107,43,0.35)]" aria-label="Play">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white" class="ml-1.5"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div>
+          <div class="display font-black text-xl tracking-wide">LAKERS vs BUCKS · G3</div>
+          <div class="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-[0.16em] mt-2">YouTube Embed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== BOX SCORE ========================== -->
+  <!--
+    DEV NOTE: Player points are halved team points (spec rule).
+    Lakers 21 => each Laker gets 10.5
+    Bucks 19 => each Buck gets 9.5
+    Player +/- = their scored - their allowed.
+    Inside one team, both players always have identical stats.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-12">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <div class="stat-label mb-1">Per-Player Breakdown</div>
+        <h2 class="display font-black text-3xl tracking-wide">BOX SCORE</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+      <!-- Lakers box -->
+      <div class="card overflow-hidden">
+        <div class="flex items-center gap-3 px-4 py-3.5 border-b border-[var(--border)]" style="background: linear-gradient(90deg, rgba(85,37,131,0.12), transparent);">
+          <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="display font-black text-lg leading-none">LAKERS</span>
+              <span class="pill accent">Winner</span>
+            </div>
+          </div>
+          <div class="display font-black text-3xl tabular leading-none">21</div>
+        </div>
+
+        <!-- Header row -->
+        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border)] text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)]">
+          <span class="flex-1">Player</span>
+          <span class="w-12 text-right">PTS</span>
+          <span class="w-12 text-right">PA</span>
+          <span class="w-12 text-right">+/-</span>
+        </div>
+
+        <!-- Jacob -->
+        <a href="#" class="box-row flex items-center gap-2 px-4 py-3 border-b border-[var(--border)] group">
+          <div class="flex-1 min-w-0 flex items-center gap-3">
+            <div class="avatar" style="background: linear-gradient(135deg, #4a90e2, #2a5a9a);">J</div>
+            <span class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">JACOB</span>
+          </div>
+          <span class="w-12 text-right display font-bold text-base tabular">10.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular text-[var(--text-muted)]">9.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular diff-pos">+1.0</span>
+        </a>
+
+        <!-- Joseph -->
+        <a href="#" class="box-row flex items-center gap-2 px-4 py-3 group">
+          <div class="flex-1 min-w-0 flex items-center gap-3">
+            <div class="avatar" style="background: linear-gradient(135deg, #ff6b2b, #a3471d);">J</div>
+            <span class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">JOSEPH</span>
+          </div>
+          <span class="w-12 text-right display font-bold text-base tabular">10.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular text-[var(--text-muted)]">9.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular diff-pos">+1.0</span>
+        </a>
+      </div>
+
+      <!-- Bucks box -->
+      <div class="card overflow-hidden">
+        <div class="flex items-center gap-3 px-4 py-3.5 border-b border-[var(--border)]" style="background: linear-gradient(90deg, rgba(0,71,27,0.15), transparent);">
+          <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-lg leading-none">BUCKS</span>
+          </div>
+          <div class="display font-black text-3xl tabular leading-none text-[var(--text-muted)]">19</div>
+        </div>
+
+        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border)] text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)]">
+          <span class="flex-1">Player</span>
+          <span class="w-12 text-right">PTS</span>
+          <span class="w-12 text-right">PA</span>
+          <span class="w-12 text-right">+/-</span>
+        </div>
+
+        <!-- Daniel -->
+        <a href="#" class="box-row flex items-center gap-2 px-4 py-3 border-b border-[var(--border)] group">
+          <div class="flex-1 min-w-0 flex items-center gap-3">
+            <div class="avatar" style="background: linear-gradient(135deg, #ef4444, #991b1b);">D</div>
+            <span class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">DANIEL</span>
+          </div>
+          <span class="w-12 text-right display font-bold text-base tabular">9.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular text-[var(--text-muted)]">10.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular diff-neg">-1.0</span>
+        </a>
+
+        <!-- Nathan -->
+        <a href="#" class="box-row flex items-center gap-2 px-4 py-3 group">
+          <div class="flex-1 min-w-0 flex items-center gap-3">
+            <div class="avatar" style="background: linear-gradient(135deg, #6b7280, #374151);">N</div>
+            <span class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">NATHAN</span>
+          </div>
+          <span class="w-12 text-right display font-bold text-base tabular">9.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular text-[var(--text-muted)]">10.5</span>
+          <span class="w-12 text-right display font-bold text-base tabular diff-neg">-1.0</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================== SERIES GAMES ========================== -->
+  <!--
+    DEV NOTE: Strip showing all 3 games in this series for quick navigation.
+    Fixed 3-column grid per cell (64px | 1fr | 64px) so that the center score group
+    has identical x-position across all cells regardless of score width or status
+    label length. Score text itself has a fixed width (56px) so "21-0" and "21-19"
+    both lay out at the same horizontal anchor, keeping logos vertically aligned.
+    The current game gets an accent ring + color-shifted label/status. The status
+    still says "Lakers W" / "Bucks W" on the current cell; the ring communicates
+    "you're viewing this one" on its own.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-12 pb-12">
+    <div class="flex items-end justify-between mb-6 gap-3 flex-wrap">
+      <div>
+        <div class="stat-label mb-1">Lakers won 2-1</div>
+        <h2 class="display font-black text-3xl tracking-wide">SERIES GAMES</h2>
+      </div>
+      <a href="#" class="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent)] uppercase tracking-[0.12em] transition">View Match ↗</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+      <!-- G1: Lakers 21-0 -->
+      <a href="#" class="game-cell">
+        <div class="game-cell-row">
+          <span class="game-cell-label">GAME 1</span>
+          <div class="game-cell-score">
+            <div class="logo" style="width:22px; height:22px; font-size: 11px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+            <span class="score-text"><span class="winner">21</span>-<span class="loser">0</span></span>
+            <div class="logo" style="width:22px; height:22px; font-size: 11px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          </div>
+          <span class="game-cell-status">Lakers W</span>
+        </div>
+      </a>
+
+      <!-- G2: Bucks 21-17 -->
+      <a href="#" class="game-cell">
+        <div class="game-cell-row">
+          <span class="game-cell-label">GAME 2</span>
+          <div class="game-cell-score">
+            <div class="logo" style="width:22px; height:22px; font-size: 11px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+            <span class="score-text"><span class="loser">17</span>-<span class="winner">21</span></span>
+            <div class="logo" style="width:22px; height:22px; font-size: 11px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          </div>
+          <span class="game-cell-status">Bucks W</span>
+        </div>
+      </a>
+
+      <!-- G3: Lakers 21-19 (current) -->
+      <div class="game-cell current">
+        <div class="game-cell-row">
+          <span class="game-cell-label">GAME 3</span>
+          <div class="game-cell-score">
+            <div class="logo" style="width:22px; height:22px; font-size: 11px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+            <span class="score-text"><span class="winner">21</span>-<span class="loser">19</span></span>
+            <div class="logo" style="width:22px; height:22px; font-size: 11px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          </div>
+          <span class="game-cell-status">Lakers W</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================== FOOTER ========================== -->
+  <footer class="border-t border-[var(--border)] mt-4">
+    <div class="max-w-6xl mx-auto px-5 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c);">
+          <span class="display font-black text-[11px] text-white leading-none">LBL</span>
+        </div>
+        <div class="leading-tight">
+          <div class="display font-black text-sm tracking-wider">LOCALS BASKETBALL LEAGUE</div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season 1</div>
+        </div>
+      </div>
+      <div class="text-[11px] text-[var(--text-dim)] uppercase tracking-wider font-semibold">
+        Jacob · Daniel · Joseph · Nathan
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
