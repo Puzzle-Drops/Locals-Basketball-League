@@ -196,7 +196,7 @@ export default function PlayerDetail() {
           <StatCard label="Points Against" value={fmt1(player.pointsAllowed)} sub="Total allowed" />
           <StatCard label="PAPG" value={fmt1(player.papg)} sub="Per game" />
 
-          <div className="card p-5 col-span-2 lg:col-span-4">
+          <div className="card p-5 col-span-2 lg:col-span-3">
             <div className="stat-label">Point Differential</div>
             <div className="flex items-baseline gap-8 flex-wrap mt-2">
               <div>
@@ -217,6 +217,12 @@ export default function PlayerDetail() {
               </div>
             </div>
           </div>
+
+          <StatCard
+            label="Longest Streak"
+            value={player.longestWinStreak}
+            sub={player.longestWinStreak === 1 ? 'Game win' : 'Consecutive wins'}
+          />
         </div>
       </section>
 

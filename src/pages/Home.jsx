@@ -238,8 +238,9 @@ export default function Home() {
 
       {/* MORE TO EXPLORE */}
       <section className="max-w-6xl mx-auto px-5 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ExploreLink to="/playoffs" eyebrow="The Bracket" title="PLAYOFFS" />
+          <ExploreLink to="/compare" eyebrow="Head to Head" title="COMPARE" />
           <ExploreLink to="/rules" eyebrow="Reference" title="RULES" />
         </div>
       </section>

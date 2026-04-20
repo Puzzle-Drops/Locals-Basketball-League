@@ -11,6 +11,7 @@ import Schedule from './pages/Schedule.jsx';
 import GameDetail from './pages/GameDetail.jsx';
 import Rules from './pages/Rules.jsx';
 import Playoffs from './pages/Playoffs.jsx';
+import Compare from './pages/Compare.jsx';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/game/:season/:week/:matchup/:game" element={<GameDetail />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/playoffs" element={<Playoffs />} />
+          <Route path="/compare" element={<Compare />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
