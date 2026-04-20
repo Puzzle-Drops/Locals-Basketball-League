@@ -17,6 +17,7 @@
       --bg-2: #0f1014;
       --surface: #15171c;
       --surface-2: #1b1e25;
+      --surface-hover: #1a1d23;
       --border: rgba(255, 255, 255, 0.07);
       --border-strong: rgba(255, 255, 255, 0.12);
       --text: #f5f5f7;
@@ -109,6 +110,91 @@
       70%  { box-shadow: 0 0 0 8px rgba(255, 107, 43, 0); }
       100% { box-shadow: 0 0 0 0 rgba(255, 107, 43, 0); }
     }
+
+    /* ================== PLAYOFF RACE TABLE ================== */
+    .race-row {
+      transition: background 120ms ease;
+      cursor: pointer;
+    }
+    .race-row:hover { background: var(--surface-hover); }
+    .race-row.out { opacity: 0.8; }
+    .race-row.out:hover { opacity: 1; }
+
+    .rank-num {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+    .rank-num.top { color: var(--accent); }
+
+    /*
+      Status pill — shown in the Status column. Two variants:
+        .in  — green "IN" pill for top 4 seeds
+        .gb  — amber "N GB" pill for teams missing the cut (N games behind)
+      Kept visually distinct so the cut line is legible at a glance.
+    */
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border: 1px solid;
+    }
+    .status-pill.in {
+      color: var(--positive);
+      background: rgba(34, 197, 94, 0.1);
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+    .status-pill.gb {
+      color: var(--amber);
+      background: rgba(251, 191, 36, 0.08);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    /*
+      Playoff Line — the visual cut between the #4 and #5 seed. Accent-tinted
+      band with a pulsing dot + label centered by two flex line segments.
+    */
+    .playoff-line-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent-soft) 50%, transparent 100%);
+      border-top: 1px dashed var(--accent-ring);
+      border-bottom: 1px dashed var(--accent-ring);
+    }
+    .playoff-line-row .line-seg {
+      flex: 1;
+      height: 1px;
+      background: var(--accent-ring);
+      opacity: 0.6;
+    }
+    .playoff-line-row .pl-label {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .playoff-line-row .pl-label::before {
+      content: "";
+      width: 6px; height: 6px; border-radius: 999px;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    .diff-pos { color: var(--positive); }
+    .diff-neg { color: var(--negative); }
 
     /*
       ================== BRACKET ==================
@@ -446,6 +532,174 @@
     </div>
   </section>
 
+  <!-- ========================== PLAYOFF RACE ========================== -->
+  <!--
+    DEV NOTE: Standings snapshot showing ALL 6 teams, sorted by playoff seed
+    (game wins primary, same ranking as the Standings page). Row styling
+    signals playoff status at a glance:
+
+      Top 4 (IN):   full opacity, green "IN" status pill.
+      Bottom 2 (OUT): .race-row.out class dims opacity to 0.8, amber "N GB"
+                      status pill showing wins-behind-the-#4-seed.
+
+    A full-width "PLAYOFF LINE" divider (.playoff-line-row) renders between
+    the #4 and #5 seed rows. Dashed accent borders + subtle accent-soft gradient
+    band so the cut reads immediately without being loud.
+
+    GB CALCULATION (simplified): GB = fourthSeed.gameWins - team.gameWins.
+    We intentionally do NOT use the traditional baseball GB formula
+    ((winsA - winsB + lossesB - lossesA) / 2), because it produces unintuitive
+    negative values when teams have played unequal numbers of games (e.g., a
+    DNP team at 0-0 vs a 1-2 team would compute to -0.5 GB, which reads as
+    "ahead" even though they have zero wins). Using the simple win gap matches
+    our canonical ranking logic (game wins primary) and is immediately legible.
+
+    PHASE 3 WIRING:
+      - All 6 rows come from the standings query in current-seed order.
+      - For each row, status = (rank <= 4) ? 'IN' : `${fourthSeedWins - teamWins} GB`.
+      - Rows are <a> tags so they double as team-detail navigation.
+      - If the mockup is at all tight for space on narrow devices, the
+        horizontal-scroll container (min-w-[560px]) handles it the same way
+        the Standings table does.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-10 pb-4">
+    <div class="flex items-baseline justify-between mb-5 gap-4">
+      <div class="min-w-0">
+        <h2 class="display font-black text-2xl md:text-3xl leading-none tracking-wide">PLAYOFF RACE</h2>
+        <div class="text-[11.5px] text-[var(--text-muted)] mt-1.5 tracking-[0.04em]">All 6 teams · Top 4 advance to the bracket</div>
+      </div>
+      <a href="#" class="stat-label hover:text-[var(--text)] transition hidden sm:inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+        Full Standings <span class="text-[var(--accent)]">→</span>
+      </a>
+    </div>
+
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <div class="min-w-[560px]">
+
+          <!-- Header row -->
+          <div class="flex items-center text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)] border-b border-[var(--border)]">
+            <span class="w-10 text-center shrink-0 py-3">#</span>
+            <span class="flex-1 py-3 pl-2">Team</span>
+            <span class="w-10 text-center shrink-0 py-3">W</span>
+            <span class="w-10 text-center shrink-0 py-3">L</span>
+            <span class="w-16 text-right shrink-0 py-3">+/-</span>
+            <span class="w-28 text-right shrink-0 py-3 pr-4">Status</span>
+          </div>
+
+          <!-- Row #1: Lakers -->
+          <a href="#" class="race-row in flex items-center border-b border-[var(--border)]">
+            <span class="w-10 text-center shrink-0 py-3"><span class="rank-num top">1</span></span>
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+              <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#552583 60%,#FDB927);">L</div>
+              <div class="min-w-0">
+                <div class="display font-black text-base leading-none">LAKERS</div>
+                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Joseph</div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
+            <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-pos">+19</span>
+            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+          </a>
+
+          <!-- Row #2: Suns -->
+          <a href="#" class="race-row in flex items-center border-b border-[var(--border)]">
+            <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">2</span></span>
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+              <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#E56020 50%,#1D1160);">S</div>
+              <div class="min-w-0">
+                <div class="display font-black text-base leading-none">SUNS</div>
+                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Joseph &amp; Nathan</div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
+            <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-pos">+1</span>
+            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+          </a>
+
+          <!-- Row #3: Celtics -->
+          <a href="#" class="race-row in flex items-center border-b border-[var(--border)]">
+            <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">3</span></span>
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+              <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#007A33 60%,#BA9653);">C</div>
+              <div class="min-w-0">
+                <div class="display font-black text-base leading-none">CELTICS</div>
+                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Daniel</div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
+            <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-neg">-1</span>
+            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+          </a>
+
+          <!-- Row #4: Bucks (last IN — no bottom border; playoff line handles separation) -->
+          <a href="#" class="race-row in flex items-center">
+            <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">4</span></span>
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+              <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#00471B 60%,#EEE1C6);color:#00471B;">B</div>
+              <div class="min-w-0">
+                <div class="display font-black text-base leading-none">BUCKS</div>
+                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Daniel &amp; Nathan</div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
+            <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-neg">-19</span>
+            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+          </a>
+
+          <!-- Playoff line divider — visual cut between #4 and #5 -->
+          <div class="playoff-line-row">
+            <div class="line-seg"></div>
+            <span class="pl-label">PLAYOFF LINE</span>
+            <div class="line-seg"></div>
+          </div>
+
+          <!-- Row #5: Warriors (DNP · 1 GB) -->
+          <a href="#" class="race-row out flex items-center border-b border-[var(--border)]">
+            <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">5</span></span>
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+              <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#1D428A 60%,#FFC72C);">W</div>
+              <div class="min-w-0">
+                <div class="display font-black text-base leading-none">WARRIORS</div>
+                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Nathan</div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-16 text-right shrink-0 py-3 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill gb">1 GB</span></span>
+          </a>
+
+          <!-- Row #6: Heat (DNP · 1 GB) -->
+          <a href="#" class="race-row out flex items-center">
+            <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">6</span></span>
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+              <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#98002E 50%,#F9A01B);">H</div>
+              <div class="min-w-0">
+                <div class="display font-black text-base leading-none">HEAT</div>
+                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Daniel &amp; Joseph</div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-16 text-right shrink-0 py-3 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill gb">1 GB</span></span>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend / footnote -->
+    <div class="mt-3 text-[11px] text-[var(--text-dim)]">
+      <span class="text-[var(--text-muted)] font-bold">GB</span> = wins behind the #4 seed. Seeding by game wins; tiebreakers: head-to-head match record, then point differential.
+    </div>
+  </section>
+
   <!-- ========================== BRACKET ========================== -->
   <section class="max-w-6xl mx-auto px-5 pt-10 pb-8">
 
@@ -549,7 +803,7 @@
             </span>
           </div>
 
-          <!-- Mini matchup — now mirrors semifinal layout (seed + logo + name+record+duo + score) -->
+          <!-- Mini matchup — mirrors semifinal layout (seed + logo + name+record+duo + score) -->
           <div class="space-y-1">
             <div class="mini-team winner">
               <span class="seed-badge">#1</span>
