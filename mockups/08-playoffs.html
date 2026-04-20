@@ -301,7 +301,7 @@
       Record pill (regular-season W-L) shown inline after the team name.
       Uses body font + lighter weight + muted color so it reads as secondary
       info without competing with the display-font team name.
-      Size is set per-context (team-card vs mini-team) below.
+      Size is set per-context below.
     */
     .record {
       font-family: 'Manrope', sans-serif;
@@ -312,6 +312,7 @@
     }
     .team-card .record { font-size: 12px; }
     .mini-team   .record { font-size: 10.5px; }
+    .race-row    .record { font-size: 11.5px; }
 
     /* ================== CHAMPIONSHIP CARD ================== */
     .championship-card {
@@ -485,10 +486,10 @@
       STAGE 1 - Seeding: top 4 by regular-season GAME WINS (= standings rank)
       STAGE 2 - Resolution: matchups decided by +/- comparison
 
-    Team-name records in the bracket (e.g. "LAKERS (2-1)") show the regular-season
-    GAME record (W-L), not the match record. Game record is the primary ranking
-    metric, so surfacing it here keeps the bracket visually consistent with the
-    standings ranking logic.
+    Team-name records in the bracket and playoff-race table (e.g. "LAKERS (2-1)")
+    show the regular-season GAME record (W-L), not the match record. Game record
+    is the primary ranking metric, so surfacing it here keeps the bracket visually
+    consistent with the standings ranking logic.
 
     The "Live Projection" pill is the critical status indicator.
     Its state depends on whether the regular season has ended:
@@ -535,9 +536,15 @@
   <!-- ========================== PLAYOFF RACE ========================== -->
   <!--
     DEV NOTE: Standings snapshot showing ALL 6 teams, sorted by playoff seed
-    (game wins primary, same ranking as the Standings page). Row styling
-    signals playoff status at a glance:
+    (game wins primary, same ranking as the Standings page). Columns:
 
+      # · Team (W-L inline) · +/- · Status
+
+    Dropped W and L as separate columns — the record in parentheses next to
+    the team name carries the same info without the visual gap that separate
+    W/L columns created. Status stays at the right edge.
+
+    Row styling signals playoff status at a glance:
       Top 4 (IN):   full opacity, green "IN" status pill.
       Bottom 2 (OUT): .race-row.out class dims opacity to 0.8, amber "N GB"
                       status pill showing wins-behind-the-#4-seed.
@@ -556,11 +563,10 @@
 
     PHASE 3 WIRING:
       - All 6 rows come from the standings query in current-seed order.
-      - For each row, status = (rank <= 4) ? 'IN' : `${fourthSeedWins - teamWins} GB`.
+      - Record string = `${gameWins}-${gameLosses}` inline with team name.
+      - Status = (rank <= 4) ? 'IN' : `${fourthSeedWins - teamWins} GB`.
       - Rows are <a> tags so they double as team-detail navigation.
-      - If the mockup is at all tight for space on narrow devices, the
-        horizontal-scroll container (min-w-[560px]) handles it the same way
-        the Standings table does.
+      - Horizontal-scroll container (min-w-[460px]) handles narrow devices.
   -->
   <section class="max-w-6xl mx-auto px-5 pt-10 pb-4">
     <div class="flex items-baseline justify-between mb-5 gap-4">
@@ -575,16 +581,14 @@
 
     <div class="card overflow-hidden">
       <div class="overflow-x-auto">
-        <div class="min-w-[560px]">
+        <div class="min-w-[460px]">
 
           <!-- Header row -->
           <div class="flex items-center text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)] border-b border-[var(--border)]">
             <span class="w-10 text-center shrink-0 py-3">#</span>
             <span class="flex-1 py-3 pl-2">Team</span>
-            <span class="w-10 text-center shrink-0 py-3">W</span>
-            <span class="w-10 text-center shrink-0 py-3">L</span>
             <span class="w-16 text-right shrink-0 py-3">+/-</span>
-            <span class="w-28 text-right shrink-0 py-3 pr-4">Status</span>
+            <span class="w-24 text-right shrink-0 py-3 pr-4">Status</span>
           </div>
 
           <!-- Row #1: Lakers -->
@@ -593,14 +597,12 @@
             <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#552583 60%,#FDB927);">L</div>
               <div class="min-w-0">
-                <div class="display font-black text-base leading-none">LAKERS</div>
+                <div class="display font-black text-base leading-none">LAKERS <span class="record">(2-1)</span></div>
                 <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Joseph</div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-pos">+19</span>
-            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+            <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
           </a>
 
           <!-- Row #2: Suns -->
@@ -609,14 +611,12 @@
             <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#E56020 50%,#1D1160);">S</div>
               <div class="min-w-0">
-                <div class="display font-black text-base leading-none">SUNS</div>
+                <div class="display font-black text-base leading-none">SUNS <span class="record">(2-1)</span></div>
                 <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Joseph &amp; Nathan</div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-pos">+1</span>
-            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+            <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
           </a>
 
           <!-- Row #3: Celtics -->
@@ -625,14 +625,12 @@
             <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#007A33 60%,#BA9653);">C</div>
               <div class="min-w-0">
-                <div class="display font-black text-base leading-none">CELTICS</div>
+                <div class="display font-black text-base leading-none">CELTICS <span class="record">(1-2)</span></div>
                 <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Daniel</div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-neg">-1</span>
-            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+            <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
           </a>
 
           <!-- Row #4: Bucks (last IN — no bottom border; playoff line handles separation) -->
@@ -641,14 +639,12 @@
             <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#00471B 60%,#EEE1C6);color:#00471B;">B</div>
               <div class="min-w-0">
-                <div class="display font-black text-base leading-none">BUCKS</div>
+                <div class="display font-black text-base leading-none">BUCKS <span class="record">(1-2)</span></div>
                 <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Daniel &amp; Nathan</div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-muted)]">1</span>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular">2</span>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-neg">-19</span>
-            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
+            <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
           </a>
 
           <!-- Playoff line divider — visual cut between #4 and #5 -->
@@ -664,14 +660,12 @@
             <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#1D428A 60%,#FFC72C);">W</div>
               <div class="min-w-0">
-                <div class="display font-black text-base leading-none">WARRIORS</div>
+                <div class="display font-black text-base leading-none">WARRIORS <span class="record">(0-0)</span></div>
                 <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Nathan</div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill gb">1 GB</span></span>
+            <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill gb">1 GB</span></span>
           </a>
 
           <!-- Row #6: Heat (DNP · 1 GB) -->
@@ -680,14 +674,12 @@
             <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#98002E 50%,#F9A01B);">H</div>
               <div class="min-w-0">
-                <div class="display font-black text-base leading-none">HEAT</div>
+                <div class="display font-black text-base leading-none">HEAT <span class="record">(0-0)</span></div>
                 <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Daniel &amp; Joseph</div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
-            <span class="w-10 text-center shrink-0 py-3 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-28 text-right shrink-0 py-3 pr-4"><span class="status-pill gb">1 GB</span></span>
+            <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill gb">1 GB</span></span>
           </a>
 
         </div>
