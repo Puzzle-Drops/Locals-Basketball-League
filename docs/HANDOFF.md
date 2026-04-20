@@ -13,12 +13,14 @@ ranking/playoff logic without reading the non-negotiable decisions section.
 ## Phase 3 Status
 
 Built so far:
-- Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops).
+- Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops, `.week-divider`, `.pill.success`).
 - Reusable components in `src/components/`: `Layout` (sticky nav with Playoffs link + hamburger mobile menu), `Scorecard` (handles played, DNP, and upcoming variants with optional `records` prop), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNGs from `assets/` with gradient-and-initial fallback, multiple sizes), `Pill`.
-- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**.
+- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**.
 
 Remaining:
-- Schedule (04), Game Detail (05), Standings (06), Rules (07), Playoffs (08).
+- Game Detail (05), Standings (06), Rules (07), Playoffs (08).
+
+Data model note: series `status` now includes `"upcoming"` alongside `completed` / `partial` / `dnp`. Upcoming gets the same stat treatment as DNP (no wins, no points) but is rendered neutrally instead of with the amber DNP pill. `data/season1.json` Week 1 Series 3 was switched from `dnp` to `upcoming` since the league plans to play it.
 
 ---
 

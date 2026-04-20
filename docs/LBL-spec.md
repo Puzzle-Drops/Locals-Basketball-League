@@ -189,7 +189,7 @@ Until decided, the Playoffs page on the site just shows "TBD."
 **Conventions:**
 - **Team keys** use age-ordered player names joined by hyphen. Older player always first (`Jacob-Daniel`, `Daniel-Joseph`, `Joseph-Nathan`, etc.).
 - **Date** is optional per-game, purely cosmetic. Leave it out or set `null` if you don't care. Nothing depends on it. "Week" is the logical unit.
-- **Status**: `"completed"` | `"partial"` | `"dnp"`
+- **Status**: `"completed"` | `"partial"` | `"dnp"` | `"upcoming"` (scheduled but not played yet, same stat treatment as DNP -- no wins, no points -- but rendered neutrally in the UI rather than with the amber DNP styling)
 - **Series labels** are derived from the series' index in the week, not from `matchup_id`.
 
 **Separate `teams.json`** holds the permanent duo to nickname map:

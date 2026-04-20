@@ -99,6 +99,17 @@ body {
   border-color: var(--team-ring, var(--accent-ring));
   background: var(--team-soft, var(--accent-soft));
 }
+.pill.success {
+  color: var(--positive);
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.08);
+}
+a.pill {
+  transition: color 120ms, border-color 120ms, background 120ms;
+}
+a.pill:hover { color: var(--text); border-color: var(--border-strong); }
+a.pill.accent:hover { color: var(--accent); }
+a.pill.success:hover { color: var(--positive); }
 
 /* Round logo (NBA team) -- backed by real PNG, gradient fallback */
 .logo {
@@ -250,3 +261,11 @@ body {
 .row:hover { background: rgba(255,255,255,0.03); }
 
 section { scroll-margin-top: 80px; }
+
+/* Faint horizontal separator between Schedule week sections. */
+.week-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-strong), transparent);
+  margin: 0 auto;
+  max-width: 240px;
+}

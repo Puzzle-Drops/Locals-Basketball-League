@@ -29,8 +29,8 @@ Full rules and data model are in `docs/LBL-spec.md`. That document is the source
 **Phase 3 (in progress): Implement the design**
 - Design system ported from mockups to `src/index.css` (CSS vars, Big Shoulders + Manrope fonts, `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` component classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops).
 - Reusable components in `src/components/`: `Layout` (sticky nav + hamburger mobile menu), `Scorecard` (played / DNP / upcoming variants), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNG with gradient fallback, multiple sizes), `Pill` (default / accent / dnp / team variants).
-- Pages built: Home, Teams (index), TeamDetail, Players (index), PlayerDetail.
-- Pages remaining: Schedule (04), Game Detail (05), Standings (06), Rules (07), Playoffs (08).
+- Pages built: Home, Teams (index), TeamDetail, Players (index), PlayerDetail, Schedule.
+- Pages remaining: Game Detail (05), Standings (06), Rules (07), Playoffs (08).
 
 ---
 
@@ -103,9 +103,10 @@ There are exactly 6 duos. Hardcode this constant.
 
 **Standings W/L shows GAMES by default.** The Standings table must support a toggle between `Games` (game record, e.g. 2-1) and `Series` (series record, e.g. 1-0). Default view is `Games`. The RANKING is always by game wins regardless of the selected view; the toggle only swaps the displayed W/L (and the per-N stats: PPG/PPS, PAPG/PAPS, AVG/G/AVG/S).
 
-**Series status values:** `"completed"` | `"partial"` | `"dnp"`
-- DNP series award no wins and no points. Don't count them in averages.
+**Series status values:** `"completed"` | `"partial"` | `"dnp"` | `"upcoming"`
+- DNP series award no wins and no points. Don't count them in averages. Render with the amber DNP pill.
 - Partial = some games played, series didn't finish. Count the played games; only award a series winner if one duo has already taken 2 of the 3 games.
+- Upcoming = scheduled but not played yet. Same stat treatment as DNP (no wins/points), but the UI renders it as a neutral upcoming card (no DNP pill, `0-0` placeholder cells, current records shown in parens).
 
 **Standings ranking:**
 1. Game wins (primary)
