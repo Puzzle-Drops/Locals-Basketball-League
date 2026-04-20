@@ -356,13 +356,17 @@
 
   <!-- ========================== HERO ========================== -->
   <!--
-    DEV NOTE: The "Live Projection" pill is the critical status indicator.
+    DEV NOTE: Two-stage playoff logic is the core concept here:
+      STAGE 1 - Seeding: top 4 by regular-season GAME WINS (= standings rank)
+      STAGE 2 - Resolution: matchups decided by +/- comparison
+
+    The "Live Projection" pill is the critical status indicator.
     Its state depends on whether the regular season has ended:
-      - Season active  -> "Live Projection" (pulsing dot, current copy)
+      - Season active   -> "Live Projection" (pulsing dot, current copy)
       - Season complete -> "Final" (static dot, different copy)
-    The rest of the page also needs to adapt: "Projected Champion" becomes
-    "Champion", "Lakers advances" remains accurate (just no longer "projected"),
-    etc. Phase 3 should thread a simple boolean like `seasonComplete` through.
+    The rest of the page also adapts: "Projected Champion" becomes "Champion",
+    "Lakers advances" remains accurate but no longer "projected", etc. Phase 3
+    should thread a simple boolean like `seasonComplete` through.
   -->
   <section class="court-bg border-b border-[var(--border)]">
     <div class="max-w-6xl mx-auto px-5 pt-10 pb-10 relative overflow-hidden">
@@ -372,7 +376,7 @@
         <div class="stat-label mb-2">Season 1 · Week 1 of 3</div>
         <h1 class="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-3">PLAYOFFS</h1>
         <p class="text-[var(--text-muted)] text-base md:text-lg max-w-xl mb-5">
-          Top 4 teams, seeded by the standings. Matchups resolve on season point differential (+/-). The bracket updates live, then locks after Week 3.
+          Top 4 teams by regular-season wins earn playoff spots. Once in, bracket matchups resolve on season point differential (+/-). The bracket updates live, then locks after Week 3.
         </p>
 
         <div class="flex flex-wrap items-center gap-2">
@@ -392,10 +396,6 @@
           <div class="flex items-baseline gap-3">
             <span class="display font-black text-2xl w-8 text-right">3</span>
             <span class="stat-label">Computed Matchups</span>
-          </div>
-          <div class="flex items-baseline gap-3">
-            <span class="display font-black text-2xl w-8 text-right text-[var(--accent)]">LAK</span>
-            <span class="stat-label">Current Projected Champion</span>
           </div>
         </div>
       </div>
@@ -433,20 +433,20 @@
 
         <div class="vs-divider">VS</div>
 
-        <!-- #4 Heat (loser, DNP) -->
+        <!-- #4 Bucks (loser) -->
         <div class="team-card loser">
           <span class="seed-badge">#4</span>
-          <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+          <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
           <div class="min-w-0">
-            <div class="team-name">HEAT <span class="pill dnp">DNP</span></div>
-            <div class="team-duo">Daniel · Joseph</div>
+            <div class="team-name">BUCKS</div>
+            <div class="team-duo">Daniel · Nathan</div>
           </div>
-          <div class="team-score tabular">+0</div>
+          <div class="team-score tabular">-19</div>
         </div>
 
         <div class="advances-note">
           <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
-          LAKERS advances (+19 vs +0)
+          LAKERS advances (+19 vs -19)
         </div>
       </div>
 
@@ -470,20 +470,20 @@
 
         <div class="vs-divider">VS</div>
 
-        <!-- #3 Warriors (loser, DNP) -->
+        <!-- #3 Celtics (loser) -->
         <div class="team-card loser">
           <span class="seed-badge">#3</span>
-          <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+          <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
           <div class="min-w-0">
-            <div class="team-name">WARRIORS <span class="pill dnp">DNP</span></div>
-            <div class="team-duo">Jacob · Nathan</div>
+            <div class="team-name">CELTICS</div>
+            <div class="team-duo">Jacob · Daniel</div>
           </div>
-          <div class="team-score tabular">+0</div>
+          <div class="team-score tabular">-1</div>
         </div>
 
         <div class="advances-note">
           <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
-          SUNS advances (+1 vs +0)
+          SUNS advances (+1 vs -1)
         </div>
       </div>
 
@@ -546,27 +546,27 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-[14px] text-[var(--text-muted)] leading-relaxed">
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">01</span>
-          <div><strong class="text-[var(--text)]">Top 4 teams</strong> from the standings seed into the bracket. #5 and #6 miss out.</div>
+          <div><strong class="text-[var(--text)]">Top 4 teams</strong> from the standings make the playoffs. #5 and #6 miss out.</div>
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">02</span>
-          <div><strong class="text-[var(--text)]">#1 vs #4</strong> on the left, <strong class="text-[var(--text)]">#2 vs #3</strong> on the right. Winners meet in the championship.</div>
+          <div><strong class="text-[var(--text)]">Seeding uses game wins</strong> — the same rule as the standings ranking.</div>
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">03</span>
-          <div>Matchups resolve by comparing each team's <strong class="text-[var(--text)]">season +/-</strong>. Higher +/- advances.</div>
+          <div><strong class="text-[var(--text)]">#1 vs #4</strong> on the left, <strong class="text-[var(--text)]">#2 vs #3</strong> on the right. Winners meet in the championship.</div>
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">04</span>
-          <div>Playoff results <strong class="text-[var(--text)]">don't add anything</strong> to team or player stats. +/- is already counted.</div>
+          <div><strong class="text-[var(--text)]">Matchups resolve on +/-.</strong> Once seeded, bracket matchups compare season point differentials. Higher +/- advances.</div>
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">05</span>
-          <div>The bracket is a <strong class="text-[var(--text)]">live projection</strong> during the season, updated as games are played.</div>
+          <div><strong class="text-[var(--text)]">Why +/-?</strong> Cross-pairing teams may never have played each other, so W/L head-to-head doesn't exist. +/- always does.</div>
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">06</span>
-          <div>After the <strong class="text-[var(--text)]">final Week 3 series</strong>, the bracket locks and the champion is declared.</div>
+          <div><strong class="text-[var(--text)]">No double counting.</strong> Playoff results don't add to stats — +/- is already tallied. Bracket is a live projection, locks after Week 3.</div>
         </div>
       </div>
     </div>

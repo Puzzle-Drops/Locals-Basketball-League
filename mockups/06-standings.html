@@ -269,6 +269,23 @@
       10. AVG/G / AVG/M (sort: avg)                   (+/-) / N
       11. Win%          (sort: winpct)                wins/games (or wins/matches)
 
+    RANKING LOGIC (canonical):
+      Primary  : game wins (descending)
+      Tiebreak 1: head-to-head match record
+      Tiebreak 2: point differential (+/-)
+    The top 4 teams make the playoffs.
+
+    NOTE ON W/L DISPLAY vs RANKING: the View toggle swaps displayed W/L values
+    between games and matches, but the RANKING itself is always by game wins.
+    The sort feature (click a column header) is an ad-hoc explorer for any
+    stat — it doesn't change the canonical ranking.
+
+    PHASE 3 OPEN ITEM: Warriors vs Heat are both 0-0 with +0 and haven't played
+    head-to-head yet (their Pairing C matchup was DNP in Week 1). We need a
+    deterministic final tiebreaker for teams identical on all three criteria.
+    Suggested: alphabetical team name. Mockup currently orders Warriors #5,
+    Heat #6, which matches team-list order; swap if we pick alpha.
+
     Sort cycle (per column):
       1st click — ascending.
       2nd click — descending.
@@ -282,9 +299,6 @@
     Row borders are CSS-driven (.standings-row:last-child removes the bottom
     border on whichever row ends up last), so re-sorting can't leave a stray
     1px line at the bottom.
-
-    Phase 3: the standings() engine should provide all these values pre-computed
-    and return rows already sorted for the active view.
   -->
   <section class="max-w-6xl mx-auto px-5 pt-6 pb-4">
     <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
@@ -308,7 +322,7 @@
             <span class="sortable w-16 text-right shrink-0 py-3 pr-3 sm:pr-4" data-sort="winpct">Win%</span>
           </div>
 
-          <!-- Row: Lakers -->
+          <!-- Row #1: Lakers (2W, +19) -->
           <a href="#" class="standings-row flex items-center group"
              data-rank="1" data-team="Lakers"
              data-w-games="2" data-w-matches="1"
@@ -341,7 +355,7 @@
             <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
           </a>
 
-          <!-- Row: Suns -->
+          <!-- Row #2: Suns (2W, +1) -->
           <a href="#" class="standings-row flex items-center group"
              data-rank="2" data-team="Suns"
              data-w-games="2" data-w-matches="1"
@@ -374,75 +388,9 @@
             <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
           </a>
 
-          <!-- Row: Warriors (DNP: all stats shown as 0 so the row can sort naturally) -->
-          <a href="#" class="standings-row flex items-center opacity-80 group"
-             data-rank="3" data-team="Warriors" data-dnp="1"
-             data-w-games="0" data-w-matches="0"
-             data-l-games="0" data-l-matches="0"
-             data-pf="0"
-             data-pp-games="0" data-pp-matches="0"
-             data-pa="0"
-             data-pap-games="0" data-pap-matches="0"
-             data-diff="0"
-             data-avg-games="0" data-avg-matches="0"
-             data-winpct-games="0" data-winpct-matches="0">
-            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-6">3</span>
-              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
-                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
-                <div class="min-w-0">
-                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">WARRIORS</div>
-                  <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Nathan</div>
-                </div>
-              </div>
-            </div>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
-          </a>
-
-          <!-- Row: Heat (DNP) -->
-          <a href="#" class="standings-row flex items-center opacity-80 group"
-             data-rank="4" data-team="Heat" data-dnp="1"
-             data-w-games="0" data-w-matches="0"
-             data-l-games="0" data-l-matches="0"
-             data-pf="0"
-             data-pp-games="0" data-pp-matches="0"
-             data-pa="0"
-             data-pap-games="0" data-pap-matches="0"
-             data-diff="0"
-             data-avg-games="0" data-avg-matches="0"
-             data-winpct-games="0" data-winpct-matches="0">
-            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-6">4</span>
-              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
-                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
-                <div class="min-w-0">
-                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">HEAT</div>
-                  <div class="text-[11px] text-[var(--text-muted)] truncate">Daniel & Joseph</div>
-                </div>
-              </div>
-            </div>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
-          </a>
-
-          <!-- Row: Celtics -->
+          <!-- Row #3: Celtics (1W, -1) -->
           <a href="#" class="standings-row flex items-center group"
-             data-rank="5" data-team="Celtics"
+             data-rank="3" data-team="Celtics"
              data-w-games="1" data-w-matches="0"
              data-l-games="2" data-l-matches="1"
              data-pf="49"
@@ -453,7 +401,7 @@
              data-avg-games="-0.3" data-avg-matches="-1.0"
              data-winpct-games="33" data-winpct-matches="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-6">5</span>
+              <span class="rank w-6">3</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
                 <div class="min-w-0">
@@ -473,9 +421,9 @@
             <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
           </a>
 
-          <!-- Row: Bucks -->
+          <!-- Row #4: Bucks (1W, -19) -->
           <a href="#" class="standings-row flex items-center group"
-             data-rank="6" data-team="Bucks"
+             data-rank="4" data-team="Bucks"
              data-w-games="1" data-w-matches="0"
              data-l-games="2" data-l-matches="1"
              data-pf="40"
@@ -486,7 +434,7 @@
              data-avg-games="-6.3" data-avg-matches="-19.0"
              data-winpct-games="33" data-winpct-matches="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-6">6</span>
+              <span class="rank w-6">4</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
                 <div class="min-w-0">
@@ -505,11 +453,77 @@
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-6.3</span><span class="val-matches">-19.0</span></span>
             <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
           </a>
+
+          <!-- Row #5: Warriors (DNP, 0W, +0) -->
+          <a href="#" class="standings-row flex items-center opacity-80 group"
+             data-rank="5" data-team="Warriors" data-dnp="1"
+             data-w-games="0" data-w-matches="0"
+             data-l-games="0" data-l-matches="0"
+             data-pf="0"
+             data-pp-games="0" data-pp-matches="0"
+             data-pa="0"
+             data-pap-games="0" data-pap-matches="0"
+             data-diff="0"
+             data-avg-games="0" data-avg-matches="0"
+             data-winpct-games="0" data-winpct-matches="0">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank w-6">5</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">WARRIORS</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Nathan</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
+          </a>
+
+          <!-- Row #6: Heat (DNP, 0W, +0) -->
+          <a href="#" class="standings-row flex items-center opacity-80 group"
+             data-rank="6" data-team="Heat" data-dnp="1"
+             data-w-games="0" data-w-matches="0"
+             data-l-games="0" data-l-matches="0"
+             data-pf="0"
+             data-pp-games="0" data-pp-matches="0"
+             data-pa="0"
+             data-pap-games="0" data-pap-matches="0"
+             data-diff="0"
+             data-avg-games="0" data-avg-matches="0"
+             data-winpct-games="0" data-winpct-matches="0">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank w-6">6</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">HEAT</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Daniel & Joseph</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
+          </a>
         </div>
       </div>
     </div>
 
-    <!-- Column legend / tiebreakers -->
+    <!-- Column legend / ranking logic -->
     <div class="mt-4 flex flex-col gap-2 text-[11px] text-[var(--text-dim)]">
       <div class="flex flex-wrap gap-x-5 gap-y-1">
         <span><span class="text-[var(--text-muted)] font-bold">W/L</span> Wins / Losses</span>
@@ -521,7 +535,11 @@
         <span><span class="text-[var(--text-muted)] font-bold">AVG/G, AVG/M</span> Avg Point Diff per Game/Match</span>
         <span><span class="text-[var(--text-muted)] font-bold">Win%</span> Win Percentage</span>
       </div>
-      <div>Click any column header to sort (asc → desc → default). Tiebreakers: head-to-head matches, then point differential.</div>
+      <div>
+        <span class="text-[var(--text-muted)] font-bold">Ranked by games won.</span> Ties broken by head-to-head match record, then point differential.
+        <span class="text-[var(--accent)] font-bold">Top 4 advance to the playoffs.</span>
+        Click any column header to sort (asc → desc → default).
+      </div>
     </div>
   </section>
 

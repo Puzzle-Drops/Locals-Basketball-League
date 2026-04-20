@@ -457,6 +457,20 @@
   </section>
 
   <!-- ========================== SECTION 05 — STANDINGS & STATS ========================== -->
+  <!--
+    DEV NOTE: Canonical ranking logic:
+      Primary   : game wins (descending)
+      Tiebreak 1: head-to-head match record
+      Tiebreak 2: point differential (+/-)
+    Top 4 make the playoffs.
+
+    The Games/Matches toggle on the Standings page only swaps the W/L column's
+    DISPLAYED values. The ranking stays based on game wins regardless of view.
+
+    PHASE 3 OPEN: final tiebreaker for teams identical on all three criteria
+    (e.g., two DNP teams at 0-0-0 with no head-to-head). Suggested fallback:
+    alphabetical team name.
+  -->
   <section class="max-w-6xl mx-auto px-5 pt-16">
     <div class="section-block">
       <div class="section-num">05</div>
@@ -465,7 +479,10 @@
 
         <div class="prose max-w-2xl mb-6">
           <p>
-            Standings rank by <strong>games won</strong> in the default view. Toggle between <strong>games</strong> (every individual game counts) and <strong>matches</strong> (series-level W/L). When two duos are tied, the first tiebreaker is <strong>head-to-head match record</strong>. If still level, <strong>point differential</strong> decides.
+            Standings rank by <strong>games won</strong>. When two duos are tied, the first tiebreaker is <strong>head-to-head match record</strong>. If still level, <strong>point differential</strong> decides. The <strong>top 4</strong> teams advance to the playoffs.
+          </p>
+          <p>
+            The W/L display can toggle between <strong>games</strong> (every game counts individually) and <strong>matches</strong> (series-level W/L), but the ranking itself is always based on game wins.
           </p>
           <p>
             Every stat is tracked at the team level. A team's point differential is its total points scored minus points allowed. <strong>Player-level points</strong> are computed as the team's points divided by two. Both teammates contribute to every bucket, so within a single game their individual lines mirror each other.
@@ -475,7 +492,7 @@
           </p>
         </div>
 
-        <!-- Tracked stats + tiebreaker order -->
+        <!-- Tracked stats + ranking logic -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div class="card p-5">
             <div class="stat-label mb-3">Columns Tracked</div>
@@ -492,10 +509,11 @@
           </div>
 
           <div class="card p-5">
-            <div class="stat-label mb-3">Tiebreakers, in order</div>
+            <div class="stat-label mb-3">Ranking Logic</div>
             <ol class="text-[14px] text-[var(--text-muted)] leading-relaxed space-y-1.5">
-              <li><span class="display font-black text-[var(--accent)] mr-2">1.</span>Head-to-head match record</li>
-              <li><span class="display font-black text-[var(--accent)] mr-2">2.</span>Point differential</li>
+              <li><span class="display font-black text-[var(--accent)] mr-2">1.</span>Game wins (primary)</li>
+              <li><span class="display font-black text-[var(--accent)] mr-2">2.</span>Head-to-head match record</li>
+              <li><span class="display font-black text-[var(--accent)] mr-2">3.</span>Point differential</li>
             </ol>
           </div>
         </div>
@@ -505,17 +523,22 @@
 
   <!-- ========================== SECTION 06 — PLAYOFFS ========================== -->
   <!--
-    DEV NOTE: Playoffs are COMPUTED, not played live.
+    DEV NOTE: Playoffs are COMPUTED, not played live. Two-stage logic:
 
-      Seeding: top 4 teams from the regular-season standings.
-      Bracket:
-        Left  bracket: #1 vs #4
-        Right bracket: #2 vs #3
-        Championship : winner of left vs winner of right
-      Matchup resolution: compare the two teams' season +/- totals.
-        Higher +/- advances. Using +/- sidesteps the cross-pairing data gap
-        (every team has a +/- regardless of who they played in the regular
-        season).
+      STAGE 1 - SEEDING (who's in the bracket):
+        Top 4 teams from the regular-season standings, ranked by GAME WINS
+        (with head-to-head match record and +/- as tiebreakers). The #5 and
+        #6 teams miss the playoffs.
+
+      STAGE 2 - MATCHUP RESOLUTION (who wins in the bracket):
+        Once seeded, matchups are decided by comparing the two teams' season
+        +/- totals. Higher +/- advances. Rationale: cross-pairing matchups
+        (e.g. #1 Lakers vs #4 Bucks) may feature teams that never played
+        each other in the regular season, so W/L head-to-head doesn't exist.
+        +/- is always defined and always comparable.
+
+      BRACKET: left = #1 vs #4, right = #2 vs #3, championship = winner-left
+      vs winner-right.
 
     IMPORTANT - NO DOUBLE-COUNTING: Playoff results must NOT add anything to
     player or team stat totals. +/- is already computed from regular-season
@@ -535,13 +558,16 @@
 
         <div class="prose max-w-2xl mb-6">
           <p>
-            The <strong>top 4 teams</strong> from the regular-season standings advance to the playoffs. Seeding comes straight from the final rankings: <strong>#1 vs #4</strong> on the left side of the bracket, <strong>#2 vs #3</strong> on the right side. The two winners meet in the <strong>championship</strong>.
+            The <strong>top 4 teams</strong> from the regular-season standings advance to the playoffs. Because standings rank by game wins, seeding is simple: the team with the most wins earns the <strong>#1</strong> seed, down to <strong>#4</strong>. Inside the bracket, <strong>#1 vs #4</strong> on the left side, <strong>#2 vs #3</strong> on the right. The two winners meet in the <strong>championship</strong>.
           </p>
           <p>
-            Playoff matchups aren't played live. Each matchup is decided by comparing the two teams' regular-season point differential (<strong>+/-</strong>). The team with the higher +/- advances. A result might look like Lakers +19 vs Celtics -1, sending Lakers through.
+            Once in the bracket, matchups aren't played live. They're decided by comparing the two teams' regular-season <strong>point differential (+/-)</strong>. The team with the higher +/- advances. A result might look like Lakers +19 vs Bucks -19, sending Lakers through.
           </p>
           <p>
-            Because +/- is already tallied from regular-season games, playoff results <strong>don't add anything</strong> to team or player stat totals. No double counting.
+            <strong>Why two different metrics?</strong> Game wins determine who <em>makes</em> the playoffs, because that's how teams are ranked over a season. But once you're in, +/- decides matchups, because a bracket pairing may feature teams that never played each other, leaving no W/L head-to-head. +/- is always defined and always comparable.
+          </p>
+          <p>
+            Because +/- comes from games already played, playoff results <strong>don't add anything</strong> to team or player stat totals. No double counting.
           </p>
           <p>
             The bracket is visible throughout the regular season as a live <strong>projection</strong>. It shows what would happen if the season ended today, and updates as games are played. When the final regular-season series wraps, the bracket locks and the champion is declared.
