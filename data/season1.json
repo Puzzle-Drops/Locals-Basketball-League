@@ -11,9 +11,9 @@
           "team2_key": "Daniel-Nathan",
           "status": "completed",
           "games": [
-            { "game": 1, "date": "2026-04-19", "team1_score": 21, "team2_score": 0,  "vod_url": "https://youtu.be/_xB6qS-A3_k" },
-            { "game": 2, "date": "2026-04-19", "team1_score": 17, "team2_score": 21, "vod_url": "https://youtu.be/Igw7L5Um8Vo" },
-            { "game": 3, "date": "2026-04-19", "team1_score": 21, "team2_score": 19, "vod_url": "https://www.youtube.com/watch?v=BQb4NOPBMk4" }
+            { "game": 1, "date": "2026-04-19", "team1_score": 21, "team2_score": 0,  "vod_url": "https://youtu.be/4AwVhgC2et0" },
+            { "game": 2, "date": "2026-04-19", "team1_score": 17, "team2_score": 21, "vod_url": "https://youtu.be/kOcG2QrsXFk" },
+            { "game": 3, "date": "2026-04-19", "team1_score": 21, "team2_score": 19, "vod_url": "https://youtu.be/ADT1K8C4Exg" }
           ]
         },
         {
