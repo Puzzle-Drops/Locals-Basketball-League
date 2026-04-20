@@ -13,7 +13,7 @@ Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
 - 2v2 basketball
 - Make it take it
 - 2-pointers and 3-pointers
-- First to 21, win by 2
+- First to 21, straight up (no win by 2)
 - Each matchup is a 3-game series. All 3 games are always played, even at 2-0. The series winner is whichever duo takes 2 or more games.
 - **First possession:** on Game 1 of a series, the team currently lower in the standings starts with the ball. On Games 2 and 3, the team that lost the previous game starts with the ball.
 
