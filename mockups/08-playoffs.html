@@ -192,7 +192,7 @@
       font-size: 16px;
       line-height: 1;
       letter-spacing: 0.02em;
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: baseline; gap: 6px;
     }
     .team-card .team-duo {
       font-size: 10.5px;
@@ -210,6 +210,22 @@
     }
     .team-card.winner .team-score { color: var(--accent); }
     .team-card.loser  .team-score { color: var(--text-muted); }
+
+    /*
+      Record pill (regular-season W-L) shown inline after the team name.
+      Uses body font + lighter weight + muted color so it reads as secondary
+      info without competing with the display-font team name.
+      Size is set per-context (team-card vs mini-team) below.
+    */
+    .record {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .team-card .record { font-size: 12px; }
+    .mini-team   .record { font-size: 10.5px; }
 
     /* ================== CHAMPIONSHIP CARD ================== */
     .championship-card {
@@ -233,9 +249,14 @@
       opacity: 0.5;
     }
 
+    /*
+      Mini-team (championship rows) mirrors the semifinal team-card layout:
+        [seed] [logo] [name + record + duo] [score]
+      Just scaled down to fit inside the narrower championship card.
+    */
     .mini-team {
       display: grid;
-      grid-template-columns: 32px 1fr auto;
+      grid-template-columns: 22px 32px 1fr auto;
       align-items: center;
       gap: 10px;
       padding: 10px 12px;
@@ -249,10 +270,26 @@
       background: var(--accent-soft);
     }
     .mini-team.loser { opacity: 0.5; }
+    .mini-team .seed-badge {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+    .mini-team.winner .seed-badge { color: var(--accent); }
     .mini-team .name {
       font-family: 'Big Shoulders Display', sans-serif;
       font-weight: 900;
       font-size: 14px;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      display: flex; align-items: baseline; gap: 5px;
+    }
+    .mini-team .duo {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
       letter-spacing: 0.02em;
     }
     .mini-team .score {
@@ -260,6 +297,8 @@
       font-weight: 900;
       font-size: 18px;
       font-variant-numeric: tabular-nums;
+      min-width: 36px;
+      text-align: right;
     }
     .mini-team.winner .score { color: var(--accent); }
     .mini-team.loser  .score { color: var(--text-muted); }
@@ -360,6 +399,11 @@
       STAGE 1 - Seeding: top 4 by regular-season GAME WINS (= standings rank)
       STAGE 2 - Resolution: matchups decided by +/- comparison
 
+    Team-name records in the bracket (e.g. "LAKERS (2-1)") show the regular-season
+    GAME record (W-L), not the match record. Game record is the primary ranking
+    metric, so surfacing it here keeps the bracket visually consistent with the
+    standings ranking logic.
+
     The "Live Projection" pill is the critical status indicator.
     Its state depends on whether the regular season has ended:
       - Season active   -> "Live Projection" (pulsing dot, current copy)
@@ -425,7 +469,7 @@
           <span class="seed-badge">#1</span>
           <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
           <div class="min-w-0">
-            <div class="team-name">LAKERS</div>
+            <div class="team-name">LAKERS <span class="record">(2-1)</span></div>
             <div class="team-duo">Jacob · Joseph</div>
           </div>
           <div class="team-score tabular">+19</div>
@@ -438,7 +482,7 @@
           <span class="seed-badge">#4</span>
           <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
           <div class="min-w-0">
-            <div class="team-name">BUCKS</div>
+            <div class="team-name">BUCKS <span class="record">(1-2)</span></div>
             <div class="team-duo">Daniel · Nathan</div>
           </div>
           <div class="team-score tabular">-19</div>
@@ -462,7 +506,7 @@
           <span class="seed-badge">#2</span>
           <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
           <div class="min-w-0">
-            <div class="team-name">SUNS</div>
+            <div class="team-name">SUNS <span class="record">(2-1)</span></div>
             <div class="team-duo">Joseph · Nathan</div>
           </div>
           <div class="team-score tabular">+1</div>
@@ -475,7 +519,7 @@
           <span class="seed-badge">#3</span>
           <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
           <div class="min-w-0">
-            <div class="team-name">CELTICS</div>
+            <div class="team-name">CELTICS <span class="record">(1-2)</span></div>
             <div class="team-duo">Jacob · Daniel</div>
           </div>
           <div class="team-score tabular">-1</div>
@@ -505,17 +549,25 @@
             </span>
           </div>
 
-          <!-- Mini matchup -->
+          <!-- Mini matchup — now mirrors semifinal layout (seed + logo + name+record+duo + score) -->
           <div class="space-y-1">
             <div class="mini-team winner">
+              <span class="seed-badge">#1</span>
               <div class="logo sm" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
-              <div class="name">LAKERS</div>
+              <div class="min-w-0">
+                <div class="name">LAKERS <span class="record">(2-1)</span></div>
+                <div class="duo">Jacob · Joseph</div>
+              </div>
               <div class="score tabular">+19</div>
             </div>
             <div class="champ-mini-vs">VS</div>
             <div class="mini-team loser">
+              <span class="seed-badge">#2</span>
               <div class="logo sm" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
-              <div class="name">SUNS</div>
+              <div class="min-w-0">
+                <div class="name">SUNS <span class="record">(2-1)</span></div>
+                <div class="duo">Joseph · Nathan</div>
+              </div>
               <div class="score tabular">+1</div>
             </div>
           </div>
