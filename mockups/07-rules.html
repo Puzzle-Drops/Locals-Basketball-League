@@ -179,6 +179,7 @@
         <a class="nav-link" href="#">Teams</a>
         <a class="nav-link" href="#">Players</a>
         <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link" href="#">Playoffs</a>
         <a class="nav-link active" href="#">Rules</a>
       </div>
 
@@ -227,7 +228,7 @@
     </div>
   </section>
 
-  <!-- ========================== SECTION 01 — THE GAME ========================== -->
+  <!-- ========================== SECTION 01 - THE GAME ========================== -->
   <section class="max-w-6xl mx-auto px-5 pt-14">
     <div class="section-block">
       <div class="section-num">01</div>
@@ -252,12 +253,12 @@
     </div>
   </section>
 
-  <!-- ========================== SECTION 02 — SERIES & SEASON ========================== -->
+  <!-- ========================== SECTION 02 - SERIES & SEASON ========================== -->
   <!--
-    DEV NOTE: A "series" (aka "match") is 3 games. ALL 3 games are always played,
-    even after a team goes up 2-0. The match winner is whichever duo takes 2 or
-    more of the 3 games. Every game counts for PF, PA, +/-, and the games-won
-    record regardless of whether the series was already decided going in.
+    DEV NOTE: A "series" is 3 games. ALL 3 games are always played, even after
+    a team goes up 2-0. The series winner is whichever duo takes 2 or more of
+    the 3 games. Every game counts for PF, PA, +/-, and the games-won record
+    regardless of whether the series was already decided going in.
     This is NOT "best-of-3" in the traditional sense; it's a fixed 3-game series.
   -->
   <section class="max-w-6xl mx-auto px-5 pt-16">
@@ -268,7 +269,7 @@
 
         <div class="prose max-w-2xl mb-6">
           <p>
-            Every matchup is a <strong>3-game series</strong>. All three games are always played. A team up 2-0 still plays G3. The series (or "match") is won by whichever duo takes <strong>2 or more</strong> of the 3 games, but every game counts toward points, differential, and the games-won record.
+            Every matchup is a <strong>3-game series</strong>. All three games are always played. A team up 2-0 still plays G3. The series is won by whichever duo takes <strong>2 or more</strong> of the 3 games, but every game counts toward points, differential, and the games-won record.
           </p>
           <p>
             A regular season runs <strong>3 weeks</strong>. Each week all 3 pairings play once, so every duo is in action every week. That's <strong>9 series</strong> per season, for <strong>27 games</strong> in a complete season.
@@ -294,7 +295,7 @@
     </div>
   </section>
 
-  <!-- ========================== SECTION 03 — THE SIX DUOS ========================== -->
+  <!-- ========================== SECTION 03 - THE SIX DUOS ========================== -->
   <section class="max-w-6xl mx-auto px-5 pt-16">
     <div class="section-block">
       <div class="section-num">03</div>
@@ -362,12 +363,12 @@
     </div>
   </section>
 
-  <!-- ========================== SECTION 04 — THE PAIRINGS ========================== -->
+  <!-- ========================== SECTION 04 - THE PAIRINGS ========================== -->
   <!--
     DEV NOTE: Only 3 matchups are ever valid across the 6 duos because a team
     can't play a team that shares a player. Each duo has exactly one legal
     opponent. These 3 fixed pairings (A, B, C) are played once per week.
-    Match-order within a week is captured by the "Match 1/2/3" display labels
+    Series-order within a week is captured by the "Series 1/2/3" display labels
     on the Schedule page. This page just shows the structural pairings.
   -->
   <section class="max-w-6xl mx-auto px-5 pt-16">
@@ -456,15 +457,15 @@
     </div>
   </section>
 
-  <!-- ========================== SECTION 05 — STANDINGS & STATS ========================== -->
+  <!-- ========================== SECTION 05 - STANDINGS & STATS ========================== -->
   <!--
     DEV NOTE: Canonical ranking logic:
       Primary   : game wins (descending)
-      Tiebreak 1: head-to-head match record
+      Tiebreak 1: head-to-head series record
       Tiebreak 2: point differential (+/-)
     Top 4 make the playoffs.
 
-    The Games/Matches toggle on the Standings page only swaps the W/L column's
+    The Games/Series toggle on the Standings page only swaps the W/L column's
     DISPLAYED values. The ranking stays based on game wins regardless of view.
 
     PHASE 3 OPEN: final tiebreaker for teams identical on all three criteria
@@ -479,10 +480,10 @@
 
         <div class="prose max-w-2xl mb-6">
           <p>
-            Standings rank by <strong>games won</strong>. When two duos are tied, the first tiebreaker is <strong>head-to-head match record</strong>. If still level, <strong>point differential</strong> decides. The <strong>top 4</strong> teams advance to the playoffs.
+            Standings rank by <strong>games won</strong>. When two duos are tied, the first tiebreaker is <strong>head-to-head series record</strong>. If still level, <strong>point differential</strong> decides. The <strong>top 4</strong> teams advance to the playoffs.
           </p>
           <p>
-            The W/L display can toggle between <strong>games</strong> (every game counts individually) and <strong>matches</strong> (series-level W/L), but the ranking itself is always based on game wins.
+            The W/L display can toggle between <strong>games</strong> (every game counts individually) and <strong>series</strong> (series-level W/L), but the ranking itself is always based on game wins.
           </p>
           <p>
             Every stat is tracked at the team level. A team's point differential is its total points scored minus points allowed. <strong>Player-level points</strong> are computed as the team's points divided by two. Both teammates contribute to every bucket, so within a single game their individual lines mirror each other.
@@ -499,9 +500,9 @@
             <div class="flex flex-wrap gap-2">
               <span class="pill small">W / L</span>
               <span class="pill small">PF</span>
-              <span class="pill small">PPG / PPM</span>
+              <span class="pill small">PPG / PPS</span>
               <span class="pill small">PA</span>
-              <span class="pill small">PAPG / PAPM</span>
+              <span class="pill small">PAPG / PAPS</span>
               <span class="pill small">+/-</span>
               <span class="pill small">AVG/G</span>
               <span class="pill small">Win%</span>
@@ -512,7 +513,7 @@
             <div class="stat-label mb-3">Ranking Logic</div>
             <ol class="text-[14px] text-[var(--text-muted)] leading-relaxed space-y-1.5">
               <li><span class="display font-black text-[var(--accent)] mr-2">1.</span>Game wins (primary)</li>
-              <li><span class="display font-black text-[var(--accent)] mr-2">2.</span>Head-to-head match record</li>
+              <li><span class="display font-black text-[var(--accent)] mr-2">2.</span>Head-to-head series record</li>
               <li><span class="display font-black text-[var(--accent)] mr-2">3.</span>Point differential</li>
             </ol>
           </div>
@@ -521,13 +522,13 @@
     </div>
   </section>
 
-  <!-- ========================== SECTION 06 — PLAYOFFS ========================== -->
+  <!-- ========================== SECTION 06 - PLAYOFFS ========================== -->
   <!--
     DEV NOTE: Playoffs are COMPUTED, not played live. Two-stage logic:
 
       STAGE 1 - SEEDING (who's in the bracket):
         Top 4 teams from the regular-season standings, ranked by GAME WINS
-        (with head-to-head match record and +/- as tiebreakers). The #5 and
+        (with head-to-head series record and +/- as tiebreakers). The #5 and
         #6 teams miss the playoffs.
 
       STAGE 2 - MATCHUP RESOLUTION (who wins in the bracket):

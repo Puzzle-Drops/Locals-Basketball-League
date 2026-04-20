@@ -170,6 +170,7 @@
         <a class="nav-link" href="#">Teams</a>
         <a class="nav-link" href="#">Players</a>
         <a class="nav-link active" href="#">Schedule</a>
+        <a class="nav-link" href="#">Playoffs</a>
         <a class="nav-link" href="#">Rules</a>
       </div>
 
@@ -245,14 +246,14 @@
 
     <div class="grid grid-cols-1 gap-4">
 
-      <!-- W1 M1: Lakers 2-1 Bucks (played) -->
+      <!-- W1 S1:Lakers 2-1 Bucks (played) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 1</span>
+            <span class="pill">Series 1</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -335,14 +336,14 @@
         </div>
       </article>
 
-      <!-- W1 M2: Suns 2-1 Celtics (played) -->
+      <!-- W1 S2:Suns 2-1 Celtics (played) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 2</span>
+            <span class="pill">Series 2</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -425,15 +426,15 @@
         </div>
       </article>
 
-      <!-- W1 M3: Warriors vs Heat (DNP) -->
+      <!-- W1 S3:Warriors vs Heat (DNP) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 3</span>
+            <span class="pill">Series 3</span>
             <span class="pill dnp">DNP</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -512,10 +513,10 @@
   <!-- ========================== WEEK 2 ========================== -->
   <!--
     DEV NOTE: Week 2 play order is Pairing B, C, A (matchup_ids 2, 3, 1).
-    Display "Match N" reflects play order, not matchup_id.
-    Match 1 => Celtics vs Suns (matchup_id 2)
-    Match 2 => Warriors vs Heat (matchup_id 3)
-    Match 3 => Lakers vs Bucks (matchup_id 1)
+    Display "Series N" reflects play order, not matchup_id.
+    Series 1 => Celtics vs Suns (matchup_id 2)
+    Series 2 => Warriors vs Heat (matchup_id 3)
+    Series 3 => Lakers vs Bucks (matchup_id 1)
     All cards show current team records in parens.
   -->
   <section id="week-2" class="max-w-6xl mx-auto px-5 pt-2">
@@ -529,14 +530,14 @@
 
     <div class="grid grid-cols-1 gap-4">
 
-      <!-- W2 M1: Celtics vs Suns (upcoming) -->
+      <!-- W2 S1:Celtics vs Suns (upcoming) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 2</span>
-            <span class="pill">Match 1</span>
+            <span class="pill">Series 1</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -619,14 +620,14 @@
         </div>
       </article>
 
-      <!-- W2 M2: Warriors vs Heat (upcoming) -->
+      <!-- W2 S2:Warriors vs Heat (upcoming) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 2</span>
-            <span class="pill">Match 2</span>
+            <span class="pill">Series 2</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -709,14 +710,14 @@
         </div>
       </article>
 
-      <!-- W2 M3: Lakers vs Bucks (upcoming) -->
+      <!-- W2 S3:Lakers vs Bucks (upcoming) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 2</span>
-            <span class="pill">Match 3</span>
+            <span class="pill">Series 3</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -807,9 +808,9 @@
   <!-- ========================== WEEK 3 ========================== -->
   <!--
     DEV NOTE: Week 3 play order is Pairing C, A, B (matchup_ids 3, 1, 2).
-    Match 1 => Warriors vs Heat
-    Match 2 => Lakers vs Bucks
-    Match 3 => Celtics vs Suns
+    Series 1 => Warriors vs Heat
+    Series 2 => Lakers vs Bucks
+    Series 3 => Celtics vs Suns
   -->
   <section id="week-3" class="max-w-6xl mx-auto px-5 pt-2 pb-12">
     <div class="flex items-end justify-between mb-6 gap-3 flex-wrap">
@@ -822,14 +823,14 @@
 
     <div class="grid grid-cols-1 gap-4">
 
-      <!-- W3 M1: Warriors vs Heat (upcoming) -->
+      <!-- W3 S1:Warriors vs Heat (upcoming) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 3</span>
-            <span class="pill">Match 1</span>
+            <span class="pill">Series 1</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -906,14 +907,14 @@
         </div>
       </article>
 
-      <!-- W3 M2: Lakers vs Bucks (upcoming) -->
+      <!-- W3 S2:Lakers vs Bucks (upcoming) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 3</span>
-            <span class="pill">Match 2</span>
+            <span class="pill">Series 2</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -990,14 +991,14 @@
         </div>
       </article>
 
-      <!-- W3 M3: Celtics vs Suns (upcoming) -->
+      <!-- W3 S3:Celtics vs Suns (upcoming) -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 3</span>
-            <span class="pill">Match 3</span>
+            <span class="pill">Series 3</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">

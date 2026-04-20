@@ -204,6 +204,7 @@
         <a class="nav-link" href="#">Teams</a>
         <a class="nav-link active" href="#">Players</a>
         <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link" href="#">Playoffs</a>
         <a class="nav-link" href="#">Rules</a>
       </div>
 
@@ -255,7 +256,7 @@
           <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5">
             <div class="flex items-baseline gap-2">
               <span class="display font-black text-2xl tabular">2-0</span>
-              <span class="stat-label">Matches</span>
+              <span class="stat-label">Series</span>
             </div>
             <span class="text-[var(--text-dim)]">·</span>
             <div class="flex items-baseline gap-2">
@@ -359,7 +360,7 @@
         <div class="flex items-baseline gap-4 mb-3">
           <div class="flex items-baseline gap-1.5">
             <span class="display font-bold text-lg tabular">1-0</span>
-            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Matches</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Series</span>
           </div>
           <div class="flex items-baseline gap-1.5">
             <span class="display font-bold text-lg tabular">2-1</span>
@@ -397,7 +398,7 @@
         <div class="flex items-baseline gap-4 mb-3">
           <div class="flex items-baseline gap-1.5">
             <span class="display font-bold text-lg tabular">1-0</span>
-            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Matches</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Series</span>
           </div>
           <div class="flex items-baseline gap-1.5">
             <span class="display font-bold text-lg tabular">2-1</span>
@@ -435,7 +436,7 @@
         <div class="flex items-baseline gap-4 mb-3">
           <div class="flex items-baseline gap-1.5">
             <span class="display font-bold text-lg tabular text-[var(--text-dim)]">0-0</span>
-            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Matches</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Series</span>
           </div>
           <div class="flex items-baseline gap-1.5">
             <span class="display font-bold text-lg tabular text-[var(--text-dim)]">0-0</span>
@@ -462,25 +463,25 @@
   </section>
 
   <!-- ========================== GAME LOG ========================== -->
-  <!-- DEV NOTE: Shows every series the player appears in, across all their duos, ordered by week/match. -->
+  <!-- DEV NOTE: Shows every series the player appears in, across all their duos, ordered by week/series. -->
   <section class="max-w-6xl mx-auto px-5 pt-12">
     <div class="flex items-end justify-between mb-6">
       <div>
-        <div class="stat-label mb-1">2 Matches Played</div>
+        <div class="stat-label mb-1">2 Series Played</div>
         <h2 class="display font-black text-3xl tracking-wide">GAME LOG</h2>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-      <!-- Week 1 Match 1: Lakers 2-1 vs Bucks -->
+      <!-- Week 1 Series 1: Lakers 2-1 vs Bucks -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 1</span>
+            <span class="pill">Series 1</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -563,14 +564,14 @@
         </div>
       </article>
 
-      <!-- Week 1 Match 2: Suns 2-1 vs Celtics -->
+      <!-- Week 1 Series 2: Suns 2-1 vs Celtics -->
       <article class="scorecard p-5 cursor-pointer" data-expand>
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 2</span>
+            <span class="pill">Series 2</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -676,9 +677,9 @@
       <header class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
           <span class="pill">Week 2</span>
-          <span class="pill">Match 1</span>
+          <span class="pill">Series 1</span>
         </div>
-        <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
       </header>
 
       <!-- Celtics row (Joseph is NOT on this team but they're team1 of this matchup) -->

@@ -124,9 +124,9 @@
       box-shadow: inset 0 0 0 1px var(--accent-ring);
     }
 
-    /* Table mode swap for Games/Matches */
-    .standings-table[data-mode="games"] .val-matches { display: none; }
-    .standings-table[data-mode="matches"] .val-games { display: none; }
+    /* Table mode swap for Games/Series */
+    .standings-table[data-mode="games"] .val-series { display: none; }
+    .standings-table[data-mode="series"] .val-games { display: none; }
 
     /* Frozen columns */
     .frozen-col {
@@ -141,7 +141,7 @@
 
     /*
       Sortable headers. Arrow only occupies space when the column is actually
-      sorted — default pseudo-element has no content, so header text right-aligns
+      sorted - default pseudo-element has no content, so header text right-aligns
       flush with the values in the column below. When sorted, the arrow appears
       (pushing the header text left by a few px, which reads as the sort signal).
     */
@@ -189,6 +189,7 @@
         <a class="nav-link" href="#">Teams</a>
         <a class="nav-link" href="#">Players</a>
         <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link" href="#">Playoffs</a>
         <a class="nav-link" href="#">Rules</a>
       </div>
 
@@ -246,7 +247,7 @@
         <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-[0.12em] uppercase">View</span>
         <div id="viewToggle" class="seg w-48" data-mode="games">
           <button class="seg-btn active flex-1" data-mode="games">Games</button>
-          <button class="seg-btn flex-1" data-mode="matches">Matches</button>
+          <button class="seg-btn flex-1" data-mode="series">Series</button>
         </div>
       </div>
     </div>
@@ -254,31 +255,31 @@
 
   <!-- ========================== STANDINGS TABLE ========================== -->
   <!--
-    DEV NOTE: Columns (11 total) — always all rendered; horizontal scroll on mobile,
+    DEV NOTE: Columns (11 total) - always all rendered; horizontal scroll on mobile,
     frozen (# + Team) pinned left.
 
       1. #              (sort: rank)                  static across views
       2. Team           (sort: team, alpha)           static across views
-      3. W              (sort: w)                     swaps value games/matches
-      4. L              (sort: l)                     swaps value games/matches
+      3. W              (sort: w)                     swaps value games/series
+      4. L              (sort: l)                     swaps value games/series
       5. PF             (sort: pf)                    total points for (static)
-      6. PPG / PPM      (sort: pp)                    PF / N where N = games or matches
+      6. PPG / PPS      (sort: pp)                    PF / N where N = games or series
       7. PA             (sort: pa)                    total points against (static)
-      8. PAPG / PAPM    (sort: pap)                   PA / N
+      8. PAPG / PAPS    (sort: pap)                   PA / N
       9. +/-            (sort: diff)                  total differential (static)
-      10. AVG/G / AVG/M (sort: avg)                   (+/-) / N
-      11. Win%          (sort: winpct)                wins/games (or wins/matches)
+      10. AVG/G / AVG/S (sort: avg)                   (+/-) / N
+      11. Win%          (sort: winpct)                wins/games (or wins/series)
 
     RANKING LOGIC (canonical):
       Primary  : game wins (descending)
-      Tiebreak 1: head-to-head match record
+      Tiebreak 1: head-to-head series record
       Tiebreak 2: point differential (+/-)
     The top 4 teams make the playoffs.
 
     NOTE ON W/L DISPLAY vs RANKING: the View toggle swaps displayed W/L values
-    between games and matches, but the RANKING itself is always by game wins.
+    between games and series, but the RANKING itself is always by game wins.
     The sort feature (click a column header) is an ad-hoc explorer for any
-    stat — it doesn't change the canonical ranking.
+    stat - it doesn't change the canonical ranking.
 
     PHASE 3 OPEN ITEM: Warriors vs Heat are both 0-0 with +0 and haven't played
     head-to-head yet (their Pairing C matchup was DNP in Week 1). We need a
@@ -287,9 +288,9 @@
     Heat #6, which matches team-list order; swap if we pick alpha.
 
     Sort cycle (per column):
-      1st click — ascending.
-      2nd click — descending.
-      3rd click — reset to default (rank asc).
+      1st click - ascending.
+      2nd click - descending.
+      3rd click - reset to default (rank asc).
       Clicking a DIFFERENT column starts that column at ascending.
       When view toggles, current sort is re-applied with new view's values.
 
@@ -314,26 +315,26 @@
             <span class="sortable w-10 text-center shrink-0 py-3" data-sort="w">W</span>
             <span class="sortable w-10 text-center shrink-0 py-3" data-sort="l">L</span>
             <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pf">PF</span>
-            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pp"><span class="val-games">PPG</span><span class="val-matches">PPM</span></span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pp"><span class="val-games">PPG</span><span class="val-series">PPS</span></span>
             <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pa">PA</span>
-            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pap"><span class="val-games">PAPG</span><span class="val-matches">PAPM</span></span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pap"><span class="val-games">PAPG</span><span class="val-series">PAPS</span></span>
             <span class="sortable w-14 text-right shrink-0 py-3" data-sort="diff">+/-</span>
-            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="avg"><span class="val-games">AVG/G</span><span class="val-matches">AVG/M</span></span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="avg"><span class="val-games">AVG/G</span><span class="val-series">AVG/S</span></span>
             <span class="sortable w-16 text-right shrink-0 py-3 pr-3 sm:pr-4" data-sort="winpct">Win%</span>
           </div>
 
           <!-- Row #1: Lakers (2W, +19) -->
           <a href="#" class="standings-row flex items-center group"
              data-rank="1" data-team="Lakers"
-             data-w-games="2" data-w-matches="1"
-             data-l-games="1" data-l-matches="0"
+             data-w-games="2" data-w-series="1"
+             data-l-games="1" data-l-series="0"
              data-pf="59"
-             data-pp-games="19.7" data-pp-matches="59.0"
+             data-pp-games="19.7" data-pp-series="59.0"
              data-pa="40"
-             data-pap-games="13.3" data-pap-matches="40.0"
+             data-pap-games="13.3" data-pap-series="40.0"
              data-diff="19"
-             data-avg-games="6.3" data-avg-matches="19.0"
-             data-winpct-games="67" data-winpct-matches="100">
+             data-avg-games="6.3" data-avg-series="19.0"
+             data-winpct-games="67" data-winpct-series="100">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
               <span class="rank top w-6">1</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
@@ -344,29 +345,29 @@
                 </div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">59</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">19.7</span><span class="val-matches">59.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">19.7</span><span class="val-series">59.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">40</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">13.3</span><span class="val-matches">40.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">13.3</span><span class="val-series">40.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos">+19</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+6.3</span><span class="val-matches">+19.0</span></span>
-            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+6.3</span><span class="val-series">+19.0</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-series">100%</span></span>
           </a>
 
           <!-- Row #2: Suns (2W, +1) -->
           <a href="#" class="standings-row flex items-center group"
              data-rank="2" data-team="Suns"
-             data-w-games="2" data-w-matches="1"
-             data-l-games="1" data-l-matches="0"
+             data-w-games="2" data-w-series="1"
+             data-l-games="1" data-l-series="0"
              data-pf="50"
-             data-pp-games="16.7" data-pp-matches="50.0"
+             data-pp-games="16.7" data-pp-series="50.0"
              data-pa="49"
-             data-pap-games="16.3" data-pap-matches="49.0"
+             data-pap-games="16.3" data-pap-series="49.0"
              data-diff="1"
-             data-avg-games="0.3" data-avg-matches="1.0"
-             data-winpct-games="67" data-winpct-matches="100">
+             data-avg-games="0.3" data-avg-series="1.0"
+             data-winpct-games="67" data-winpct-series="100">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
               <span class="rank w-6">2</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
@@ -377,29 +378,29 @@
                 </div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">50</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">16.7</span><span class="val-matches">50.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">16.7</span><span class="val-series">50.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">49</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.3</span><span class="val-matches">49.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.3</span><span class="val-series">49.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos">+1</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+0.3</span><span class="val-matches">+1.0</span></span>
-            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+0.3</span><span class="val-series">+1.0</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-series">100%</span></span>
           </a>
 
           <!-- Row #3: Celtics (1W, -1) -->
           <a href="#" class="standings-row flex items-center group"
              data-rank="3" data-team="Celtics"
-             data-w-games="1" data-w-matches="0"
-             data-l-games="2" data-l-matches="1"
+             data-w-games="1" data-w-series="0"
+             data-l-games="2" data-l-series="1"
              data-pf="49"
-             data-pp-games="16.3" data-pp-matches="49.0"
+             data-pp-games="16.3" data-pp-series="49.0"
              data-pa="50"
-             data-pap-games="16.7" data-pap-matches="50.0"
+             data-pap-games="16.7" data-pap-series="50.0"
              data-diff="-1"
-             data-avg-games="-0.3" data-avg-matches="-1.0"
-             data-winpct-games="33" data-winpct-matches="0">
+             data-avg-games="-0.3" data-avg-series="-1.0"
+             data-winpct-games="33" data-winpct-series="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
               <span class="rank w-6">3</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
@@ -410,29 +411,29 @@
                 </div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">49</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">16.3</span><span class="val-matches">49.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">16.3</span><span class="val-series">49.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">50</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.7</span><span class="val-matches">50.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.7</span><span class="val-series">50.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg">-1</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-0.3</span><span class="val-matches">-1.0</span></span>
-            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-0.3</span><span class="val-series">-1.0</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-series">0%</span></span>
           </a>
 
           <!-- Row #4: Bucks (1W, -19) -->
           <a href="#" class="standings-row flex items-center group"
              data-rank="4" data-team="Bucks"
-             data-w-games="1" data-w-matches="0"
-             data-l-games="2" data-l-matches="1"
+             data-w-games="1" data-w-series="0"
+             data-l-games="2" data-l-series="1"
              data-pf="40"
-             data-pp-games="13.3" data-pp-matches="40.0"
+             data-pp-games="13.3" data-pp-series="40.0"
              data-pa="59"
-             data-pap-games="19.7" data-pap-matches="59.0"
+             data-pap-games="19.7" data-pap-series="59.0"
              data-diff="-19"
-             data-avg-games="-6.3" data-avg-matches="-19.0"
-             data-winpct-games="33" data-winpct-matches="0">
+             data-avg-games="-6.3" data-avg-series="-19.0"
+             data-winpct-games="33" data-winpct-series="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
               <span class="rank w-6">4</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
@@ -443,29 +444,29 @@
                 </div>
               </div>
             </div>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
-            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">40</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">13.3</span><span class="val-matches">40.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">13.3</span><span class="val-series">40.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">59</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">19.7</span><span class="val-matches">59.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">19.7</span><span class="val-series">59.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg">-19</span>
-            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-6.3</span><span class="val-matches">-19.0</span></span>
-            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-6.3</span><span class="val-series">-19.0</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-series">0%</span></span>
           </a>
 
           <!-- Row #5: Warriors (DNP, 0W, +0) -->
           <a href="#" class="standings-row flex items-center opacity-80 group"
              data-rank="5" data-team="Warriors" data-dnp="1"
-             data-w-games="0" data-w-matches="0"
-             data-l-games="0" data-l-matches="0"
+             data-w-games="0" data-w-series="0"
+             data-l-games="0" data-l-series="0"
              data-pf="0"
-             data-pp-games="0" data-pp-matches="0"
+             data-pp-games="0" data-pp-series="0"
              data-pa="0"
-             data-pap-games="0" data-pap-matches="0"
+             data-pap-games="0" data-pap-series="0"
              data-diff="0"
-             data-avg-games="0" data-avg-matches="0"
-             data-winpct-games="0" data-winpct-matches="0">
+             data-avg-games="0" data-avg-series="0"
+             data-winpct-games="0" data-winpct-series="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
               <span class="rank w-6">5</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
@@ -490,15 +491,15 @@
           <!-- Row #6: Heat (DNP, 0W, +0) -->
           <a href="#" class="standings-row flex items-center opacity-80 group"
              data-rank="6" data-team="Heat" data-dnp="1"
-             data-w-games="0" data-w-matches="0"
-             data-l-games="0" data-l-matches="0"
+             data-w-games="0" data-w-series="0"
+             data-l-games="0" data-l-series="0"
              data-pf="0"
-             data-pp-games="0" data-pp-matches="0"
+             data-pp-games="0" data-pp-series="0"
              data-pa="0"
-             data-pap-games="0" data-pap-matches="0"
+             data-pap-games="0" data-pap-series="0"
              data-diff="0"
-             data-avg-games="0" data-avg-matches="0"
-             data-winpct-games="0" data-winpct-matches="0">
+             data-avg-games="0" data-avg-series="0"
+             data-winpct-games="0" data-winpct-series="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
               <span class="rank w-6">6</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
@@ -528,15 +529,15 @@
       <div class="flex flex-wrap gap-x-5 gap-y-1">
         <span><span class="text-[var(--text-muted)] font-bold">W/L</span> Wins / Losses</span>
         <span><span class="text-[var(--text-muted)] font-bold">PF</span> Points For</span>
-        <span><span class="text-[var(--text-muted)] font-bold">PPG/PPM</span> Points per Game/Match</span>
+        <span><span class="text-[var(--text-muted)] font-bold">PPG/PPS</span> Points per Game/Series</span>
         <span><span class="text-[var(--text-muted)] font-bold">PA</span> Points Against</span>
-        <span><span class="text-[var(--text-muted)] font-bold">PAPG/PAPM</span> Points Against per Game/Match</span>
+        <span><span class="text-[var(--text-muted)] font-bold">PAPG/PAPS</span> Points Against per Game/Series</span>
         <span><span class="text-[var(--text-muted)] font-bold">+/-</span> Point Differential</span>
-        <span><span class="text-[var(--text-muted)] font-bold">AVG/G, AVG/M</span> Avg Point Diff per Game/Match</span>
+        <span><span class="text-[var(--text-muted)] font-bold">AVG/G, AVG/S</span> Avg Point Diff per Game/Series</span>
         <span><span class="text-[var(--text-muted)] font-bold">Win%</span> Win Percentage</span>
       </div>
       <div>
-        <span class="text-[var(--text-muted)] font-bold">Ranked by games won.</span> Ties broken by head-to-head match record, then point differential.
+        <span class="text-[var(--text-muted)] font-bold">Ranked by games won.</span> Ties broken by head-to-head series record, then point differential.
         <span class="text-[var(--accent)] font-bold">Top 4 advance to the playoffs.</span>
         Click any column header to sort (asc → desc → default).
       </div>
@@ -623,7 +624,7 @@
             if (sort.dir === 'asc') {
               sort.dir = 'desc';
             } else {
-              // Was desc — third click resets to default sort.
+              // Was desc - third click resets to default sort.
               sort = { ...DEFAULT_SORT };
             }
           } else {
@@ -645,7 +646,7 @@
         });
       });
 
-      // ------- View toggle (Games / Matches) -------
+      // ------- View toggle (Games / Series) -------
       viewToggle.querySelectorAll('.seg-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const mode = btn.getAttribute('data-mode');

@@ -148,7 +148,7 @@
     }
     .vod-btn:hover { background: var(--accent); color: #fff; transform: scale(1.08); }
 
-    /* Segmented toggle (for Games/Matches view on Standings) */
+    /* Segmented toggle (for Games/Series view on Standings) */
     .seg {
       display: inline-flex; border-radius: 8px;
       background: rgba(255,255,255,0.03); border: 1px solid var(--border);
@@ -168,8 +168,8 @@
     }
 
     /* Standings table mode swap */
-    .standings-table[data-mode="games"] .val-matches { display: none; }
-    .standings-table[data-mode="matches"] .val-games { display: none; }
+    .standings-table[data-mode="games"] .val-series { display: none; }
+    .standings-table[data-mode="series"] .val-games { display: none; }
 
     section { scroll-margin-top: 80px; }
   </style>
@@ -196,6 +196,7 @@
         <a class="nav-link" href="#">Teams</a>
         <a class="nav-link" href="#">Players</a>
         <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link" href="#">Playoffs</a>
         <a class="nav-link" href="#">Rules</a>
       </div>
 
@@ -262,9 +263,9 @@
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 1</span>
+            <span class="pill">Series 1</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -352,9 +353,9 @@
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 2</span>
+            <span class="pill">Series 2</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -442,10 +443,10 @@
         <header class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="pill">Week 1</span>
-            <span class="pill">Match 3</span>
+            <span class="pill">Series 3</span>
             <span class="pill dnp">DNP</span>
           </div>
-          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">3 GAMES</span>
         </header>
 
         <div class="flex items-center gap-3">
@@ -532,12 +533,12 @@
         <a href="#" class="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent)] uppercase tracking-[0.12em] transition">Full Table →</a>
       </div>
 
-      <!-- Games/Matches toggle -->
+      <!-- Games/Series toggle -->
       <div class="flex items-center gap-2 mb-3">
         <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-[0.12em] uppercase">View</span>
         <div id="standingsToggle" class="seg" data-mode="games">
           <button class="seg-btn active" data-mode="games">Games</button>
-          <button class="seg-btn" data-mode="matches">Matches</button>
+          <button class="seg-btn" data-mode="series">Series</button>
         </div>
       </div>
 
@@ -552,7 +553,7 @@
           <span class="w-11 sm:w-14 text-right">+/-</span>
         </div>
 
-        <!-- Row 1: Lakers (games 2-1, matches 1-0) -->
+        <!-- Row 1: Lakers (games 2-1, series 1-0) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5 border-b border-[var(--border)]">
           <span class="rank top w-5 sm:w-6">1</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -562,13 +563,13 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Joseph</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">59</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-pos">+19</span>
         </div>
 
-        <!-- Row 2: Suns (games 2-1, matches 1-0) -->
+        <!-- Row 2: Suns (games 2-1, series 1-0) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5 border-b border-[var(--border)]">
           <span class="rank w-5 sm:w-6">2</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -578,8 +579,8 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Joseph & Nathan</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">50</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-pos">+1</span>
         </div>
@@ -616,7 +617,7 @@
           <span class="w-11 sm:w-14 text-right display font-bold tabular text-[var(--text-dim)]">-</span>
         </div>
 
-        <!-- Row 5: Celtics (games 1-2, matches 0-1) -->
+        <!-- Row 5: Celtics (games 1-2, series 0-1) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5 border-b border-[var(--border)]">
           <span class="rank w-5 sm:w-6">5</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -626,13 +627,13 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Daniel</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">49</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-neg">-1</span>
         </div>
 
-        <!-- Row 6: Bucks (games 1-2, matches 0-1) -->
+        <!-- Row 6: Bucks (games 1-2, series 0-1) -->
         <div class="standings-row flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
           <span class="rank w-5 sm:w-6">6</span>
           <div class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
@@ -642,14 +643,14 @@
               <div class="text-[11px] text-[var(--text-muted)] truncate">Daniel & Nathan</div>
             </div>
           </div>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
-          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-series">0</span></span>
+          <span class="w-8 sm:w-10 text-center display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-series">1</span></span>
           <span class="hidden sm:inline w-14 text-right display font-bold tabular text-[var(--text-muted)]">40</span>
           <span class="w-11 sm:w-14 text-right display font-bold tabular diff-neg">-19</span>
         </div>
       </div>
 
-      <p class="text-[11px] text-[var(--text-dim)] mt-3">Tiebreakers: head-to-head matches, then point differential.</p>
+      <p class="text-[11px] text-[var(--text-dim)] mt-3">Tiebreakers: head-to-head series, then point differential.</p>
     </div>
 
     <!-- LEADERS -->
@@ -673,7 +674,7 @@
           <div class="avatar avatar-lg" style="background: linear-gradient(135deg, #ff6b2b, #a3471d);">J</div>
           <div class="flex-1 min-w-0">
             <div class="display font-black text-3xl leading-none">JOSEPH</div>
-            <div class="text-xs text-[var(--text-muted)] mt-1">Undefeated · 2-0 in matches</div>
+            <div class="text-xs text-[var(--text-muted)] mt-1">Undefeated · 2-0 in series</div>
           </div>
         </div>
 
@@ -757,9 +758,9 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <!-- Match 1 in Week 2 = spec M2 pairing (Celtics vs Suns) -->
+        <!-- Series 1 in Week 2 = matchup_id 2 pairing (Celtics vs Suns) -->
         <div class="bg-white/[0.02] border border-[var(--border)] rounded-lg p-4">
-          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">First Up · Match 1</div>
+          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">First Up · Series 1</div>
           <div class="flex items-center gap-2 mb-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
             <span class="display font-black text-base">CELTICS</span>
@@ -773,9 +774,9 @@
           </div>
         </div>
 
-        <!-- Match 2 in Week 2 = spec M3 pairing (Warriors vs Heat) -->
+        <!-- Series 2 in Week 2 = matchup_id 3 pairing (Warriors vs Heat) -->
         <div class="bg-white/[0.02] border border-[var(--border)] rounded-lg p-4">
-          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Second · Match 2</div>
+          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Second · Series 2</div>
           <div class="flex items-center gap-2 mb-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
             <span class="display font-black text-base">WARRIORS</span>
@@ -789,9 +790,9 @@
           </div>
         </div>
 
-        <!-- Match 3 in Week 2 = spec M1 pairing (Lakers vs Bucks) -->
+        <!-- Series 3 in Week 2 = matchup_id 1 pairing (Lakers vs Bucks) -->
         <div class="bg-white/[0.02] border border-[var(--border)] rounded-lg p-4">
-          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Closing · Match 3</div>
+          <div class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3">Closing · Series 3</div>
           <div class="flex items-center gap-2 mb-2">
             <div class="logo" style="width:28px; height:28px; font-size: 11px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
             <span class="display font-black text-base">LAKERS</span>
@@ -837,7 +838,7 @@
       });
     });
 
-    // Standings games/matches toggle
+    // Standings games/series toggle
     const toggle = document.getElementById('standingsToggle');
     const table = document.getElementById('standingsTable');
     toggle.querySelectorAll('.seg-btn').forEach(btn => {
