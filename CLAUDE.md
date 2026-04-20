@@ -103,9 +103,12 @@ There are exactly 6 duos. Hardcode this constant.
 - DNP series award no wins and no points. Don't count them in averages.
 - Partial = some games played, series didn't finish. Count the played games; only award a series winner if one duo has already taken 2 of the 3 games.
 
-**Tiebreakers for standings:**
-1. Head-to-head series record
-2. Point differential
+**Standings ranking:**
+1. Game wins (primary)
+2. Head-to-head series record (tiebreak)
+3. Point differential (tiebreak)
+
+The Games/Series toggle on the Standings table is display-only. Ranking is always by game wins regardless of the selected view.
 
 **Player order everywhere (display):** Jacob, Daniel, Joseph, Nathan (age order, oldest first).
 
@@ -135,8 +138,9 @@ Lives in `src/lib/stats.js`. All pure. No I/O, no DOM. UI components consume the
 Public functions:
 - `computeSeason(seasonJson)` returns `{ duoStats, h2h, playerStats, seriesIndex }`.
 - `computeCareer(seasonJsonArray)` returns `{ duoStats, playerStats, h2h, seriesIndex, perSeason }`.
-- `standings(duoStats, h2h, { mode: "games" | "series" })` returns decorated rows. Ranking is always by game wins (h2h series, then point diff for tiebreakers); `mode` only controls which W/L and per-N stats are surfaced. Default mode is `"games"`.
-- `decorateDuo(key, raw)` / `decoratePlayer(name, raw)` add derived rates (diff, avg margin, ppg, papg, win%, +/-).
+- `standings(duoStats, h2h, { mode = "games" } = {})` returns decorated rows sorted by game wins, then h2h series record, then point diff. `mode` is surfaced on each row so the UI's Games/Series toggle has a single source of truth, but ranking does not change with mode.
+- `decorateDuo(key, raw)` adds derived rates. Both per-game (`ppg`, `papg`, `avgMarginGame`) and per-series (`pps`, `paps`, `avgMarginSeries`) averages are exposed; the standings UI picks based on the active toggle. `avgPF` / `avgPA` / `avgMargin` are aliases of the per-game versions for legacy Phase 1 callers.
+- `decoratePlayer(name, raw)` adds player rates (`plusMinus`, `seriesWinPct`, `gameWinPct`, `ppg`, `papg`, `pps`).
 - `partnerBreakdown(player, duoStats)` returns `{ entries, best, worst }` keyed by game win%.
 - `fmt1(n)` returns a string with 1 decimal place (used for halved player points).
 

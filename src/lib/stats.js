@@ -7,9 +7,19 @@
 //   - Team points are authoritative per game.
 //   - Player points scored  = team points / 2
 //   - Player points allowed = opponent points / 2
+//   - A series is a fixed 3 games; all 3 are always played even at 2-0.
+//     Every game counts toward PF, PA, +/-, and the games-won record.
+//     The series winner is whichever duo takes 2 or more of the 3 games.
 //   - DNP series award no wins, no points, and don't count toward averages.
-//   - Partial series count played games; a series winner is only awarded if
-//     the BO3 was mathematically decided (one team already has 2 game wins).
+//   - Partial series count played games; a series winner is only awarded
+//     if one duo has already taken 2 of the 3 games.
+//
+// Standings ranking:
+//   primary)   game wins
+//   tiebreak1) head-to-head series record
+//   tiebreak2) point differential
+// The standings page exposes a Games/Series toggle, but it's display-only
+// (it swaps the rendered W/L and per-N stats). Ranking never changes.
 
 import { DUO_KEYS, PLAYERS, PLAYER_DUOS, partnerOf, splitKey } from './constants.js';
 
@@ -268,14 +278,26 @@ export function computeCareer(seasons) {
 // ---------- derived views ----------
 
 // Decorate raw duoStats with computed rates + diff for display.
+// Both per-game and per-series averages are surfaced; the standings UI's
+// Games/Series toggle picks which to render.
 export function decorateDuo(key, raw) {
   const diff = raw.pointsFor - raw.pointsAgainst;
   const seriesWinPct = raw.seriesPlayed ? raw.seriesWon / raw.seriesPlayed : 0;
   const gameWinPct = raw.gamesPlayed ? raw.gamesWon / raw.gamesPlayed : 0;
-  const avgMargin = raw.gamesPlayed ? diff / raw.gamesPlayed : 0;
-  const avgPF = raw.gamesPlayed ? raw.pointsFor / raw.gamesPlayed : 0;
-  const avgPA = raw.gamesPlayed ? raw.pointsAgainst / raw.gamesPlayed : 0;
-  return { key, ...raw, diff, seriesWinPct, gameWinPct, avgMargin, avgPF, avgPA };
+  const ppg = raw.gamesPlayed ? raw.pointsFor / raw.gamesPlayed : 0;
+  const papg = raw.gamesPlayed ? raw.pointsAgainst / raw.gamesPlayed : 0;
+  const avgMarginGame = raw.gamesPlayed ? diff / raw.gamesPlayed : 0;
+  const pps = raw.seriesPlayed ? raw.pointsFor / raw.seriesPlayed : 0;
+  const paps = raw.seriesPlayed ? raw.pointsAgainst / raw.seriesPlayed : 0;
+  const avgMarginSeries = raw.seriesPlayed ? diff / raw.seriesPlayed : 0;
+  return {
+    key, ...raw, diff, seriesWinPct, gameWinPct,
+    ppg, papg, avgMarginGame,
+    pps, paps, avgMarginSeries,
+    // Default-mode aliases (per game). Phase 1 pages read these; Phase 3 will
+    // pick game vs series fields based on the active standings toggle.
+    avgPF: ppg, avgPA: papg, avgMargin: avgMarginGame,
+  };
 }
 
 export function decoratePlayer(name, raw) {
@@ -288,26 +310,27 @@ export function decoratePlayer(name, raw) {
   return { name, ...raw, plusMinus, seriesWinPct, gameWinPct, ppg, papg, pps };
 }
 
-// Sort a list of decorated duos applying LBL tiebreakers:
-//   1) series wins
-//   2) head-to-head series record (within the tied subset)
-//   3) point differential
-// `h2h` is the merged head-to-head dict.
+// Sort a list of decorated duos applying LBL ranking + tiebreakers:
+//   primary)   game wins
+//   tiebreak1) head-to-head series record (within the tied subset)
+//   tiebreak2) point differential
+// `h2h` is the merged head-to-head dict. Ranking is independent of the
+// standings Games/Series toggle; the toggle is display-only.
 export function sortDuosWithTiebreakers(decoratedDuos, h2h) {
-  // Primary sort by series wins desc, then point diff desc as fallback.
   const byGroup = new Map();
   for (const d of decoratedDuos) {
-    const g = byGroup.get(d.seriesWon) ?? [];
+    const g = byGroup.get(d.gamesWon) ?? [];
     g.push(d);
-    byGroup.set(d.seriesWon, g);
+    byGroup.set(d.gamesWon, g);
   }
   const groups = [...byGroup.entries()].sort((a, b) => b[0] - a[0]);
 
   const out = [];
   for (const [, group] of groups) {
     if (group.length === 1) { out.push(group[0]); continue; }
-    // Within the tied group, sort by head-to-head series record (wins within
-    // the group minus losses within the group), then by overall point diff.
+    // Within the tied group, sort by head-to-head series record (series wins
+    // within the group minus series losses within the group), then by overall
+    // point diff.
     const h2hScore = (d) => {
       let s = 0;
       for (const other of group) {
@@ -347,8 +370,11 @@ export function partnerBreakdown(player, perSeasonOrCareerDuoStats) {
 }
 
 // Convenience: full decorated standings for a duoStats dict.
-export function standings(duoStats, h2h) {
-  const decorated = DUO_KEYS.map((k) => decorateDuo(k, duoStats[k]));
+// `mode` is "games" (default) or "series" -- it's surfaced on each row so
+// the UI's display toggle has a single source of truth, but ranking is
+// always by game wins regardless of mode.
+export function standings(duoStats, h2h, { mode = "games" } = {}) {
+  const decorated = DUO_KEYS.map((k) => ({ ...decorateDuo(k, duoStats[k]), mode }));
   return sortDuosWithTiebreakers(decorated, h2h);
 }
 

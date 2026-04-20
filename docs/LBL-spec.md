@@ -22,9 +22,12 @@ Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
 - Matchup order rotates each week so no pairing is always rested or always tired
 - "Week" is a logical label, not calendar time. A single "week" may span multiple real-world play sessions.
 
-**Standings tiebreakers:**
-1. Head-to-head series record
-2. Point differential
+**Standings ranking:**
+1. Game wins (primary)
+2. Head-to-head series record (tiebreak)
+3. Point differential (tiebreak)
+
+Top 4 teams advance to the playoffs. The Games/Series toggle on the Standings page is display-only; ranking is always by game wins.
 
 **DNP:** any series or game that doesn't get played is logged but awards no points and no wins.
 
