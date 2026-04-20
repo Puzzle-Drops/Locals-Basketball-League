@@ -14,58 +14,59 @@ Full rules and data model are in `docs/LBL-spec.md`. That document is the source
 
 ## Workflow: this is being built in phases
 
-**You (Claude Code) are being asked to build the backend / data layer first.** Design polish comes later from mockups produced in Claude Desktop. Do NOT over-invest in visual design right now — use plain, functional styling. The design will be handed to you as HTML/CSS mockups in the `mockups/` folder in a later phase.
+**Design polish comes from mockups produced in Claude Desktop.** Do NOT over-invest in visual design until those mockups land in `mockups/`.
 
-**Phase 1 (current): Scaffold + data layer + stat engine**
-- Repo scaffold, build tooling, routing
-- Load `data/season1.json` and `data/teams.json`
-- Pure stat engine: functions that take the season JSON and return computed standings, team stats, player stats
-- Plain/minimal UI showing that the data and stats work end-to-end
-- Seed `data/season1.json` with the Day 1 data shown in the spec
-- Seed `data/teams.json` with the six team names from the spec
+**Phase 1 (DONE): Scaffold + data layer + stat engine**
+- Vite + React + Tailwind + React Router scaffold (plain JS).
+- `data/season1.json` seeded with Day 1 results; `data/teams.json` seeded with the six-duo NBA map.
+- Pure stat engine in `src/lib/stats.js` — `computeSeason`, `computeCareer`, `standings` (h2h → point-diff tiebreakers), `decorateDuo`/`decoratePlayer`, `partnerBreakdown`.
+- All pages wired to the engine: Home, Standings, Teams (+detail), Players (+detail), Schedule, GameDetail (with halved player lines + YouTube embed), Rules, Playoffs (TBD).
+- Plain/minimal styling — intentionally unstyled pending mockups.
 
-**Phase 2 (next, not you): Mockups**
-- Claude Desktop produces styled HTML mockups in `mockups/`
+**Phase 2 (next, NOT Claude Code): Mockups**
+- Claude Desktop produces styled HTML mockups in `mockups/`.
 
-**Phase 3 (back to you): Implement the design**
-- Rebuild the UI layer using the approved mockups as the visual reference
-
-Keep Phase 1 code clean and componentized so Phase 3 is a styling pass, not a rewrite.
+**Phase 3 (back to Claude Code): Implement the design**
+- Rebuild the UI layer using the approved mockups as the visual reference. Stat engine and data layer should not need to change.
 
 ---
 
-## Recommended stack
+## Stack (chosen in Phase 1)
 
-Flexible, but this is a good default:
-- **Vite + React** — fast dev, easy componentization, static build
-- **Tailwind CSS** — matches the mockup-driven design workflow cleanly in Phase 3
-- **Plain JS** is fine. **TypeScript** is nice-to-have given the stat shapes, but optional — defer to user preference if asked.
-- **No backend, no database.** Data lives in JSON files in `data/`.
-- **Deploy target:** GitHub Pages (configure `vite.config` `base` accordingly).
-
-If the user prefers a different stack, go with theirs.
+- **Vite + React (plain JS)** — fast dev, easy componentization, static build.
+- **Tailwind CSS** — utility classes; Phase 3 swaps the look without restructuring the markup.
+- **React Router** — client-side routing.
+- **No backend, no database.** Data lives in JSON files in `data/` and is imported directly.
+- **Deploy target:** GitHub Pages. `vite.config.js` defaults to base `/` in dev and `/Locals-Basketball-League/` for `vite build`. Override with `VITE_BASE`.
 
 ---
 
-## Project structure (target)
+## Project structure
 
 ```
 Locals-Basketball-League/
 ├── CLAUDE.md                 (this file)
-├── README.md                 (create in Phase 1 — brief project blurb + how to run)
+├── README.md                 (project blurb + how to run)
 ├── docs/
 │   └── LBL-spec.md           (full spec, source of truth)
-├── assets/                   (DO NOT rename or move — file paths are referenced by name)
+├── assets/                   (DO NOT rename or move — Vite serves this as publicDir)
 │   ├── league/LBL.png
 │   ├── players/{Jacob,Daniel,Joseph,Nathan}.png
 │   └── teams/{Celtics,Lakers,Warriors,Heat,Bucks,Suns}.png
 ├── data/
-│   ├── season1.json          (create in Phase 1, seed with Day 1 data from spec)
-│   └── teams.json            (create in Phase 1, seed with spec's team map)
-├── mockups/                  (currently empty, populated in Phase 2)
-├── src/                      (app source)
-└── [build tooling — package.json, vite config, etc.]
+│   ├── season1.json          (Day 1 results seeded; edit to record more games)
+│   └── teams.json            (six-duo NBA name map)
+├── mockups/                  (empty until Phase 2)
+├── src/
+│   ├── lib/                  (constants.js, stats.js, data.js)
+│   ├── components/           (Layout)
+│   ├── pages/                (Home, Standings, Teams, TeamDetail, Players,
+│   │                          PlayerDetail, Schedule, GameDetail, Rules, Playoffs)
+│   ├── App.jsx, main.jsx, index.css
+├── index.html, package.json, vite.config.js, tailwind.config.js, postcss.config.js
 ```
+
+**Adding a new season:** drop `data/season2.json`, import it in `src/lib/data.js`, append to `SEASONS`.
 
 ---
 
@@ -104,22 +105,17 @@ There are exactly 6 duos. Hardcode this constant.
 
 ## The stat engine
 
-This is the most important code in Phase 1. Keep it in pure functions, ideally one module (e.g. `src/lib/stats.js`). It should:
+Lives in `src/lib/stats.js`. All pure — no I/O, no DOM. UI components consume the outputs.
 
-Take inputs:
-- A season JSON (or array of season JSONs for career stats)
-- The teams map
+Public functions:
+- `computeSeason(seasonJson)` → `{ duoStats, h2h, playerStats, seriesIndex }`.
+- `computeCareer(seasonJsonArray)` → `{ duoStats, playerStats, h2h, seriesIndex, perSeason }`.
+- `standings(duoStats, h2h)` → decorated rows sorted by series wins, then h2h within tied groups, then point diff.
+- `decorateDuo(key, raw)` / `decoratePlayer(name, raw)` — add derived rates (diff, avg margin, ppg, win%, +/-, etc.).
+- `partnerBreakdown(player, duoStats)` → `{ entries, best, worst }` keyed by game win%.
+- `fmt1(n)` → string with 1 decimal place (used for halved player points).
 
-Return computed outputs:
-- Duo standings (sorted with tiebreakers applied)
-- Per-duo season stats (W-L series, W-L games, PF, PA, diff, avg margin, win%)
-- Per-duo career stats (same, aggregated across seasons)
-- Per-player season stats (aggregated across their 3 duos)
-- Per-player career stats
-- Head-to-head records between any two duos
-- Best/worst partner per player (by win%)
-
-All pure. No I/O. No DOM. Easy to unit test. UI components consume the outputs.
+If you change a public signature, update every page that calls it.
 
 ---
 
@@ -131,22 +127,6 @@ Already in place, do not modify:
 - `assets/teams/{TeamName}.png` — logo per duo (Celtics, Lakers, Warriors, Heat, Bucks, Suns)
 
 Reference them by relative path. Team-key → logo mapping comes from `teams.json`.
-
----
-
-## Seed data for `data/season1.json` (Week 1)
-
-From the spec, day 1 results to populate:
-
-**Series 1 (M1):** Jacob-Joseph vs Daniel-Nathan → Jacob-Joseph wins 2-1
-- Game 1: 21-0, Game 2: 17-21, Game 3: 21-19
-
-**Series 2 (M2):** Jacob-Daniel vs Joseph-Nathan → Joseph-Nathan wins 2-1
-- Game 1: 17-23, Game 2: 22-5, Game 3: 10-22
-
-**Series 3 (M3):** Jacob-Nathan vs Daniel-Joseph → status `"dnp"`, games `[]`
-
-VOD URL placeholder for all played games: `"https://google.com"` (will be swapped for real YouTube links later).
 
 ---
 
