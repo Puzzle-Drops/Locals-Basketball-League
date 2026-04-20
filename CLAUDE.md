@@ -8,7 +8,7 @@ Project context for Claude Code. Read this first, then read `docs/LBL-spec.md`.
 
 The **Locals Basketball League (LBL)** is a 2v2 basketball league between four players (Jacob, Daniel, Joseph, Nathan). This repo is a static website that tracks the league: standings, teams, players, schedule, stats, and VODs.
 
-Full rules and data model are in `docs/LBL-spec.md`. That document is the source of truth — if anything here conflicts with it, the spec wins.
+Full rules and data model are in `docs/LBL-spec.md`. That document is the source of truth. If anything here conflicts with it, the spec wins.
 
 ---
 
@@ -19,11 +19,11 @@ Full rules and data model are in `docs/LBL-spec.md`. That document is the source
 **Phase 1 (DONE): Scaffold + data layer + stat engine**
 - Vite + React + Tailwind + React Router scaffold (plain JS).
 - `data/season1.json` seeded with Day 1 results; `data/teams.json` seeded with the six-duo NBA map.
-- Pure stat engine in `src/lib/stats.js` — `computeSeason`, `computeCareer`, `standings` (h2h → point-diff tiebreakers), `decorateDuo`/`decoratePlayer`, `partnerBreakdown`.
+- Pure stat engine in `src/lib/stats.js` with `computeSeason`, `computeCareer`, `standings` (h2h then point-diff tiebreakers), `decorateDuo`, `decoratePlayer`, `partnerBreakdown`.
 - All pages wired to the engine: Home, Standings, Teams (+detail), Players (+detail), Schedule, GameDetail (with halved player lines + YouTube embed), Rules, Playoffs (TBD).
-- Plain/minimal styling — intentionally unstyled pending mockups.
+- Plain, minimal styling. Intentionally unstyled pending mockups.
 
-**Phase 2 (next, NOT Claude Code): Mockups**
+**Phase 2 (in progress, NOT Claude Code): Mockups**
 - Claude Desktop produces styled HTML mockups in `mockups/`.
 
 **Phase 3 (back to Claude Code): Implement the design**
@@ -33,9 +33,9 @@ Full rules and data model are in `docs/LBL-spec.md`. That document is the source
 
 ## Stack (chosen in Phase 1)
 
-- **Vite + React (plain JS)** — fast dev, easy componentization, static build.
-- **Tailwind CSS** — utility classes; Phase 3 swaps the look without restructuring the markup.
-- **React Router** — client-side routing.
+- **Vite + React (plain JS)** for fast dev, easy componentization, static build.
+- **Tailwind CSS** utility classes. Phase 3 swaps the look without restructuring the markup.
+- **React Router** for client-side routing.
 - **No backend, no database.** Data lives in JSON files in `data/` and is imported directly.
 - **Deploy target:** GitHub Pages. `vite.config.js` defaults to base `/` in dev and `/Locals-Basketball-League/` for `vite build`. Override with `VITE_BASE`.
 
@@ -49,14 +49,14 @@ Locals-Basketball-League/
 ├── README.md                 (project blurb + how to run)
 ├── docs/
 │   └── LBL-spec.md           (full spec, source of truth)
-├── assets/                   (DO NOT rename or move — Vite serves this as publicDir)
+├── assets/                   (DO NOT rename or move. Vite serves this as publicDir.)
 │   ├── league/LBL.png
 │   ├── players/{Jacob,Daniel,Joseph,Nathan}.png
 │   └── teams/{Celtics,Lakers,Warriors,Heat,Bucks,Suns}.png
 ├── data/
 │   ├── season1.json          (Day 1 results seeded; edit to record more games)
 │   └── teams.json            (six-duo NBA name map)
-├── mockups/                  (empty until Phase 2)
+├── mockups/                  (Phase 2 output)
 ├── src/
 │   ├── lib/                  (constants.js, stats.js, data.js)
 │   ├── components/           (Layout)
@@ -75,19 +75,21 @@ Locals-Basketball-League/
 These come from the spec. Getting them wrong silently breaks stats.
 
 **Team keys use age-ordered player names, not alphabetical.**
-Age order (oldest → youngest): Jacob, Daniel, Joseph, Nathan.
+Age order (oldest to youngest): Jacob, Daniel, Joseph, Nathan.
 - Correct: `Jacob-Daniel`, `Jacob-Joseph`, `Jacob-Nathan`, `Daniel-Joseph`, `Daniel-Nathan`, `Joseph-Nathan`
 - Wrong: `Daniel-Jacob`, `Joseph-Jacob`, etc.
 
 There are exactly 6 duos. Hardcode this constant.
 
-**Scoring model — player points are HALVED team points.**
+**Scoring model: player points are HALVED team points.**
 - Team points are authoritative (what's recorded per game).
 - Player points scored = team points / 2
 - Player points allowed = opponent points / 2
-- Player +/- = scored − allowed
-- Display player points to 1 decimal place (21 → 10.5).
-- Never record "who scored what" individually — it's not tracked and shouldn't be invented.
+- Player +/- = scored minus allowed
+- Display player points to 1 decimal place (21 becomes 10.5).
+- Never record "who scored what" individually. It's not tracked and shouldn't be invented.
+
+**Wins/Losses in standings are GAMES, not series.** A team that went 2-1 in a best-of-3 shows as 2W, 1L.
 
 **Series status values:** `"completed"` | `"partial"` | `"dnp"`
 - DNP series award no wins and no points. Don't count them in averages.
@@ -99,21 +101,36 @@ There are exactly 6 duos. Hardcode this constant.
 
 **Player order everywhere (display):** Jacob, Daniel, Joseph, Nathan (age order, oldest first).
 
-**Week labels are logical, not calendar.** A "Week 1" in data might span multiple real-world days. Don't compute anything from dates — dates are optional cosmetic metadata on games only.
+**Week labels are logical, not calendar.** A "Week 1" in data might span multiple real-world days. Don't compute anything from dates. Dates are optional cosmetic metadata on games only.
+
+---
+
+## Typography rules (strict)
+
+**Only regular ASCII hyphens (`-`) are allowed for dashes and score separators.** Never use em dashes (`—` U+2014), en dashes (`–` U+2013), or minus signs (`−` U+2212). This applies to:
+
+- Score separators: `21-0`, never `21—0`, `21–0`, or `21 · 0`.
+- Negative numbers: `-1`, `-19`, never `−1`.
+- Empty/no-data cells in tables: `-`, never `—`.
+- Any dash in body copy or UI text: use a regular hyphen, or rewrite the sentence to avoid a dash entirely.
+
+Middle dots (`·`) are fine as text separators in label lines like `Season 1 · 2026` or `4-2 · 9.1 PPG`. They are NOT dashes and are not banned. Just don't use them between score numbers.
+
+Claude Code must also scrub any existing em dashes in source files on touch.
 
 ---
 
 ## The stat engine
 
-Lives in `src/lib/stats.js`. All pure — no I/O, no DOM. UI components consume the outputs.
+Lives in `src/lib/stats.js`. All pure. No I/O, no DOM. UI components consume the outputs.
 
 Public functions:
-- `computeSeason(seasonJson)` → `{ duoStats, h2h, playerStats, seriesIndex }`.
-- `computeCareer(seasonJsonArray)` → `{ duoStats, playerStats, h2h, seriesIndex, perSeason }`.
-- `standings(duoStats, h2h)` → decorated rows sorted by series wins, then h2h within tied groups, then point diff.
-- `decorateDuo(key, raw)` / `decoratePlayer(name, raw)` — add derived rates (diff, avg margin, ppg, win%, +/-, etc.).
-- `partnerBreakdown(player, duoStats)` → `{ entries, best, worst }` keyed by game win%.
-- `fmt1(n)` → string with 1 decimal place (used for halved player points).
+- `computeSeason(seasonJson)` returns `{ duoStats, h2h, playerStats, seriesIndex }`.
+- `computeCareer(seasonJsonArray)` returns `{ duoStats, playerStats, h2h, seriesIndex, perSeason }`.
+- `standings(duoStats, h2h)` returns decorated rows sorted by games won, then h2h within tied groups, then point diff.
+- `decorateDuo(key, raw)` / `decoratePlayer(name, raw)` add derived rates (diff, avg margin, ppg, papg, win%, +/-).
+- `partnerBreakdown(player, duoStats)` returns `{ entries, best, worst }` keyed by game win%.
+- `fmt1(n)` returns a string with 1 decimal place (used for halved player points).
 
 If you change a public signature, update every page that calls it.
 
@@ -122,22 +139,23 @@ If you change a public signature, update every page that calls it.
 ## Assets
 
 Already in place, do not modify:
-- `assets/league/LBL.png` — league logo
-- `assets/players/{Name}.png` — portrait per player (Jacob, Daniel, Joseph, Nathan)
-- `assets/teams/{TeamName}.png` — logo per duo (Celtics, Lakers, Warriors, Heat, Bucks, Suns)
+- `assets/league/LBL.png` is the league logo.
+- `assets/players/{Name}.png` is the portrait per player (Jacob, Daniel, Joseph, Nathan).
+- `assets/teams/{TeamName}.png` is the logo per duo (Celtics, Lakers, Warriors, Heat, Bucks, Suns).
 
-Reference them by relative path. Team-key → logo mapping comes from `teams.json`.
+Reference them by relative path. Team-key to logo mapping comes from `teams.json`.
 
 ---
 
 ## Things to avoid
 
-- Don't invent per-player scoring lines — halved team points is the only individual scoring stat.
+- Don't invent per-player scoring lines. Halved team points is the only individual scoring stat.
 - Don't alphabetize team keys.
-- Don't auto-compute "days since last game" or anything else tied to calendar dates — dates don't drive logic.
+- Don't auto-compute "days since last game" or anything else tied to calendar dates. Dates don't drive logic.
 - Don't add authentication, backend, or a database. Data is static JSON edited directly in the repo.
-- Don't hardcode stats into components — everything flows from the stat engine.
+- Don't hardcode stats into components. Everything flows from the stat engine.
 - Don't polish the UI in Phase 1. That's Phase 3's job and it needs mockups first.
+- Don't use em dashes, en dashes, or minus signs. See "Typography rules" above.
 
 ---
 
