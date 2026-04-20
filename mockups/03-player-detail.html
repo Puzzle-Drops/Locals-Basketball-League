@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LBL - Joseph</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --bg-2: #0f1014;
+      --surface: #15171c;
+      --surface-2: #1b1e25;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f5f7;
+      --text-muted: #8b8f97;
+      --text-dim: #5b5e66;
+      --accent: #ff6b2b;
+      --accent-soft: rgba(255, 107, 43, 0.12);
+      --accent-ring: rgba(255, 107, 43, 0.35);
+      --positive: #22c55e;
+      --negative: #ef4444;
+      --amber: #fbbf24;
+    }
+
+    html, body { background: var(--bg); color: var(--text); }
+    body { font-family: 'Manrope', system-ui, sans-serif; font-feature-settings: "ss01", "cv11"; }
+
+    .display { font-family: 'Big Shoulders Display', sans-serif; letter-spacing: 0.01em; }
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    /* Player hero backdrop: warm orange, no specific team bias */
+    .player-bg {
+      background-image:
+        radial-gradient(ellipse 60% 50% at 25% 20%, rgba(255, 107, 43, 0.25), transparent 60%),
+        radial-gradient(ellipse 40% 40% at 85% 30%, rgba(253, 185, 39, 0.12), transparent 60%);
+    }
+
+    .grid-lines {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 120ms ease, background 120ms ease;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card.dim { opacity: 0.7; }
+
+    .scorecard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+    .scorecard:hover { border-color: var(--border-strong); background: var(--surface-2); }
+    .scorecard.expanded { background: var(--surface-2); border-color: var(--accent-ring); }
+
+    .team-bar { width: 4px; border-radius: 999px; align-self: stretch; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 8px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.02);
+      white-space: nowrap;
+    }
+    .pill.dnp { color: var(--amber); border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.06); }
+    .pill.accent { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+
+    .logo {
+      width: 40px; height: 40px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 18px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .logo-mini {
+      width: 18px; height: 18px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 10px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    /*
+      DEV NOTE: Player avatar is a circular placeholder here. In Phase 3 this
+      should render the real photo from /assets/players/{Name}.png as a cover-fit
+      image inside the circle.
+    */
+    .avatar {
+      width: 40px; height: 40px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 800; font-size: 16px;
+      background: linear-gradient(135deg, #2a2d36, #1a1c22);
+      box-shadow: 0 0 0 1px var(--border-strong);
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .avatar-xl {
+      width: 128px; height: 128px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 56px;
+      color: #fff;
+      box-shadow: inset 0 0 0 3px rgba(0,0,0,0.3), 0 0 0 2px var(--border-strong), 0 10px 40px -10px rgba(255, 107, 43, 0.6);
+      flex-shrink: 0;
+    }
+
+    .nav-link { color: var(--text-muted); position: relative; padding: 4px 0; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.active { color: var(--text); }
+    .nav-link.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+
+    .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+    .stat-value { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; line-height: 1; }
+
+    .row { transition: background 120ms ease; }
+    .row:hover { background: rgba(255,255,255,0.03); }
+
+    .diff-pos { color: var(--positive); }
+    .diff-neg { color: var(--negative); }
+
+    .winner { color: var(--text); }
+    .loser { color: var(--text-dim); }
+
+    .chev { transition: transform 160ms ease; }
+    .scorecard.expanded .chev { transform: rotate(180deg); }
+    .scorecard .expandable { max-height: 0; overflow: hidden; transition: max-height 240ms ease; }
+    .scorecard.expanded .expandable { max-height: 420px; }
+
+    .vod-btn {
+      width: 18px; height: 18px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-muted);
+      transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+      flex-shrink: 0;
+    }
+    .vod-btn:hover { background: var(--accent); color: #fff; transform: scale(1.08); }
+
+    .seg {
+      display: inline-flex; border-radius: 8px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      padding: 3px;
+    }
+    .seg-btn {
+      padding: 5px 12px; border-radius: 5px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); transition: all 120ms ease;
+      white-space: nowrap;
+    }
+    .seg-btn:hover { color: var(--text); }
+    .seg-btn.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--accent-ring);
+    }
+
+    section { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ========================== NAV ========================== -->
+  <nav class="sticky top-0 z-40 backdrop-blur-md bg-[var(--bg)]/85 border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);">
+          <span class="display font-black text-[13px] text-white leading-none">LBL</span>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="display font-black text-[15px] tracking-wider">LBL</span>
+          <span class="text-[9.5px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Locals Basketball League</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-7 text-sm font-semibold">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#">Standings</a>
+        <a class="nav-link" href="#">Teams</a>
+        <a class="nav-link active" href="#">Players</a>
+        <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link" href="#">Rules</a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="hidden sm:flex pill accent items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+          Season 1
+        </button>
+        <button class="h-9 w-9 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition" aria-label="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================== HERO ========================== -->
+  <section class="player-bg border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 pt-6 pb-10 relative overflow-hidden">
+      <div class="absolute inset-0 grid-lines opacity-40 pointer-events-none"></div>
+
+      <a href="#" class="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.12em] uppercase text-[var(--text-muted)] hover:text-[var(--accent)] transition mb-6 relative">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        All Players
+      </a>
+
+      <div class="relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
+        <!-- DEV NOTE: replace with <img src="/assets/players/Joseph.png" ...> cover-fit inside the circle. -->
+        <div class="avatar-xl shrink-0" style="background: linear-gradient(135deg, #ff8a3d 20%, #ff6b2b 50%, #a3471d 90%);">J</div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="pill accent">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+              Season MVP
+            </span>
+            <span class="pill">#1 Player</span>
+            <span class="pill">Season 1</span>
+          </div>
+          <h1 class="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide">JOSEPH</h1>
+          <div class="flex flex-wrap items-center gap-2 mt-2 text-[var(--text-muted)] font-semibold">
+            <span>Plays for</span>
+            <span class="text-[var(--text)]">Lakers</span>
+            <span class="text-[var(--text-dim)]">·</span>
+            <span class="text-[var(--text)]">Suns</span>
+            <span class="text-[var(--text-dim)]">·</span>
+            <span class="text-[var(--text)]">Heat</span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5">
+            <div class="flex items-baseline gap-2">
+              <span class="display font-black text-2xl tabular">2-0</span>
+              <span class="stat-label">Matches</span>
+            </div>
+            <span class="text-[var(--text-dim)]">·</span>
+            <div class="flex items-baseline gap-2">
+              <span class="display font-black text-2xl tabular">4-2</span>
+              <span class="stat-label">Games</span>
+            </div>
+            <span class="text-[var(--text-dim)]">·</span>
+            <div class="flex items-baseline gap-2">
+              <span class="display font-black text-2xl tabular diff-pos">+10.0</span>
+              <span class="stat-label">Point Diff</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== SCOPE SELECTOR ========================== -->
+  <!-- DEV NOTE: Career and Season 1 are identical while only one season exists. -->
+  <section class="max-w-6xl mx-auto px-5 pt-8">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-[0.12em] uppercase">Scope</span>
+      <div id="scopeToggle" class="seg" data-mode="season1">
+        <button class="seg-btn active" data-mode="season1">Season 1</button>
+        <button class="seg-btn" data-mode="career">Career</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== PRIMARY STATS ========================== -->
+  <!--
+    DEV NOTE: Player points are halved team points. Here they are across all
+    teams the player has played on. Joseph: Lakers (59-40) + Suns (50-49),
+    halved and summed = 54.5 scored / 44.5 allowed over 6 games.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="card p-5">
+        <div class="stat-label">Points</div>
+        <div class="stat-value text-4xl mt-2 tabular">54.5</div>
+        <div class="text-[11px] text-[var(--text-muted)] font-semibold mt-1">Total scored</div>
+      </div>
+      <div class="card p-5">
+        <div class="stat-label">PPG</div>
+        <div class="stat-value text-4xl mt-2 tabular">9.1</div>
+        <div class="text-[11px] text-[var(--text-muted)] font-semibold mt-1">Per game</div>
+      </div>
+      <div class="card p-5">
+        <div class="stat-label">Points Against</div>
+        <div class="stat-value text-4xl mt-2 tabular">44.5</div>
+        <div class="text-[11px] text-[var(--text-muted)] font-semibold mt-1">Total allowed</div>
+      </div>
+      <div class="card p-5">
+        <div class="stat-label">PAPG</div>
+        <div class="stat-value text-4xl mt-2 tabular">7.4</div>
+        <div class="text-[11px] text-[var(--text-muted)] font-semibold mt-1">Per game</div>
+      </div>
+
+      <div class="card p-5 col-span-2 lg:col-span-4">
+        <div class="stat-label">Point Differential</div>
+        <div class="flex items-baseline gap-8 flex-wrap mt-2">
+          <div>
+            <div class="stat-value text-4xl tabular diff-pos">+10.0</div>
+            <div class="text-[11px] text-[var(--text-muted)] font-semibold mt-1">Total</div>
+          </div>
+          <div>
+            <div class="stat-value text-4xl tabular diff-pos">+1.7</div>
+            <div class="text-[11px] text-[var(--text-muted)] font-semibold mt-1">Avg margin per game</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== MY TEAMS (partnerships) ========================== -->
+  <!--
+    DEV NOTE: Each player plays on exactly 3 duos (one with each other player).
+    Cards should be ordered by game win% descending, with unplayed partnerships
+    last and dimmed. Tiebreaker on equal win% is point differential.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-12">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <div class="stat-label mb-1">3 Partnerships</div>
+        <h2 class="display font-black text-3xl tracking-wide">MY TEAMS</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <!-- Lakers (with Jacob): best partnership by PD -->
+      <a href="#" class="card p-5 flex flex-col group">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="flex-1 min-w-0">
+            <div class="display font-black text-xl leading-none">LAKERS</div>
+            <div class="text-[11px] text-[var(--text-muted)] mt-1 truncate">with Jacob</div>
+          </div>
+          <svg class="text-[var(--text-dim)] group-hover:text-[var(--accent)] transition" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <div class="flex items-baseline gap-4 mb-3">
+          <div class="flex items-baseline gap-1.5">
+            <span class="display font-bold text-lg tabular">1-0</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Matches</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="display font-bold text-lg tabular">2-1</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Games</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 pt-3 border-t border-[var(--border)]">
+          <div>
+            <div class="stat-label">+/-</div>
+            <div class="stat-value text-lg mt-1 diff-pos tabular">+9.5</div>
+          </div>
+          <div>
+            <div class="stat-label">PPG</div>
+            <div class="stat-value text-lg mt-1 tabular">9.8</div>
+          </div>
+          <div>
+            <div class="stat-label">PAPG</div>
+            <div class="stat-value text-lg mt-1 tabular">6.7</div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Suns (with Nathan) -->
+      <a href="#" class="card p-5 flex flex-col group">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          <div class="flex-1 min-w-0">
+            <div class="display font-black text-xl leading-none">SUNS</div>
+            <div class="text-[11px] text-[var(--text-muted)] mt-1 truncate">with Nathan</div>
+          </div>
+          <svg class="text-[var(--text-dim)] group-hover:text-[var(--accent)] transition" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <div class="flex items-baseline gap-4 mb-3">
+          <div class="flex items-baseline gap-1.5">
+            <span class="display font-bold text-lg tabular">1-0</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Matches</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="display font-bold text-lg tabular">2-1</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Games</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 pt-3 border-t border-[var(--border)]">
+          <div>
+            <div class="stat-label">+/-</div>
+            <div class="stat-value text-lg mt-1 diff-pos tabular">+0.5</div>
+          </div>
+          <div>
+            <div class="stat-label">PPG</div>
+            <div class="stat-value text-lg mt-1 tabular">8.3</div>
+          </div>
+          <div>
+            <div class="stat-label">PAPG</div>
+            <div class="stat-value text-lg mt-1 tabular">8.2</div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Heat (with Daniel): unplayed, dimmed -->
+      <a href="#" class="card dim p-5 flex flex-col group">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+          <div class="flex-1 min-w-0">
+            <div class="display font-black text-xl leading-none">HEAT</div>
+            <div class="text-[11px] text-[var(--text-muted)] mt-1 truncate">with Daniel</div>
+          </div>
+          <svg class="text-[var(--text-dim)] group-hover:text-[var(--accent)] transition" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <div class="flex items-baseline gap-4 mb-3">
+          <div class="flex items-baseline gap-1.5">
+            <span class="display font-bold text-lg tabular text-[var(--text-dim)]">0-0</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Matches</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="display font-bold text-lg tabular text-[var(--text-dim)]">0-0</span>
+            <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Games</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 pt-3 border-t border-[var(--border)]">
+          <div>
+            <div class="stat-label">+/-</div>
+            <div class="stat-value text-lg mt-1 tabular text-[var(--text-dim)]">-</div>
+          </div>
+          <div>
+            <div class="stat-label">PPG</div>
+            <div class="stat-value text-lg mt-1 tabular text-[var(--text-dim)]">-</div>
+          </div>
+          <div>
+            <div class="stat-label">PAPG</div>
+            <div class="stat-value text-lg mt-1 tabular text-[var(--text-dim)]">-</div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ========================== GAME LOG ========================== -->
+  <!-- DEV NOTE: Shows every series the player appears in, across all their duos, ordered by week/match. -->
+  <section class="max-w-6xl mx-auto px-5 pt-12">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <div class="stat-label mb-1">2 Matches Played</div>
+        <h2 class="display font-black text-3xl tracking-wide">GAME LOG</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+      <!-- Week 1 Match 1: Lakers 2-1 vs Bucks -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 1</span>
+            <span class="pill">Match 1</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #552583, #FDB927);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="display font-black text-xl winner">LAKERS</span>
+              <span class="pill accent">Winner</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Joseph</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular winner leading-none">59</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">2 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3 loser">
+          <div class="team-bar" style="background: linear-gradient(180deg, #00471B, #EEE1C6);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-xl">BUCKS</span>
+            <div class="text-xs text-[var(--text-dim)] truncate">Daniel & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none">40</div>
+            <div class="text-[11px] font-bold text-[var(--text-dim)] tracking-wider mt-1">1 WIN</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="winner">21</span>-<span class="loser">0</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="loser">17</span>-<span class="winner">21</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="winner">21</span>-<span class="loser">19</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 diff-pos">+19</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular">21-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular">21-19</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Week 1 Match 2: Suns 2-1 vs Celtics -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 1</span>
+            <span class="pill">Match 2</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #E56020, #1D1160);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="display font-black text-xl winner">SUNS</span>
+              <span class="pill accent">Winner</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Joseph & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular winner leading-none">50</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">2 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3 loser">
+          <div class="team-bar" style="background: linear-gradient(180deg, #007A33, #BA9653);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-xl">CELTICS</span>
+            <div class="text-xs text-[var(--text-dim)] truncate">Jacob & Daniel</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none">49</div>
+            <div class="text-[11px] font-bold text-[var(--text-dim)] tracking-wider mt-1">1 WIN</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="loser">17</span>-<span class="winner">23</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="winner">22</span>-<span class="loser">5</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="loser">10</span>-<span class="winner">22</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 diff-pos">+1</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular">22-5</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular">17-23</div></div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ========================== UPCOMING ========================== -->
+  <!--
+    DEV NOTE: For a player on all 3 duos, every week they have 3 upcoming
+    series. This section shows the next one only. The "View full schedule"
+    link surfaces the rest. Upcoming scorecard pattern matches Team Detail
+    (records in parens, 0 scores, 0-0 cells, no VOD icons).
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-12 pb-12">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <div class="stat-label mb-1">Next Series</div>
+        <h2 class="display font-black text-3xl tracking-wide">UP NEXT</h2>
+      </div>
+      <a href="#" class="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent)] uppercase tracking-[0.12em] transition">Full Schedule →</a>
+    </div>
+
+    <article class="scorecard p-5 cursor-pointer" data-expand>
+      <header class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="pill">Week 2</span>
+          <span class="pill">Match 1</span>
+        </div>
+        <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+      </header>
+
+      <!-- Celtics row (Joseph is NOT on this team but they're team1 of this matchup) -->
+      <div class="flex items-center gap-3">
+        <div class="team-bar" style="background: linear-gradient(180deg, #007A33, #BA9653);"></div>
+        <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="display font-black text-xl">CELTICS</span>
+            <span class="text-xs text-[var(--text-muted)] font-bold tabular">(1-2)</span>
+          </div>
+          <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Daniel</div>
+        </div>
+        <div class="text-right">
+          <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+          <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+        </div>
+      </div>
+
+      <!-- Suns row (Joseph's team on this matchup) -->
+      <div class="flex items-center gap-3 mt-3">
+        <div class="team-bar" style="background: linear-gradient(180deg, #E56020, #1D1160);"></div>
+        <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="display font-black text-xl">SUNS</span>
+            <span class="text-xs text-[var(--text-muted)] font-bold tabular">(2-1)</span>
+          </div>
+          <div class="text-xs text-[var(--text-muted)] truncate">Joseph & Nathan</div>
+        </div>
+        <div class="text-right">
+          <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+          <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+        <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+          </div>
+          <div class="flex items-center justify-center gap-1.5 mt-1.5">
+            <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+            <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+            <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          </div>
+        </div>
+        <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+          </div>
+          <div class="flex items-center justify-center gap-1.5 mt-1.5">
+            <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+            <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+            <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          </div>
+        </div>
+        <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+          </div>
+          <div class="flex items-center justify-center gap-1.5 mt-1.5">
+            <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+            <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+            <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center justify-end">
+        <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+          Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <div class="expandable">
+        <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+          <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-muted)]">0</div></div>
+          <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+          <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ========================== FOOTER ========================== -->
+  <footer class="border-t border-[var(--border)] mt-4">
+    <div class="max-w-6xl mx-auto px-5 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c);">
+          <span class="display font-black text-[11px] text-white leading-none">LBL</span>
+        </div>
+        <div class="leading-tight">
+          <div class="display font-black text-sm tracking-wider">LOCALS BASKETBALL LEAGUE</div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season 1</div>
+        </div>
+      </div>
+      <div class="text-[11px] text-[var(--text-dim)] uppercase tracking-wider font-semibold">
+        Jacob · Daniel · Joseph · Nathan
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('[data-expand]').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        if (e.target.closest('.seg-btn')) return;
+        card.classList.toggle('expanded');
+      });
+    });
+
+    const scopeToggle = document.getElementById('scopeToggle');
+    scopeToggle.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        scopeToggle.dataset.mode = btn.dataset.mode;
+        scopeToggle.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === btn.dataset.mode));
+      });
+    });
+  </script>
+</body>
+</html>

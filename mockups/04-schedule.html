@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LBL - Schedule</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --bg-2: #0f1014;
+      --surface: #15171c;
+      --surface-2: #1b1e25;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f5f7;
+      --text-muted: #8b8f97;
+      --text-dim: #5b5e66;
+      --accent: #ff6b2b;
+      --accent-soft: rgba(255, 107, 43, 0.12);
+      --accent-ring: rgba(255, 107, 43, 0.35);
+      --positive: #22c55e;
+      --positive-soft: rgba(34, 197, 94, 0.08);
+      --positive-ring: rgba(34, 197, 94, 0.35);
+      --negative: #ef4444;
+      --amber: #fbbf24;
+    }
+
+    html, body { background: var(--bg); color: var(--text); }
+    body { font-family: 'Manrope', system-ui, sans-serif; font-feature-settings: "ss01", "cv11"; }
+
+    .display { font-family: 'Big Shoulders Display', sans-serif; letter-spacing: 0.01em; }
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    .court-bg {
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% -10%, rgba(255, 107, 43, 0.12), transparent 60%),
+        radial-gradient(ellipse 40% 30% at 90% 10%, rgba(255, 107, 43, 0.06), transparent 60%);
+    }
+
+    .grid-lines {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 120ms ease, background 120ms ease;
+    }
+    .card:hover { border-color: var(--border-strong); }
+
+    .scorecard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+    .scorecard:hover { border-color: var(--border-strong); background: var(--surface-2); }
+    .scorecard.expanded { background: var(--surface-2); border-color: var(--accent-ring); }
+
+    .team-bar { width: 4px; border-radius: 999px; align-self: stretch; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 8px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.02);
+      white-space: nowrap;
+    }
+    .pill.dnp { color: var(--amber); border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.06); }
+    .pill.accent { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+    .pill.success { color: var(--positive); border-color: var(--positive-ring); background: var(--positive-soft); }
+
+    a.pill { transition: color 120ms, border-color 120ms, background 120ms; }
+    a.pill:hover { color: var(--text); border-color: var(--border-strong); }
+    a.pill.accent:hover { color: var(--accent); }
+
+    .logo {
+      width: 40px; height: 40px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 18px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .logo-mini {
+      width: 18px; height: 18px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 10px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .nav-link { color: var(--text-muted); position: relative; padding: 4px 0; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.active { color: var(--text); }
+    .nav-link.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+
+    .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+    .stat-value { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; line-height: 1; }
+
+    .diff-pos { color: var(--positive); }
+    .diff-neg { color: var(--negative); }
+
+    .winner { color: var(--text); }
+    .loser { color: var(--text-dim); }
+
+    .chev { transition: transform 160ms ease; }
+    .scorecard.expanded .chev { transform: rotate(180deg); }
+    .scorecard .expandable { max-height: 0; overflow: hidden; transition: max-height 240ms ease; }
+    .scorecard.expanded .expandable { max-height: 420px; }
+
+    .vod-btn {
+      width: 18px; height: 18px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-muted);
+      transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+      flex-shrink: 0;
+    }
+    .vod-btn:hover { background: var(--accent); color: #fff; transform: scale(1.08); }
+
+    section { scroll-margin-top: 80px; }
+
+    /* Faint separators between week sections */
+    .week-divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border-strong), transparent);
+      margin: 0 auto;
+      max-width: 240px;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ========================== NAV ========================== -->
+  <nav class="sticky top-0 z-40 backdrop-blur-md bg-[var(--bg)]/85 border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);">
+          <span class="display font-black text-[13px] text-white leading-none">LBL</span>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="display font-black text-[15px] tracking-wider">LBL</span>
+          <span class="text-[9.5px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Locals Basketball League</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-7 text-sm font-semibold">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#">Standings</a>
+        <a class="nav-link" href="#">Teams</a>
+        <a class="nav-link" href="#">Players</a>
+        <a class="nav-link active" href="#">Schedule</a>
+        <a class="nav-link" href="#">Rules</a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="hidden sm:flex pill accent items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+          Season 1
+        </button>
+        <button class="h-9 w-9 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition" aria-label="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================== HERO ========================== -->
+  <section class="court-bg border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 pt-10 pb-8 relative overflow-hidden">
+      <div class="absolute inset-0 grid-lines opacity-60 pointer-events-none"></div>
+
+      <div class="relative">
+        <div class="stat-label mb-2">Season 1 · 2026</div>
+        <h1 class="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-5">SCHEDULE</h1>
+
+        <!-- Season progress strip -->
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mb-5">
+          <div class="flex items-baseline gap-2">
+            <span class="display font-black text-2xl tabular">9</span>
+            <span class="stat-label">Series</span>
+          </div>
+          <span class="text-[var(--text-dim)]">·</span>
+          <div class="flex items-baseline gap-2">
+            <span class="display font-black text-2xl tabular diff-pos">2</span>
+            <span class="stat-label">Played</span>
+          </div>
+          <span class="text-[var(--text-dim)]">·</span>
+          <div class="flex items-baseline gap-2">
+            <span class="display font-black text-2xl tabular text-[var(--amber)]">1</span>
+            <span class="stat-label">DNP</span>
+          </div>
+          <span class="text-[var(--text-dim)]">·</span>
+          <div class="flex items-baseline gap-2">
+            <span class="display font-black text-2xl tabular">6</span>
+            <span class="stat-label">Upcoming</span>
+          </div>
+        </div>
+
+        <!-- Jump-to nav -->
+        <div class="flex flex-wrap gap-2">
+          <a href="#week-1" class="pill">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Week 1
+          </a>
+          <a href="#week-2" class="pill accent">Week 2 · Next Up</a>
+          <a href="#week-3" class="pill">Week 3</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== WEEK 1 ========================== -->
+  <section id="week-1" class="max-w-6xl mx-auto px-5 pt-12">
+    <div class="flex items-end justify-between mb-6 gap-3 flex-wrap">
+      <div>
+        <div class="stat-label mb-1">2 Played · 1 DNP</div>
+        <h2 class="display font-black text-3xl tracking-wide">WEEK 1</h2>
+      </div>
+      <span class="pill success">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Complete
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+
+      <!-- W1 M1: Lakers 2-1 Bucks (played) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 1</span>
+            <span class="pill">Match 1</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #552583, #FDB927);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="display font-black text-xl winner">LAKERS</span>
+              <span class="pill accent">Winner</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Joseph</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular winner leading-none">59</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">2 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3 loser">
+          <div class="team-bar" style="background: linear-gradient(180deg, #00471B, #EEE1C6);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-xl">BUCKS</span>
+            <div class="text-xs text-[var(--text-dim)] truncate">Daniel & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none">40</div>
+            <div class="text-[11px] font-bold text-[var(--text-dim)] tracking-wider mt-1">1 WIN</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="winner">21</span>-<span class="loser">0</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="loser">17</span>-<span class="winner">21</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="winner">21</span>-<span class="loser">19</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 diff-pos">+19</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular">21-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular">21-19</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- W1 M2: Suns 2-1 Celtics (played) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 1</span>
+            <span class="pill">Match 2</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #E56020, #1D1160);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="display font-black text-xl winner">SUNS</span>
+              <span class="pill accent">Winner</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Joseph & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular winner leading-none">50</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">2 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3 loser">
+          <div class="team-bar" style="background: linear-gradient(180deg, #007A33, #BA9653);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-xl">CELTICS</span>
+            <div class="text-xs text-[var(--text-dim)] truncate">Jacob & Daniel</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none">49</div>
+            <div class="text-[11px] font-bold text-[var(--text-dim)] tracking-wider mt-1">1 WIN</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="loser">17</span>-<span class="winner">23</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="winner">22</span>-<span class="loser">5</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+              <a href="https://google.com" class="vod-btn" onclick="event.stopPropagation()" title="Watch VOD"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none"><span class="loser">10</span>-<span class="winner">22</span></span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 diff-pos">+1</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular">22-5</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular">17-23</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- W1 M3: Warriors vs Heat (DNP) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 1</span>
+            <span class="pill">Match 3</span>
+            <span class="pill dnp">DNP</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #1D428A, #FFC72C);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-xl">WARRIORS</span>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #98002E, #F9A01B);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+          <div class="flex-1 min-w-0">
+            <span class="display font-black text-xl">HEAT</span>
+            <div class="text-xs text-[var(--text-muted)] truncate">Daniel & Joseph</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5" style="min-height: 18px;">
+              <span class="display font-bold text-sm tracking-widest text-[var(--text-dim)] leading-none">DNP</span>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5" style="min-height: 18px;">
+              <span class="display font-bold text-sm tracking-widest text-[var(--text-dim)] leading-none">DNP</span>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5" style="min-height: 18px;">
+              <span class="display font-bold text-sm tracking-widest text-[var(--text-dim)] leading-none">DNP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-dim)]">0</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-dim)]">0-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-dim)]">0-0</div></div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <div class="week-divider my-16"></div>
+
+  <!-- ========================== WEEK 2 ========================== -->
+  <!--
+    DEV NOTE: Week 2 play order is Pairing B, C, A (matchup_ids 2, 3, 1).
+    Display "Match N" reflects play order, not matchup_id.
+    Match 1 => Celtics vs Suns (matchup_id 2)
+    Match 2 => Warriors vs Heat (matchup_id 3)
+    Match 3 => Lakers vs Bucks (matchup_id 1)
+    All cards show current team records in parens.
+  -->
+  <section id="week-2" class="max-w-6xl mx-auto px-5 pt-2">
+    <div class="flex items-end justify-between mb-6 gap-3 flex-wrap">
+      <div>
+        <div class="stat-label mb-1">0 of 3 Played</div>
+        <h2 class="display font-black text-3xl tracking-wide">WEEK 2</h2>
+      </div>
+      <span class="pill accent">Next Up</span>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+
+      <!-- W2 M1: Celtics vs Suns (upcoming) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 2</span>
+            <span class="pill">Match 1</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #007A33, #BA9653);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">CELTICS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(1-2)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Daniel</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #E56020, #1D1160);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">SUNS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(2-1)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Joseph & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-muted)]">0</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- W2 M2: Warriors vs Heat (upcoming) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 2</span>
+            <span class="pill">Match 2</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #1D428A, #FFC72C);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">WARRIORS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(0-0)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #98002E, #F9A01B);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">HEAT</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(0-0)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Daniel & Joseph</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-muted)]">0</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- W2 M3: Lakers vs Bucks (upcoming) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 2</span>
+            <span class="pill">Match 3</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #552583, #FDB927);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">LAKERS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(2-1)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Joseph</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #00471B, #EEE1C6);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">BUCKS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(1-2)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Daniel & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-muted)]">0</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <div class="week-divider my-16"></div>
+
+  <!-- ========================== WEEK 3 ========================== -->
+  <!--
+    DEV NOTE: Week 3 play order is Pairing C, A, B (matchup_ids 3, 1, 2).
+    Match 1 => Warriors vs Heat
+    Match 2 => Lakers vs Bucks
+    Match 3 => Celtics vs Suns
+  -->
+  <section id="week-3" class="max-w-6xl mx-auto px-5 pt-2 pb-12">
+    <div class="flex items-end justify-between mb-6 gap-3 flex-wrap">
+      <div>
+        <div class="stat-label mb-1">0 of 3 Played</div>
+        <h2 class="display font-black text-3xl tracking-wide">WEEK 3</h2>
+      </div>
+      <span class="pill">Upcoming</span>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+
+      <!-- W3 M1: Warriors vs Heat (upcoming) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 3</span>
+            <span class="pill">Match 1</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #1D428A, #FFC72C);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">WARRIORS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(0-0)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #98002E, #F9A01B);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">HEAT</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(0-0)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Daniel & Joseph</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-muted)]">0</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- W3 M2: Lakers vs Bucks (upcoming) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 3</span>
+            <span class="pill">Match 2</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #552583, #FDB927);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">LAKERS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(2-1)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Joseph</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #00471B, #EEE1C6);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">BUCKS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(1-2)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Daniel & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-muted)]">0</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- W3 M3: Celtics vs Suns (upcoming) -->
+      <article class="scorecard p-5 cursor-pointer" data-expand>
+        <header class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill">Week 3</span>
+            <span class="pill">Match 3</span>
+          </div>
+          <span class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider">BEST OF 3</span>
+        </header>
+
+        <div class="flex items-center gap-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #007A33, #BA9653);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">CELTICS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(1-2)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Jacob & Daniel</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <div class="team-bar" style="background: linear-gradient(180deg, #E56020, #1D1160);"></div>
+          <div class="logo" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="display font-black text-xl">SUNS</span>
+              <span class="text-xs text-[var(--text-muted)] font-bold tabular">(2-1)</span>
+            </div>
+            <div class="text-xs text-[var(--text-muted)] truncate">Joseph & Nathan</div>
+          </div>
+          <div class="text-right">
+            <div class="display font-black text-4xl tabular leading-none text-[var(--text-muted)]">0</div>
+            <div class="text-[11px] font-bold text-[var(--text-muted)] tracking-wider mt-1">0 WINS</div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-2">
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G1</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G2</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+          <div class="relative bg-white/[0.02] rounded-lg p-2 border border-[var(--border)]">
+            <div class="flex items-center justify-between"><span class="text-[10px] text-[var(--text-muted)] font-bold tracking-wider">G3</span></div>
+            <div class="flex items-center justify-center gap-1.5 mt-1.5">
+              <div class="logo-mini" style="background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+              <span class="display font-bold text-base tabular leading-none text-[var(--text-muted)]">0-0</span>
+              <div class="logo-mini" style="background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="text-[var(--accent)] text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+            Details <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="expandable">
+          <div class="mt-4 pt-4 border-t border-[var(--border)] grid grid-cols-3 gap-3 text-center">
+            <div><div class="stat-label">Margin</div><div class="stat-value text-xl mt-1 text-[var(--text-muted)]">0</div></div>
+            <div><div class="stat-label">Biggest Game</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+            <div><div class="stat-label">Closest</div><div class="stat-value text-xl mt-1 tabular text-[var(--text-muted)]">0-0</div></div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ========================== FOOTER ========================== -->
+  <footer class="border-t border-[var(--border)] mt-12">
+    <div class="max-w-6xl mx-auto px-5 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c);">
+          <span class="display font-black text-[11px] text-white leading-none">LBL</span>
+        </div>
+        <div class="leading-tight">
+          <div class="display font-black text-sm tracking-wider">LOCALS BASKETBALL LEAGUE</div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season 1</div>
+        </div>
+      </div>
+      <div class="text-[11px] text-[var(--text-dim)] uppercase tracking-wider font-semibold">
+        Jacob · Daniel · Joseph · Nathan
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('[data-expand]').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        if (e.target.closest('button')) return;
+        card.classList.toggle('expanded');
+      });
+    });
+  </script>
+</body>
+</html>
