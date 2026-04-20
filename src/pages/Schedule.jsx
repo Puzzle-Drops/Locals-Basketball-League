@@ -19,7 +19,7 @@ export default function Schedule() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Schedule — Season {CURRENT_SEASON.season}</h1>
+      <h1 className="text-2xl font-bold">Schedule - Season {CURRENT_SEASON.season}</h1>
       {[...byWeek.entries()].map(([week, series]) => (
         <section key={week}>
           <h2 className="text-lg font-semibold mb-2">Week {week}</h2>

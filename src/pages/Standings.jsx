@@ -52,7 +52,7 @@ export default function Standings() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-2xl font-bold mb-2">Standings — Season {CURRENT_SEASON.season}</h1>
+        <h1 className="text-2xl font-bold mb-2">Standings - Season {CURRENT_SEASON.season}</h1>
         <Table rows={seasonRows} />
         <p className="text-xs text-gray-500 mt-2">
           Tiebreakers: head-to-head series record, then point differential.

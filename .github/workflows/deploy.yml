@@ -12,7 +12,7 @@ permissions:
   pages: write
   id-token: write
 
-# Don't queue up multiple deploys — if a new push lands while one is running,
+# Don't queue up multiple deploys - if a new push lands while one is running,
 # let the running one finish, then run the latest.
 concurrency:
   group: pages

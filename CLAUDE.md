@@ -159,7 +159,7 @@ Reference them by relative path. Team-key to logo mapping comes from `teams.json
 
 - Don't invent per-player scoring lines. Halved team points is the only individual scoring stat.
 - Don't alphabetize team keys.
-- Don't derive "Match N" labels from `matchup_id`. Use the series' index within its week.
+- Don't derive "Series N" labels from `matchup_id`. Use the series' index within its week.
 - Don't auto-compute "days since last game" or anything else tied to calendar dates. Dates don't drive logic.
 - Don't add authentication, backend, or a database. Data is static JSON edited directly in the repo.
 - Don't hardcode stats into components. Everything flows from the stat engine.

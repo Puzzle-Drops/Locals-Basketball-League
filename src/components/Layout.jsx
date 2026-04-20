@@ -42,7 +42,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className="mx-auto max-w-5xl px-4 py-6 text-xs text-gray-500">
-        Phase 1 scaffold — styling pass comes later.
+        Phase 1 scaffold - styling pass comes later.
       </footer>
     </div>
   );

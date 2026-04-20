@@ -34,8 +34,8 @@ export default function PlayerDetail() {
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <PartnerBlock title={`Season ${CURRENT_SEASON.season} — Partners`} player={name} pb={seasonPartners} />
-        <PartnerBlock title="Career — Partners" player={name} pb={careerPartners} />
+        <PartnerBlock title={`Season ${CURRENT_SEASON.season} - Partners`} player={name} pb={seasonPartners} />
+        <PartnerBlock title="Career - Partners" player={name} pb={careerPartners} />
       </section>
 
       <section>
@@ -97,14 +97,14 @@ function PartnerBlock({ title, player, pb }) {
                 <span className="text-gray-500 text-xs">({TEAMS[e.duoKey]})</span>
               </td>
               <td className="py-1">{e.gamesWon}-{e.gamesLost}</td>
-              <td className="py-1">{e.gamesPlayed ? `${Math.round(e.winPct * 100)}%` : '—'}</td>
+              <td className="py-1">{e.gamesPlayed ? `${Math.round(e.winPct * 100)}%` : '-'}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <p className="text-xs text-gray-500 mt-2">
-        Best: {pb.best ? `${pb.best.partner} (${Math.round(pb.best.winPct * 100)}%)` : '—'} ·{' '}
-        Worst: {pb.worst ? `${pb.worst.partner} (${Math.round(pb.worst.winPct * 100)}%)` : '—'}
+        Best: {pb.best ? `${pb.best.partner} (${Math.round(pb.best.winPct * 100)}%)` : '-'} ·{' '}
+        Worst: {pb.worst ? `${pb.worst.partner} (${Math.round(pb.worst.winPct * 100)}%)` : '-'}
       </p>
     </div>
   );
