@@ -130,9 +130,9 @@
     .rank-num.top { color: var(--accent); }
 
     /*
-      Status pill — shown in the Status column. Two variants:
-        .in  — green "IN" pill for top 4 seeds
-        .gb  — amber "N GB" pill for teams missing the cut (N games behind)
+      Status pill - shown in the Status column. Two variants:
+        .in  - green "IN" pill for top 4 seeds
+        .gb  - amber "N GB" pill for teams missing the cut (N games behind)
       Kept visually distinct so the cut line is legible at a glance.
     */
     .status-pill {
@@ -159,7 +159,7 @@
     }
 
     /*
-      Playoff Line — the visual cut between the #4 and #5 seed. Accent-tinted
+      Playoff Line - the visual cut between the #4 and #5 seed. Accent-tinted
       band with a pulsing dot + label centered by two flex line segments.
     */
     .playoff-line-row {
@@ -487,7 +487,7 @@
       STAGE 2 - Resolution: matchups decided by +/- comparison
 
     Team-name records in the bracket and playoff-race table (e.g. "LAKERS (2-1)")
-    show the regular-season GAME record (W-L), not the match record. Game record
+    show the regular-season GAME record (W-L), not the series record. Game record
     is the primary ranking metric, so surfacing it here keeps the bracket visually
     consistent with the standings ranking logic.
 
@@ -540,7 +540,7 @@
 
       # · Team (W-L inline) · +/- · Status
 
-    LAYOUT NOTE — COLUMN ALIGNMENT IS THE PRIORITY:
+    LAYOUT NOTE - COLUMN ALIGNMENT IS THE PRIORITY:
       The outer flex-1 Team cell has `min-w-0` so it stays at its ALLOCATED
       width (the remainder after the fixed # / +/- / Status columns), identical
       on every row. The inner name+duo wrapper also has `min-w-0`. Both are
@@ -549,7 +549,7 @@
 
       Team name and duo both use `whitespace-nowrap`, so text that's wider than
       the allocated cell overflows visually INTO the next column's empty space
-      (which is fine — +/- and Status are right-aligned, leaving empty space on
+      (which is fine - +/- and Status are right-aligned, leaving empty space on
       their left edges). This is the "overlap, don't push" behavior we want.
 
       Status pill's width stays at w-24 so the right edge always lands in the
@@ -643,7 +643,7 @@
             <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
           </a>
 
-          <!-- Row #4: Bucks (last IN — no bottom border; playoff line handles separation) -->
+          <!-- Row #4: Bucks (last IN - no bottom border; playoff line handles separation) -->
           <a href="#" class="race-row in flex items-center">
             <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">4</span></span>
             <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
@@ -657,7 +657,7 @@
             <span class="w-24 text-right shrink-0 py-3 pr-4"><span class="status-pill in">IN</span></span>
           </a>
 
-          <!-- Playoff line divider — visual cut between #4 and #5 -->
+          <!-- Playoff line divider - visual cut between #4 and #5 -->
           <div class="playoff-line-row">
             <div class="line-seg"></div>
             <span class="pl-label">PLAYOFF LINE</span>
@@ -698,7 +698,7 @@
 
     <!-- Legend / footnote -->
     <div class="mt-3 text-[11px] text-[var(--text-dim)]">
-      <span class="text-[var(--text-muted)] font-bold">GB</span> = wins behind the #4 seed. Seeding by game wins; tiebreakers: head-to-head match record, then point differential.
+      <span class="text-[var(--text-muted)] font-bold">GB</span> = wins behind the #4 seed. Seeding by game wins; tiebreakers: head-to-head series record, then point differential.
     </div>
   </section>
 
@@ -805,7 +805,7 @@
             </span>
           </div>
 
-          <!-- Mini matchup — mirrors semifinal layout (seed + logo + name+record+duo + score) -->
+          <!-- Mini matchup - mirrors semifinal layout (seed + logo + name+record+duo + score) -->
           <div class="space-y-1">
             <div class="mini-team winner">
               <span class="seed-badge">#1</span>
@@ -858,7 +858,7 @@
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">02</span>
-          <div><strong class="text-[var(--text)]">Seeding uses game wins</strong> — the same rule as the standings ranking.</div>
+          <div><strong class="text-[var(--text)]">Seeding uses game wins</strong> - the same rule as the standings ranking.</div>
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">03</span>
@@ -874,7 +874,7 @@
         </div>
         <div class="flex items-start gap-3">
           <span class="display font-black text-[var(--accent)] text-lg leading-none mt-0.5 w-6 shrink-0">06</span>
-          <div><strong class="text-[var(--text)]">No double counting.</strong> Playoff results don't add to stats — +/- is already tallied. Bracket is a live projection, locks after Week 3.</div>
+          <div><strong class="text-[var(--text)]">No double counting.</strong> Playoff results don't add to stats - +/- is already tallied. Bracket is a live projection, locks after Week 3.</div>
         </div>
       </div>
     </div>
