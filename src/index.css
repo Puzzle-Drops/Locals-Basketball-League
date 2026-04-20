@@ -317,6 +317,66 @@ section { scroll-margin-top: 80px; }
   max-width: 240px;
 }
 
+/* Rules page section blocks: big chapter number on the left, content right. */
+.section-block {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .section-block {
+    grid-template-columns: 120px 1fr;
+    gap: 40px;
+  }
+}
+.section-num {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 72px;
+  line-height: 0.85;
+  color: var(--text-dim);
+  letter-spacing: -0.02em;
+}
+@media (min-width: 768px) {
+  .section-num { font-size: 96px; }
+}
+.section-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  margin-bottom: 20px;
+}
+@media (min-width: 768px) {
+  .section-title { font-size: 40px; }
+}
+
+/* Rules-style body prose */
+.prose-body {
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 15px;
+}
+.prose-body strong { color: var(--text); font-weight: 700; }
+.prose-body p + p { margin-top: 14px; }
+
+/* Bracket structure cards on Rules section 06 */
+.bracket-card { text-align: center; }
+.bracket-seed {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900; font-size: 18px;
+  letter-spacing: 0.02em;
+}
+.bracket-vs {
+  display: block;
+  margin: 8px 0;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
 /* Game Detail hero -- both team colors layered subtly. Driven by
    --game-c1 / --game-c2 CSS vars set inline by the page. */
 .game-bg {

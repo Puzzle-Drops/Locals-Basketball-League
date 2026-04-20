@@ -15,10 +15,10 @@ ranking/playoff logic without reading the non-negotiable decisions section.
 Built so far:
 - Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` / `.game-bg` backdrops, `.week-divider`, `.pill.success`, `.game-cell` strip, `.crumb` breadcrumb, `.video-placeholder`, `.box-row`).
 - Reusable components in `src/components/`: `Layout` (sticky nav with Playoffs link + hamburger mobile menu), `Scorecard` (handles played, DNP, and upcoming variants with optional `records` prop), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNGs from `assets/` with gradient-and-initial fallback, multiple sizes), `Pill`, `ScrollManager` (smooth-scrolls to hash on cross-page nav, jumps to top otherwise).
-- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**, **Game Detail (05)**, **Standings (06)**.
+- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**, **Game Detail (05)**, **Standings (06)**, **Rules (07)**.
 
 Remaining:
-- Rules (07), Playoffs (08).
+- Playoffs (08).
 
 Data model note: series `status` now includes `"upcoming"` alongside `completed` / `partial` / `dnp`. Upcoming gets the same stat treatment as DNP (no wins, no points) but is rendered neutrally instead of with the amber DNP pill. `data/season1.json` Week 1 Series 3 was switched from `dnp` to `upcoming` since the league plans to play it.
 
@@ -222,12 +222,15 @@ series, then point diff. The Standings page (`src/pages/Standings.jsx`)
 renders in that order by default and includes a sortable header layer that
 lets the user re-sort by any column without changing the canonical ranking.
 
-### 6. Rules page prose -- TODO (Rules page not yet built)
+### 6. Rules page prose -- DONE
 
-Sections 05 and 06 of the Rules mockup contain the authoritative prose for
-how standings and playoffs work. Copy that prose verbatim -- it was carefully
-worded to explain the two-stage logic. Consider adding a one-line mention
-of the coinflip fallback (see Coinflip decision in the decisions section).
+`src/pages/Rules.jsx` renders all six sections with the mockup's prose
+intact. Section 05 includes a 4th-item coinflip fallback in the Ranking
+Logic list and a coinflip note in the prose. Section 06 includes the
+"Game wins get you in, +/- wins you games inside" tagline and a coinflip
+mention for tied bracket matchups. The first-possession rule was added
+to section 01 (lower-seeded team starts G1, prior-game loser starts
+G2/G3) and mirrored into `docs/LBL-spec.md`.
 
 ### 7. Coinflip support -- TODO
 
