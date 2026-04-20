@@ -89,20 +89,22 @@ There are exactly 6 duos. Hardcode this constant.
 - Display player points to 1 decimal place (21 becomes 10.5).
 - Never record "who scored what" individually. It's not tracked and shouldn't be invented.
 
-**Match number labeling (display only).** The UI labels series as `Match 1`, `Match 2`, `Match 3` based on **play order within the week**, NOT on fixed pairing identity.
-- `matchup_id` in the JSON is a fixed identifier for a specific pairing (1 = Jacob+Joseph vs Daniel+Nathan, 2 = Jacob+Daniel vs Joseph+Nathan, 3 = Jacob+Nathan vs Daniel+Joseph).
-- The display label is `Match N`, where N is the series's index+1 within its week's `series` array.
-- Example: In Week 2, the play order is `[matchup_id: 2, matchup_id: 3, matchup_id: 1]`. The card for Jacob+Daniel vs Joseph+Nathan (matchup_id 2) displays as "Match 1" because it's played first. Lakers vs Bucks (matchup_id 1) displays as "Match 3" because it's played last.
-- Rule of thumb: compute `matchNumber = seriesIndex + 1` from the week's `series` array. Never derive it from `matchup_id`.
+**A series is 3 games. ALL 3 are always played, even at 2-0.** This is NOT best-of-3. Every game counts toward PF, PA, +/-, and the games-won record. The series winner is whichever duo takes 2 or more of the 3 games. Vocabulary: call it a "series", never "match" or "best of 3". UI pills should say `3 GAMES`, not `BEST OF 3`.
 
-**Standings W/L shows GAMES by default.** The Standings table must support a toggle between `Games` (game record, e.g. 2-1) and `Matches` (series record, e.g. 1-0). Default view is `Games`. Both use the same sort order (standings are ranked by wins in the selected view). When in `Matches` view, "W/L" still means wins/losses but counts series wins, not game wins.
+**Series number labeling (display only).** The UI labels series as `Series 1`, `Series 2`, `Series 3` based on **play order within the week**, NOT on fixed pairing identity.
+- `matchup_id` in the JSON is a fixed identifier for a specific pairing (1 = Jacob+Joseph vs Daniel+Nathan, 2 = Jacob+Daniel vs Joseph+Nathan, 3 = Jacob+Nathan vs Daniel+Joseph).
+- The display label is `Series N`, where N is the series's index+1 within its week's `series` array.
+- Example: In Week 2, the play order is `[matchup_id: 2, matchup_id: 3, matchup_id: 1]`. The card for Jacob+Daniel vs Joseph+Nathan (matchup_id 2) displays as "Series 1" because it's played first. Lakers vs Bucks (matchup_id 1) displays as "Series 3" because it's played last.
+- Rule of thumb: compute `seriesNumber = seriesIndex + 1` from the week's `series` array. Never derive it from `matchup_id`.
+
+**Standings W/L shows GAMES by default.** The Standings table must support a toggle between `Games` (game record, e.g. 2-1) and `Series` (series record, e.g. 1-0). Default view is `Games`. The RANKING is always by game wins regardless of the selected view; the toggle only swaps the displayed W/L (and the per-N stats: PPG/PPS, PAPG/PAPS, AVG/G/AVG/S).
 
 **Series status values:** `"completed"` | `"partial"` | `"dnp"`
 - DNP series award no wins and no points. Don't count them in averages.
-- Partial = some games played, series didn't finish. Count the played games; don't award a series winner unless the BO3 was mathematically decided.
+- Partial = some games played, series didn't finish. Count the played games; only award a series winner if one duo has already taken 2 of the 3 games.
 
 **Tiebreakers for standings:**
-1. Head-to-head match (series) record
+1. Head-to-head series record
 2. Point differential
 
 **Player order everywhere (display):** Jacob, Daniel, Joseph, Nathan (age order, oldest first).
@@ -133,7 +135,7 @@ Lives in `src/lib/stats.js`. All pure. No I/O, no DOM. UI components consume the
 Public functions:
 - `computeSeason(seasonJson)` returns `{ duoStats, h2h, playerStats, seriesIndex }`.
 - `computeCareer(seasonJsonArray)` returns `{ duoStats, playerStats, h2h, seriesIndex, perSeason }`.
-- `standings(duoStats, h2h, { mode: "games" | "matches" })` returns decorated rows sorted by wins in the selected mode, then h2h series, then point diff. Default mode is `"games"`.
+- `standings(duoStats, h2h, { mode: "games" | "series" })` returns decorated rows. Ranking is always by game wins (h2h series, then point diff for tiebreakers); `mode` only controls which W/L and per-N stats are surfaced. Default mode is `"games"`.
 - `decorateDuo(key, raw)` / `decoratePlayer(name, raw)` add derived rates (diff, avg margin, ppg, papg, win%, +/-).
 - `partnerBreakdown(player, duoStats)` returns `{ entries, best, worst }` keyed by game win%.
 - `fmt1(n)` returns a string with 1 decimal place (used for halved player points).
