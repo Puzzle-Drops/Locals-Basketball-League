@@ -553,6 +553,14 @@
     the #4 and #5 seed rows. Dashed accent borders + subtle accent-soft gradient
     band so the cut reads immediately without being loud.
 
+    LAYOUT NOTE: min-w on the inner container is set to 300px so the table
+    fits comfortably on narrow mobile viewports. The flex-1 Team cell has
+    NO min-w-0, which means it resists shrinking below its content — so
+    longer duo names ("Joseph & Nathan", "Daniel & Joseph") naturally push
+    the row past the viewport and trigger the overflow-x-auto scroll. The
+    duo uses whitespace-nowrap (not truncate) so names never get ellipsis-clipped;
+    the small amount of horizontal scroll is an accepted tradeoff.
+
     GB CALCULATION (simplified): GB = fourthSeed.gameWins - team.gameWins.
     We intentionally do NOT use the traditional baseball GB formula
     ((winsA - winsB + lossesB - lossesA) / 2), because it produces unintuitive
@@ -566,7 +574,6 @@
       - Record string = `${gameWins}-${gameLosses}` inline with team name.
       - Status = (rank <= 4) ? 'IN' : `${fourthSeedWins - teamWins} GB`.
       - Rows are <a> tags so they double as team-detail navigation.
-      - Horizontal-scroll container (min-w-[460px]) handles narrow devices.
   -->
   <section class="max-w-6xl mx-auto px-5 pt-10 pb-4">
     <div class="flex items-baseline justify-between mb-5 gap-4">
@@ -581,7 +588,7 @@
 
     <div class="card overflow-hidden">
       <div class="overflow-x-auto">
-        <div class="min-w-[460px]">
+        <div class="min-w-[300px]">
 
           <!-- Header row -->
           <div class="flex items-center text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)] border-b border-[var(--border)]">
@@ -594,11 +601,11 @@
           <!-- Row #1: Lakers -->
           <a href="#" class="race-row in flex items-center border-b border-[var(--border)]">
             <span class="w-10 text-center shrink-0 py-3"><span class="rank-num top">1</span></span>
-            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#552583 60%,#FDB927);">L</div>
-              <div class="min-w-0">
+              <div>
                 <div class="display font-black text-base leading-none">LAKERS <span class="record">(2-1)</span></div>
-                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Joseph</div>
+                <div class="text-[11px] text-[var(--text-muted)] whitespace-nowrap mt-1">Jacob &amp; Joseph</div>
               </div>
             </div>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-pos">+19</span>
@@ -608,11 +615,11 @@
           <!-- Row #2: Suns -->
           <a href="#" class="race-row in flex items-center border-b border-[var(--border)]">
             <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">2</span></span>
-            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#E56020 50%,#1D1160);">S</div>
-              <div class="min-w-0">
+              <div>
                 <div class="display font-black text-base leading-none">SUNS <span class="record">(2-1)</span></div>
-                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Joseph &amp; Nathan</div>
+                <div class="text-[11px] text-[var(--text-muted)] whitespace-nowrap mt-1">Joseph &amp; Nathan</div>
               </div>
             </div>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-pos">+1</span>
@@ -622,11 +629,11 @@
           <!-- Row #3: Celtics -->
           <a href="#" class="race-row in flex items-center border-b border-[var(--border)]">
             <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">3</span></span>
-            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#007A33 60%,#BA9653);">C</div>
-              <div class="min-w-0">
+              <div>
                 <div class="display font-black text-base leading-none">CELTICS <span class="record">(1-2)</span></div>
-                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Daniel</div>
+                <div class="text-[11px] text-[var(--text-muted)] whitespace-nowrap mt-1">Jacob &amp; Daniel</div>
               </div>
             </div>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-neg">-1</span>
@@ -636,11 +643,11 @@
           <!-- Row #4: Bucks (last IN — no bottom border; playoff line handles separation) -->
           <a href="#" class="race-row in flex items-center">
             <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">4</span></span>
-            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#00471B 60%,#EEE1C6);color:#00471B;">B</div>
-              <div class="min-w-0">
+              <div>
                 <div class="display font-black text-base leading-none">BUCKS <span class="record">(1-2)</span></div>
-                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Daniel &amp; Nathan</div>
+                <div class="text-[11px] text-[var(--text-muted)] whitespace-nowrap mt-1">Daniel &amp; Nathan</div>
               </div>
             </div>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular diff-neg">-19</span>
@@ -657,11 +664,11 @@
           <!-- Row #5: Warriors (DNP · 1 GB) -->
           <a href="#" class="race-row out flex items-center border-b border-[var(--border)]">
             <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">5</span></span>
-            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#1D428A 60%,#FFC72C);">W</div>
-              <div class="min-w-0">
+              <div>
                 <div class="display font-black text-base leading-none">WARRIORS <span class="record">(0-0)</span></div>
-                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Jacob &amp; Nathan</div>
+                <div class="text-[11px] text-[var(--text-muted)] whitespace-nowrap mt-1">Jacob &amp; Nathan</div>
               </div>
             </div>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular text-[var(--text-dim)]">0</span>
@@ -671,11 +678,11 @@
           <!-- Row #6: Heat (DNP · 1 GB) -->
           <a href="#" class="race-row out flex items-center">
             <span class="w-10 text-center shrink-0 py-3"><span class="rank-num">6</span></span>
-            <div class="flex-1 py-3 pl-2 flex items-center gap-3 min-w-0">
+            <div class="flex-1 py-3 pl-2 flex items-center gap-3">
               <div class="logo" style="width:32px;height:32px;font-size:14px;background:linear-gradient(135deg,#98002E 50%,#F9A01B);">H</div>
-              <div class="min-w-0">
+              <div>
                 <div class="display font-black text-base leading-none">HEAT <span class="record">(0-0)</span></div>
-                <div class="text-[11px] text-[var(--text-muted)] truncate mt-1">Daniel &amp; Joseph</div>
+                <div class="text-[11px] text-[var(--text-muted)] whitespace-nowrap mt-1">Daniel &amp; Joseph</div>
               </div>
             </div>
             <span class="w-16 text-right shrink-0 py-3 display font-bold tabular text-[var(--text-dim)]">0</span>
