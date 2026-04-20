@@ -1,0 +1,57 @@
+name: Deploy to GitHub Pages
+
+# Run on every push to main, and let me trigger it manually too.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permissions GitHub Pages needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Don't queue up multiple deploys — if a new push lands while one is running,
+# let the running one finish, then run the latest.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the site
+        run: npm run build
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload built site as a Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
