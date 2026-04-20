@@ -10,6 +10,18 @@ ranking/playoff logic without reading the non-negotiable decisions section.
 
 ---
 
+## Phase 3 Status
+
+Built so far:
+- Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops).
+- Reusable components in `src/components/`: `Layout` (sticky nav with Playoffs link + hamburger mobile menu), `Scorecard` (handles played, DNP, and upcoming variants with optional `records` prop), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNGs from `assets/` with gradient-and-initial fallback, multiple sizes), `Pill`.
+- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**.
+
+Remaining:
+- Schedule (04), Game Detail (05), Standings (06), Rules (07), Playoffs (08).
+
+---
+
 ## Non-Negotiable Decisions
 
 These were debated and resolved during the design pass. Do not change them
@@ -174,60 +186,58 @@ mockups match the math.
 Phase 1 was scaffolded before some design decisions. These need to be applied
 during Phase 3:
 
-### 1. Nav: add "Playoffs" link everywhere
+### 1. Nav: add "Playoffs" link everywhere -- DONE
 
-Current nav on pages 01–07: `Home · Standings · Teams · Players · Schedule · Rules`.
+Layout has the Playoffs link between Schedule and Rules. Active state styling
+matches the other links. Mobile hamburger menu mirrors the same order.
 
-Add a `Playoffs` link between Schedule and Rules on every page. The Playoffs
-mockup (08) already shows it in the correct position.
+### 2. "BEST OF 3" -> "3 GAMES" -- DONE
 
-### 2. "BEST OF 3" → "3 GAMES"
+Mockup pass scrubbed every "BEST OF 3" pill to "3 GAMES". Scorecard component
+hardcodes "3 GAMES" in the header.
 
-Scorecards across Home, Schedule, and Team Detail currently say "BEST OF 3"
-on the header pill. This is wrong given the 3-games-always-played rule. Change
-to `3 GAMES` everywhere. The Rules mockup has this right.
-
-### 3. Game Detail "clincher" label
+### 3. Game Detail "clincher" label -- TODO (Game Detail page not yet built)
 
 Game Detail tags G3 as "Series clincher." Since G3 is always played, it's not
 always a clincher. Conditional logic:
 
-- If series was tied 1-1 going into this game → `CLINCHER`
-- If series was already 2-0 going into this game → `DEAD GAME` (or omit the label)
-- If this is G1 or G2 → no clincher-style label
+- If series was tied 1-1 going into this game -> `CLINCHER`
+- If series was already 2-0 going into this game -> `DEAD GAME` (or omit the label)
+- If this is G1 or G2 -> no clincher-style label
 
-### 4. Playoffs page is new
+### 4. Playoffs page is new -- TODO
 
 `src/pages/Playoffs.jsx` exists (Phase 1 stub) but has none of the design.
 Build it from `mockups/08-playoffs.html`. Sections, in order:
 
 1. Hero with Live Projection pill (pulsing accent dot) + stacked stats
-2. **Playoff Race** table (standings snapshot, all 6 teams, PLAYOFF LINE divider between #4 and #5) — this is a new section not in the spec
+2. **Playoff Race** table (standings snapshot, all 6 teams, PLAYOFF LINE divider between #4 and #5) -- this is a new section not in the spec
 3. The Bracket (2 semifinals + championship, desktop uses grid-column placement to put championship in middle)
 4. How Playoffs Work reference card
 
-### 5. Standings page row order
+### 5. Standings page row order -- DONE in stat engine
 
-The Standings mockup (06) uses the canonical ranking (game wins primary). If
-the current `src/pages/Standings.jsx` sorts differently, fix it.
+`sortDuosWithTiebreakers` in `src/lib/stats.js` ranks by game wins, then h2h
+series, then point diff. The Standings page mockup just needs to render in
+the order the engine produces. Page itself not yet rebuilt.
 
-### 6. Rules page prose
+### 6. Rules page prose -- TODO (Rules page not yet built)
 
 Sections 05 and 06 of the Rules mockup contain the authoritative prose for
-how standings and playoffs work. Copy that prose verbatim — it was carefully
+how standings and playoffs work. Copy that prose verbatim -- it was carefully
 worded to explain the two-stage logic. Consider adding a one-line mention
 of the coinflip fallback (see Coinflip decision in the decisions section).
 
-### 7. Coinflip support
+### 7. Coinflip support -- TODO
 
 Build the `COINFLIP` pill component and thread it into the three places it
 can appear:
 
-- **Playoff Race table Status column** — `COINFLIP` or `COINFLIP TBD` pill when
+- **Playoff Race table Status column** -- `COINFLIP` or `COINFLIP TBD` pill when
   a coinflip decides a seed
-- **Bracket advances notes** — replace the `(+X vs -X)` score comparison with
+- **Bracket advances notes** -- replace the `(+X vs -X)` score comparison with
   `(COINFLIP)` when the matchup +/- is tied
-- **Championship projection** — same pattern if the final is a tied +/-
+- **Championship projection** -- same pattern if the final is a tied +/-
 
 No Week 1 data currently triggers a coinflip display, but the component must
 exist for when it does.

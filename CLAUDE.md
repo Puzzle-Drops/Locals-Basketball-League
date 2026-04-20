@@ -23,11 +23,14 @@ Full rules and data model are in `docs/LBL-spec.md`. That document is the source
 - All pages wired to the engine: Home, Standings, Teams (+detail), Players (+detail), Schedule, GameDetail (with halved player lines + YouTube embed), Rules, Playoffs (TBD).
 - Plain, minimal styling. Intentionally unstyled pending mockups.
 
-**Phase 2 (in progress, NOT Claude Code): Mockups**
-- Claude Desktop produces styled HTML mockups in `mockups/`.
+**Phase 2 (DONE, NOT Claude Code): Mockups**
+- Eight styled HTML mockups in `mockups/`. They are the source of truth for visual design and contain inline `<!-- DEV NOTE -->` comments explaining intent. Read `docs/HANDOFF.md` for the design pass decisions.
 
-**Phase 3 (back to Claude Code): Implement the design**
-- Rebuild the UI layer using the approved mockups as the visual reference. Stat engine and data layer should not need to change.
+**Phase 3 (in progress): Implement the design**
+- Design system ported from mockups to `src/index.css` (CSS vars, Big Shoulders + Manrope fonts, `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` component classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops).
+- Reusable components in `src/components/`: `Layout` (sticky nav + hamburger mobile menu), `Scorecard` (played / DNP / upcoming variants), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNG with gradient fallback, multiple sizes), `Pill` (default / accent / dnp / team variants).
+- Pages built: Home, Teams (index), TeamDetail, Players (index), PlayerDetail.
+- Pages remaining: Schedule (04), Game Detail (05), Standings (06), Rules (07), Playoffs (08).
 
 ---
 
@@ -59,7 +62,8 @@ Locals-Basketball-League/
 ├── mockups/                  (Phase 2 output)
 ├── src/
 │   ├── lib/                  (constants.js, stats.js, data.js)
-│   ├── components/           (Layout)
+│   ├── components/           (Layout, Scorecard, Seg, TeamLogo,
+│   │                          PlayerAvatar, Pill)
 │   ├── pages/                (Home, Standings, Teams, TeamDetail, Players,
 │   │                          PlayerDetail, Schedule, GameDetail, Rules, Playoffs)
 │   ├── App.jsx, main.jsx, index.css
