@@ -15,10 +15,9 @@ ranking/playoff logic without reading the non-negotiable decisions section.
 Built so far:
 - Design system in `src/index.css` (CSS vars, Big Shoulders + Manrope, all `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` classes, `.court-bg` / `.player-bg` / `.team-bg` / `.game-bg` backdrops, `.week-divider`, `.pill.success`, `.game-cell` strip, `.crumb` breadcrumb, `.video-placeholder`, `.box-row`).
 - Reusable components in `src/components/`: `Layout` (sticky nav with Playoffs link + hamburger mobile menu), `Scorecard` (handles played, DNP, and upcoming variants with optional `records` prop), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNGs from `assets/` with gradient-and-initial fallback, multiple sizes), `Pill`, `ScrollManager` (smooth-scrolls to hash on cross-page nav, jumps to top otherwise).
-- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**, **Game Detail (05)**, **Standings (06)**, **Rules (07)**.
+- Pages: **Home (01)**, **Teams (index)**, **TeamDetail (02)**, **Players (index)**, **PlayerDetail (03)**, **Schedule (04)**, **Game Detail (05)**, **Standings (06)**, **Rules (07)**, **Playoffs (08)**.
 
-Remaining:
-- Playoffs (08).
+All eight mockups built. Phase 3 complete.
 
 Data model note: series `status` now includes `"upcoming"` alongside `completed` / `partial` / `dnp`. Upcoming gets the same stat treatment as DNP (no wins, no points) but is rendered neutrally instead of with the amber DNP pill. `data/season1.json` Week 1 Series 3 was switched from `dnp` to `upcoming` since the league plans to play it.
 
@@ -205,15 +204,13 @@ hardcodes "3 GAMES" in the header.
 - G3 with series 1-1 going in: `Series clincher · {Winner} won 2-1`.
 - G3 with series 2-0 going in: `Dead game · {Winner} clinched 2-0`.
 
-### 4. Playoffs page is new -- TODO
+### 4. Playoffs page is new -- DONE
 
-`src/pages/Playoffs.jsx` exists (Phase 1 stub) but has none of the design.
-Build it from `mockups/08-playoffs.html`. Sections, in order:
-
-1. Hero with Live Projection pill (pulsing accent dot) + stacked stats
-2. **Playoff Race** table (standings snapshot, all 6 teams, PLAYOFF LINE divider between #4 and #5) -- this is a new section not in the spec
-3. The Bracket (2 semifinals + championship, desktop uses grid-column placement to put championship in middle)
-4. How Playoffs Work reference card
+`src/pages/Playoffs.jsx` renders all four sections from the mockup:
+1. Hero with pulsing Live Projection pill (`live-pulse` keyframe). Flips to a static `Final` pill when `seasonComplete` is true.
+2. Playoff Race table with all 6 teams, PLAYOFF LINE divider between #4 and #5, IN green pill for top 4, orange `-N` games-behind value for the bottom 2 (replaces the original GB pill per user feedback).
+3. Bracket: 3-column grid on desktop (championship in middle), stacks vertically on mobile. Semifinal team-cards highlight winner with accent ring; advances note shows the +/- comparison.
+4. How Playoffs Work reference card with 6 numbered steps.
 
 ### 5. Standings page row order -- DONE
 
@@ -232,19 +229,21 @@ mention for tied bracket matchups. The first-possession rule was added
 to section 01 (lower-seeded team starts G1, prior-game loser starts
 G2/G3) and mirrored into `docs/LBL-spec.md`.
 
-### 7. Coinflip support -- TODO
+### 7. Coinflip support -- DONE
 
-Build the `COINFLIP` pill component and thread it into the three places it
-can appear:
+`src/lib/coinflip.js` provides `seededWinner`, `overrideWinner`, and a
+combined `resolveCoinflip` helper. The Playoffs page uses it via
+`resolveMatchup` for both semifinals and the championship, with a per-round
+salt so the three coinflip moments don't share an outcome.
 
-- **Playoff Race table Status column** -- `COINFLIP` or `COINFLIP TBD` pill when
-  a coinflip decides a seed
-- **Bracket advances notes** -- replace the `(+X vs -X)` score comparison with
-  `(COINFLIP)` when the matchup +/- is tied
-- **Championship projection** -- same pattern if the final is a tied +/-
-
-No Week 1 data currently triggers a coinflip display, but the component must
-exist for when it does.
+- **Bracket advances notes** swap `(+X vs -X)` to `(COINFLIP)` when +/- ties.
+- **Championship projection** appends `· COINFLIP` to the duo line.
+- **Status pill** has a `.coinflip` accent variant ready for the Playoff
+  Race seeding case (not yet wired to the standings tiebreaker chain --
+  the stat engine's `sortDuosWithTiebreakers` doesn't currently surface
+  ties as coinflip resolutions; see Open Question #4 below).
+- **Override format**: `season.coinflips["DuoA__DuoB"] = "DuoA"` (sorted
+  duo keys joined by `__`, value is the winner). Documented in CLAUDE.md.
 
 ---
 

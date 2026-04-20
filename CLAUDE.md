@@ -26,11 +26,11 @@ Full rules and data model are in `docs/LBL-spec.md`. That document is the source
 **Phase 2 (DONE, NOT Claude Code): Mockups**
 - Eight styled HTML mockups in `mockups/`. They are the source of truth for visual design and contain inline `<!-- DEV NOTE -->` comments explaining intent. Read `docs/HANDOFF.md` for the design pass decisions.
 
-**Phase 3 (in progress): Implement the design**
-- Design system ported from mockups to `src/index.css` (CSS vars, Big Shoulders + Manrope fonts, `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` component classes, `.court-bg` / `.player-bg` / `.team-bg` backdrops).
-- Reusable components in `src/components/`: `Layout` (sticky nav + hamburger mobile menu), `Scorecard` (played / DNP / upcoming variants), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNG with gradient fallback, multiple sizes), `Pill` (default / accent / dnp / team / success variants), `ScrollManager` (route-change hash-scroll + top-of-page reset).
-- Pages built: Home, Teams (index), TeamDetail, Players (index), PlayerDetail, Schedule, Game Detail, Standings, Rules.
-- Pages remaining: Playoffs (08).
+**Phase 3 (DONE): Implement the design**
+- Design system ported from mockups to `src/index.css` (CSS vars, Big Shoulders + Manrope fonts, `.scorecard` / `.pill` / `.seg` / `.logo` / `.avatar` / `.card` component classes, `.court-bg` / `.player-bg` / `.team-bg` / `.game-bg` backdrops, sortable-table + frozen-column system, bracket layout, live-pulse animation).
+- Reusable components in `src/components/`: `Layout` (sticky nav + hamburger mobile menu), `Scorecard` (played / DNP / upcoming variants), `Seg` toggle, `TeamLogo` and `PlayerAvatar` (real PNG with gradient fallback, multiple sizes), `Pill` (default / accent / dnp / team / success / small variants), `ScrollManager` (route-change hash-scroll + top-of-page reset).
+- Pages: Home, Teams (index), TeamDetail, Players (index), PlayerDetail, Schedule, Game Detail, Standings, Rules, Playoffs.
+- Coinflip tiebreaker (`src/lib/coinflip.js`): deterministic seeded fallback when teams tie on every quantitative criterion, with optional `season.coinflips` override map for recording real-life flips.
 
 ---
 
@@ -107,6 +107,14 @@ There are exactly 6 duos. Hardcode this constant.
 - DNP series award no wins and no points. Don't count them in averages. Render with the amber DNP pill.
 - Partial = some games played, series didn't finish. Count the played games; only award a series winner if one duo has already taken 2 of the 3 games.
 - Upcoming = scheduled but not played yet. Same stat treatment as DNP (no wins/points), but the UI renders it as a neutral upcoming card (no DNP pill, `0-0` placeholder cells, current records shown in parens).
+
+**Coinflip overrides (optional).** When the league actually flips a coin for a tiebreaker, record the result in `season.coinflips` so the UI reflects it instead of the deterministic seeded pick. Format:
+```json
+"coinflips": {
+  "Daniel-Nathan__Joseph-Nathan": "Daniel-Nathan"
+}
+```
+Key is the two duo keys joined by `__` in alphabetical order. Value is the winner's duo key. Without an entry, `src/lib/coinflip.js` falls back to a hash-based seeded pick that's stable across refreshes.
 
 **Standings ranking:**
 1. Game wins (primary)

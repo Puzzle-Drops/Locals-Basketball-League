@@ -377,6 +377,297 @@ section { scroll-margin-top: 80px; }
   font-weight: 700;
 }
 
+/* ==========================================================================
+   Playoffs page
+   ========================================================================== */
+
+/* Pulsing accent dot for the Live Projection pill */
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(255, 107, 43, 0.6);
+  animation: live-pulse 1.8s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 107, 43, 0.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(255, 107, 43, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 107, 43, 0); }
+}
+
+/* Playoff Race table */
+.race-row { transition: background 120ms ease; cursor: pointer; }
+.race-row:hover { background: var(--surface-hover); }
+.race-row.out { opacity: 0.8; }
+.race-row.out:hover { opacity: 1; }
+
+/* Status pill (Playoff Race column) */
+.status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid;
+}
+.status-pill.in {
+  color: var(--positive);
+  background: rgba(34, 197, 94, 0.10);
+  border-color: rgba(34, 197, 94, 0.30);
+}
+.status-pill.gb {
+  color: var(--amber);
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.30);
+}
+.status-pill.coinflip {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-ring);
+}
+
+/* Playoff line divider between #4 and #5 */
+.playoff-line-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent-soft) 50%, transparent 100%);
+  border-top: 1px dashed var(--accent-ring);
+  border-bottom: 1px dashed var(--accent-ring);
+}
+.playoff-line-row .line-seg {
+  flex: 1;
+  height: 1px;
+  background: var(--accent-ring);
+  opacity: 0.6;
+}
+.playoff-line-row .pl-label {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.playoff-line-row .pl-label::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+/* Bracket layout: stacks vertically on mobile, 3-column on desktop with
+   the championship pinned to the middle column. */
+.bracket {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 900px) {
+  .bracket {
+    grid-template-columns: 1fr 1.15fr 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+  .semifinal-left  { grid-column: 1; grid-row: 1; }
+  .semifinal-right { grid-column: 3; grid-row: 1; }
+  .championship    { grid-column: 2; grid-row: 1; }
+}
+
+.semi-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.vs-divider {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  font-weight: 700;
+  padding: 6px 0;
+  font-family: 'Big Shoulders Display', sans-serif;
+}
+.advances-note {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* Semifinal team card */
+.team-card {
+  display: grid;
+  grid-template-columns: 28px 40px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  transition: border-color 200ms, background 200ms;
+}
+.team-card.winner {
+  border-color: var(--accent-ring);
+  background: linear-gradient(to right, var(--accent-soft), transparent 70%);
+}
+.team-card.loser { opacity: 0.55; }
+.team-card .seed-badge {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+.team-card.winner .seed-badge { color: var(--accent); }
+.team-card .team-name {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  display: flex; align-items: baseline; gap: 6px;
+}
+.team-card .team-duo {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.team-card .team-score {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  min-width: 44px;
+  text-align: right;
+}
+.team-card.winner .team-score { color: var(--accent); }
+.team-card.loser  .team-score { color: var(--text-muted); }
+
+/* Inline regular-season W-L next to a team name */
+.record {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.team-card .record { font-size: 12px; }
+.mini-team   .record { font-size: 10.5px; }
+.race-row    .record { font-size: 11.5px; }
+
+/* Championship card and mini-teams inside it */
+.championship-card {
+  padding: 20px;
+  border: 1px solid var(--accent-ring);
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 107, 43, 0.14), transparent 70%),
+    var(--surface);
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+}
+.championship-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+  opacity: 0.5;
+}
+
+.mini-team {
+  display: grid;
+  grid-template-columns: 22px 32px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.25);
+  text-align: left;
+}
+.mini-team.winner {
+  border-color: var(--accent-ring);
+  background: var(--accent-soft);
+}
+.mini-team.loser { opacity: 0.5; }
+.mini-team .seed-badge {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.mini-team.winner .seed-badge { color: var(--accent); }
+.mini-team .name {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  display: flex; align-items: baseline; gap: 5px;
+}
+.mini-team .duo {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.mini-team .score {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  min-width: 36px;
+  text-align: right;
+}
+.mini-team.winner .score { color: var(--accent); }
+.mini-team.loser  .score { color: var(--text-muted); }
+
+.champ-mini-vs {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  padding: 4px 0;
+  text-align: center;
+}
+
+.projected-champion {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border-strong);
+}
+.projected-champion .pc-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.projected-champion .pc-name {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 38px;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: 0.03em;
+}
+.projected-champion .pc-duo {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
 /* Game Detail hero -- both team colors layered subtly. Driven by
    --game-c1 / --game-c2 CSS vars set inline by the page. */
 .game-bg {
