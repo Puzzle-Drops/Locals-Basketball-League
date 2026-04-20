@@ -140,30 +140,29 @@
     .standings-row:hover .frozen-col { background: var(--surface-hover); }
 
     /*
-      Sortable headers. Arrow is a pseudo-element so it doesn't affect flex
-      layout of child elements (like the .val-games/.val-matches spans inside).
+      Sortable headers. Arrow only occupies space when the column is actually
+      sorted — default pseudo-element has no content, so header text right-aligns
+      flush with the values in the column below. When sorted, the arrow appears
+      (pushing the header text left by a few px, which reads as the sort signal).
     */
     .sortable {
       cursor: pointer;
       user-select: none;
       transition: color 120ms;
-      position: relative;
     }
     .sortable:hover { color: var(--text); }
-    .sortable::after {
-      content: "▲";
-      display: inline-block;
-      font-size: 8px;
+    .sortable::after { content: ""; }
+    .sortable.sorted-asc,
+    .sortable.sorted-desc { color: var(--text); }
+    .sortable.sorted-asc::after,
+    .sortable.sorted-desc::after {
       margin-left: 4px;
-      opacity: 0;
-      transition: opacity 120ms;
+      font-size: 8px;
       vertical-align: 1px;
       color: var(--accent);
     }
-    .sortable.sorted-asc,
-    .sortable.sorted-desc { color: var(--text); }
-    .sortable.sorted-asc::after { opacity: 1; content: "▲"; }
-    .sortable.sorted-desc::after { opacity: 1; content: "▼"; }
+    .sortable.sorted-asc::after { content: "▲"; }
+    .sortable.sorted-desc::after { content: "▼"; }
 
     section { scroll-margin-top: 80px; }
   </style>
@@ -270,21 +269,22 @@
       10. AVG/G / AVG/M (sort: avg)                   (+/-) / N
       11. Win%          (sort: winpct)                wins/games (or wins/matches)
 
-    Sorting:
-      - Default: rank asc.
-      - First click on a header: ascending. Second click on the same header: descending.
-        Clicking a different header resets direction to ascending.
-      - DNP teams sort naturally using 0 values across every stat column — they
-        float to whichever end of the sort their zeros put them. Among ties they
-        fall back to rank order via the stable tiebreaker.
-      - When view toggles, re-sort with the new view's values (same column + direction).
+    Sort cycle (per column):
+      1st click — ascending.
+      2nd click — descending.
+      3rd click — reset to default (rank asc).
+      Clicking a DIFFERENT column starts that column at ascending.
+      When view toggles, current sort is re-applied with new view's values.
 
-    Row borders are purely CSS-driven (see .standings-row:last-child rule in the
-    <style> block), so re-sorting can't leave a stray 1px line at the bottom.
+    DNP teams sort naturally via their 0 values across every stat column; they
+    float to whichever end the zeros place them. Ties resolve by rank order.
+
+    Row borders are CSS-driven (.standings-row:last-child removes the bottom
+    border on whichever row ends up last), so re-sorting can't leave a stray
+    1px line at the bottom.
 
     Phase 3: the standings() engine should provide all these values pre-computed
-    and return rows already sorted for the active view. Header click should call
-    the same sort routine; view toggle should trigger a recompute+re-sort.
+    and return rows already sorted for the active view.
   -->
   <section class="max-w-6xl mx-auto px-5 pt-6 pb-4">
     <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
@@ -294,7 +294,7 @@
           <!-- Header row -->
           <div class="standings-header flex items-center border-b border-[var(--border)] text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)]">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3">
-              <span class="sortable w-5 sm:w-6 text-center" data-sort="rank">#</span>
+              <span class="sortable w-6 text-center" data-sort="rank">#</span>
               <span class="sortable w-[140px] sm:w-[180px]" data-sort="team">Team</span>
             </div>
             <span class="sortable w-10 text-center shrink-0 py-3" data-sort="w">W</span>
@@ -305,7 +305,7 @@
             <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pap"><span class="val-games">PAPG</span><span class="val-matches">PAPM</span></span>
             <span class="sortable w-14 text-right shrink-0 py-3" data-sort="diff">+/-</span>
             <span class="sortable w-14 text-right shrink-0 py-3" data-sort="avg"><span class="val-games">AVG/G</span><span class="val-matches">AVG/M</span></span>
-            <span class="sortable w-14 text-right shrink-0 py-3 pr-3 sm:pr-4" data-sort="winpct">Win%</span>
+            <span class="sortable w-16 text-right shrink-0 py-3 pr-3 sm:pr-4" data-sort="winpct">Win%</span>
           </div>
 
           <!-- Row: Lakers -->
@@ -321,7 +321,7 @@
              data-avg-games="6.3" data-avg-matches="19.0"
              data-winpct-games="67" data-winpct-matches="100">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank top w-5 sm:w-6">1</span>
+              <span class="rank top w-6">1</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
                 <div class="min-w-0">
@@ -338,7 +338,7 @@
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">13.3</span><span class="val-matches">40.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos">+19</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+6.3</span><span class="val-matches">+19.0</span></span>
-            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
           </a>
 
           <!-- Row: Suns -->
@@ -354,7 +354,7 @@
              data-avg-games="0.3" data-avg-matches="1.0"
              data-winpct-games="67" data-winpct-matches="100">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-5 sm:w-6">2</span>
+              <span class="rank w-6">2</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
                 <div class="min-w-0">
@@ -371,7 +371,7 @@
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.3</span><span class="val-matches">49.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos">+1</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+0.3</span><span class="val-matches">+1.0</span></span>
-            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
           </a>
 
           <!-- Row: Warriors (DNP: all stats shown as 0 so the row can sort naturally) -->
@@ -387,7 +387,7 @@
              data-avg-games="0" data-avg-matches="0"
              data-winpct-games="0" data-winpct-matches="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-5 sm:w-6">3</span>
+              <span class="rank w-6">3</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
                 <div class="min-w-0">
@@ -404,7 +404,7 @@
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
           </a>
 
           <!-- Row: Heat (DNP) -->
@@ -420,7 +420,7 @@
              data-avg-games="0" data-avg-matches="0"
              data-winpct-games="0" data-winpct-matches="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-5 sm:w-6">4</span>
+              <span class="rank w-6">4</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
                 <div class="min-w-0">
@@ -437,7 +437,7 @@
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
-            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
           </a>
 
           <!-- Row: Celtics -->
@@ -453,7 +453,7 @@
              data-avg-games="-0.3" data-avg-matches="-1.0"
              data-winpct-games="33" data-winpct-matches="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-5 sm:w-6">5</span>
+              <span class="rank w-6">5</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
                 <div class="min-w-0">
@@ -470,7 +470,7 @@
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.7</span><span class="val-matches">50.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg">-1</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-0.3</span><span class="val-matches">-1.0</span></span>
-            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
           </a>
 
           <!-- Row: Bucks -->
@@ -486,7 +486,7 @@
              data-avg-games="-6.3" data-avg-matches="-19.0"
              data-winpct-games="33" data-winpct-matches="0">
             <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
-              <span class="rank w-5 sm:w-6">6</span>
+              <span class="rank w-6">6</span>
               <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
                 <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
                 <div class="min-w-0">
@@ -503,7 +503,7 @@
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">19.7</span><span class="val-matches">59.0</span></span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg">-19</span>
             <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-6.3</span><span class="val-matches">-19.0</span></span>
-            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
+            <span class="w-16 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
           </a>
         </div>
       </div>
@@ -521,7 +521,7 @@
         <span><span class="text-[var(--text-muted)] font-bold">AVG/G, AVG/M</span> Avg Point Diff per Game/Match</span>
         <span><span class="text-[var(--text-muted)] font-bold">Win%</span> Win Percentage</span>
       </div>
-      <div>Click any column header to sort. Tiebreakers: head-to-head matches, then point differential.</div>
+      <div>Click any column header to sort (asc → desc → default). Tiebreakers: head-to-head matches, then point differential.</div>
     </div>
   </section>
 
@@ -551,7 +551,8 @@
       const table = document.getElementById('standingsTable');
 
       // ------- Sort state -------
-      let sort = { key: 'rank', dir: 'asc' };
+      const DEFAULT_SORT = { key: 'rank', dir: 'asc' };
+      let sort = { ...DEFAULT_SORT };
       const VIEW_DEPENDENT = new Set(['w', 'l', 'pp', 'pap', 'avg', 'winpct']);
 
       function attrForKey(key, view) {
@@ -594,12 +595,19 @@
       }
 
       // ------- Header clicks -------
+      // Cycle per column: asc → desc → default. Clicking a different column
+      // starts fresh at ascending.
       table.querySelectorAll('.sortable').forEach(h => {
         h.addEventListener('click', (e) => {
           e.preventDefault();
           const key = h.getAttribute('data-sort');
           if (sort.key === key) {
-            sort.dir = sort.dir === 'asc' ? 'desc' : 'asc';
+            if (sort.dir === 'asc') {
+              sort.dir = 'desc';
+            } else {
+              // Was desc — third click resets to default sort.
+              sort = { ...DEFAULT_SORT };
+            }
           } else {
             sort.key = key;
             sort.dir = 'asc';
