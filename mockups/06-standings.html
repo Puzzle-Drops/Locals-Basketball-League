@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LBL - Standings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --bg-2: #0f1014;
+      --surface: #15171c;
+      --surface-2: #1b1e25;
+      --surface-hover: #1a1d23;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f5f7;
+      --text-muted: #8b8f97;
+      --text-dim: #5b5e66;
+      --accent: #ff6b2b;
+      --accent-soft: rgba(255, 107, 43, 0.12);
+      --accent-ring: rgba(255, 107, 43, 0.35);
+      --positive: #22c55e;
+      --negative: #ef4444;
+      --amber: #fbbf24;
+    }
+
+    html, body { background: var(--bg); color: var(--text); }
+    body { font-family: 'Manrope', system-ui, sans-serif; font-feature-settings: "ss01", "cv11"; }
+
+    .display { font-family: 'Big Shoulders Display', sans-serif; letter-spacing: 0.01em; }
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    .court-bg {
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% -10%, rgba(255, 107, 43, 0.12), transparent 60%),
+        radial-gradient(ellipse 40% 30% at 90% 10%, rgba(255, 107, 43, 0.06), transparent 60%);
+    }
+
+    .grid-lines {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 8px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.02);
+      white-space: nowrap;
+    }
+    .pill.accent { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+
+    .logo {
+      width: 40px; height: 40px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 900; font-size: 18px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25), 0 0 0 1px var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .nav-link { color: var(--text-muted); position: relative; padding: 4px 0; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.active { color: var(--text); }
+    .nav-link.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+
+    .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+    .stat-value { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; line-height: 1; }
+
+    .rank {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 800; font-size: 18px; color: var(--text-dim);
+      text-align: center; flex-shrink: 0;
+    }
+    .rank.top { color: var(--accent); }
+
+    /*
+      Row borders handled entirely via CSS so re-sorting can't cause a flash
+      or a leftover 1px line at the bottom. Every row gets a bottom border;
+      :last-child strips it off whichever row currently sits last in DOM order.
+    */
+    .standings-row {
+      border-bottom: 1px solid var(--border);
+      transition: background 120ms ease;
+      cursor: pointer;
+    }
+    .standings-row:last-child { border-bottom: none; }
+    .standings-row:hover { background: var(--surface-hover); }
+
+    .diff-pos { color: var(--positive); }
+    .diff-neg { color: var(--negative); }
+
+    /* Segmented toggle */
+    .seg {
+      display: inline-flex; border-radius: 8px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      padding: 3px;
+    }
+    .seg-btn {
+      padding: 5px 12px; border-radius: 5px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); transition: all 120ms ease;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .seg-btn:hover { color: var(--text); }
+    .seg-btn.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--accent-ring);
+    }
+
+    /* Table mode swap for Games/Matches */
+    .standings-table[data-mode="games"] .val-matches { display: none; }
+    .standings-table[data-mode="matches"] .val-games { display: none; }
+
+    /* Frozen columns */
+    .frozen-col {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--surface);
+      transition: background 120ms ease;
+      box-shadow: 1px 0 0 0 var(--border);
+    }
+    .standings-row:hover .frozen-col { background: var(--surface-hover); }
+
+    /*
+      Sortable headers. Arrow is a pseudo-element so it doesn't affect flex
+      layout of child elements (like the .val-games/.val-matches spans inside).
+    */
+    .sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: color 120ms;
+      position: relative;
+    }
+    .sortable:hover { color: var(--text); }
+    .sortable::after {
+      content: "▲";
+      display: inline-block;
+      font-size: 8px;
+      margin-left: 4px;
+      opacity: 0;
+      transition: opacity 120ms;
+      vertical-align: 1px;
+      color: var(--accent);
+    }
+    .sortable.sorted-asc,
+    .sortable.sorted-desc { color: var(--text); }
+    .sortable.sorted-asc::after { opacity: 1; content: "▲"; }
+    .sortable.sorted-desc::after { opacity: 1; content: "▼"; }
+
+    section { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ========================== NAV ========================== -->
+  <nav class="sticky top-0 z-40 backdrop-blur-md bg-[var(--bg)]/85 border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);">
+          <span class="display font-black text-[13px] text-white leading-none">LBL</span>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="display font-black text-[15px] tracking-wider">LBL</span>
+          <span class="text-[9.5px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Locals Basketball League</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-7 text-sm font-semibold">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link active" href="#">Standings</a>
+        <a class="nav-link" href="#">Teams</a>
+        <a class="nav-link" href="#">Players</a>
+        <a class="nav-link" href="#">Schedule</a>
+        <a class="nav-link" href="#">Rules</a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="hidden sm:flex pill accent items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+          Season 1
+        </button>
+        <button class="h-9 w-9 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 transition" aria-label="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================== HERO ========================== -->
+  <section class="court-bg border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 pt-10 pb-8 relative overflow-hidden">
+      <div class="absolute inset-0 grid-lines opacity-60 pointer-events-none"></div>
+
+      <div class="relative">
+        <div class="stat-label mb-2">Season 1 · 2026</div>
+        <h1 class="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-5">STANDINGS</h1>
+
+        <div class="flex flex-col gap-2">
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl tabular w-7 text-right">6</span>
+            <span class="stat-label">Teams</span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl tabular w-7 text-right">6</span>
+            <span class="stat-label">Games Played</span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="display font-black text-2xl tabular w-7 text-right">2</span>
+            <span class="stat-label">Series Complete</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== CONTROLS ========================== -->
+  <section class="max-w-6xl mx-auto px-5 pt-8">
+    <div class="flex flex-wrap gap-4">
+      <div class="flex flex-col gap-2">
+        <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-[0.12em] uppercase">Scope</span>
+        <div id="scopeToggle" class="seg w-48" data-mode="season1">
+          <button class="seg-btn active flex-1" data-mode="season1">Season 1</button>
+          <button class="seg-btn flex-1" data-mode="career">Career</button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-[10px] text-[var(--text-muted)] font-bold tracking-[0.12em] uppercase">View</span>
+        <div id="viewToggle" class="seg w-48" data-mode="games">
+          <button class="seg-btn active flex-1" data-mode="games">Games</button>
+          <button class="seg-btn flex-1" data-mode="matches">Matches</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== STANDINGS TABLE ========================== -->
+  <!--
+    DEV NOTE: Columns (11 total) — always all rendered; horizontal scroll on mobile,
+    frozen (# + Team) pinned left.
+
+      1. #              (sort: rank)                  static across views
+      2. Team           (sort: team, alpha)           static across views
+      3. W              (sort: w)                     swaps value games/matches
+      4. L              (sort: l)                     swaps value games/matches
+      5. PF             (sort: pf)                    total points for (static)
+      6. PPG / PPM      (sort: pp)                    PF / N where N = games or matches
+      7. PA             (sort: pa)                    total points against (static)
+      8. PAPG / PAPM    (sort: pap)                   PA / N
+      9. +/-            (sort: diff)                  total differential (static)
+      10. AVG/G / AVG/M (sort: avg)                   (+/-) / N
+      11. Win%          (sort: winpct)                wins/games (or wins/matches)
+
+    Sorting:
+      - Default: rank asc.
+      - First click on a header: ascending. Second click on the same header: descending.
+        Clicking a different header resets direction to ascending.
+      - DNP teams sort naturally using 0 values across every stat column — they
+        float to whichever end of the sort their zeros put them. Among ties they
+        fall back to rank order via the stable tiebreaker.
+      - When view toggles, re-sort with the new view's values (same column + direction).
+
+    Row borders are purely CSS-driven (see .standings-row:last-child rule in the
+    <style> block), so re-sorting can't leave a stray 1px line at the bottom.
+
+    Phase 3: the standings() engine should provide all these values pre-computed
+    and return rows already sorted for the active view. Header click should call
+    the same sort routine; view toggle should trigger a recompute+re-sort.
+  -->
+  <section class="max-w-6xl mx-auto px-5 pt-6 pb-4">
+    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <div id="standingsTable" class="standings-table min-w-[760px]" data-mode="games">
+
+          <!-- Header row -->
+          <div class="standings-header flex items-center border-b border-[var(--border)] text-[10px] tracking-[0.12em] uppercase font-bold text-[var(--text-muted)]">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3">
+              <span class="sortable w-5 sm:w-6 text-center" data-sort="rank">#</span>
+              <span class="sortable w-[140px] sm:w-[180px]" data-sort="team">Team</span>
+            </div>
+            <span class="sortable w-10 text-center shrink-0 py-3" data-sort="w">W</span>
+            <span class="sortable w-10 text-center shrink-0 py-3" data-sort="l">L</span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pf">PF</span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pp"><span class="val-games">PPG</span><span class="val-matches">PPM</span></span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pa">PA</span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="pap"><span class="val-games">PAPG</span><span class="val-matches">PAPM</span></span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="diff">+/-</span>
+            <span class="sortable w-14 text-right shrink-0 py-3" data-sort="avg"><span class="val-games">AVG/G</span><span class="val-matches">AVG/M</span></span>
+            <span class="sortable w-14 text-right shrink-0 py-3 pr-3 sm:pr-4" data-sort="winpct">Win%</span>
+          </div>
+
+          <!-- Row: Lakers -->
+          <a href="#" class="standings-row flex items-center group"
+             data-rank="1" data-team="Lakers"
+             data-w-games="2" data-w-matches="1"
+             data-l-games="1" data-l-matches="0"
+             data-pf="59"
+             data-pp-games="19.7" data-pp-matches="59.0"
+             data-pa="40"
+             data-pap-games="13.3" data-pap-matches="40.0"
+             data-diff="19"
+             data-avg-games="6.3" data-avg-matches="19.0"
+             data-winpct-games="67" data-winpct-matches="100">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank top w-5 sm:w-6">1</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #552583 60%, #FDB927);">L</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">LAKERS</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Joseph</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">59</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">19.7</span><span class="val-matches">59.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">40</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">13.3</span><span class="val-matches">40.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos">+19</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+6.3</span><span class="val-matches">+19.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
+          </a>
+
+          <!-- Row: Suns -->
+          <a href="#" class="standings-row flex items-center group"
+             data-rank="2" data-team="Suns"
+             data-w-games="2" data-w-matches="1"
+             data-l-games="1" data-l-matches="0"
+             data-pf="50"
+             data-pp-games="16.7" data-pp-matches="50.0"
+             data-pa="49"
+             data-pap-games="16.3" data-pap-matches="49.0"
+             data-diff="1"
+             data-avg-games="0.3" data-avg-matches="1.0"
+             data-winpct-games="67" data-winpct-matches="100">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank w-5 sm:w-6">2</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #E56020 50%, #1D1160);">S</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">SUNS</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Joseph & Nathan</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">50</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">16.7</span><span class="val-matches">50.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">49</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.3</span><span class="val-matches">49.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos">+1</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-pos"><span class="val-games">+0.3</span><span class="val-matches">+1.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">67%</span><span class="val-matches">100%</span></span>
+          </a>
+
+          <!-- Row: Warriors (DNP: all stats shown as 0 so the row can sort naturally) -->
+          <a href="#" class="standings-row flex items-center opacity-80 group"
+             data-rank="3" data-team="Warriors" data-dnp="1"
+             data-w-games="0" data-w-matches="0"
+             data-l-games="0" data-l-matches="0"
+             data-pf="0"
+             data-pp-games="0" data-pp-matches="0"
+             data-pa="0"
+             data-pap-games="0" data-pap-matches="0"
+             data-diff="0"
+             data-avg-games="0" data-avg-matches="0"
+             data-winpct-games="0" data-winpct-matches="0">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank w-5 sm:w-6">3</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #1D428A 60%, #FFC72C);">W</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">WARRIORS</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Nathan</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
+          </a>
+
+          <!-- Row: Heat (DNP) -->
+          <a href="#" class="standings-row flex items-center opacity-80 group"
+             data-rank="4" data-team="Heat" data-dnp="1"
+             data-w-games="0" data-w-matches="0"
+             data-l-games="0" data-l-matches="0"
+             data-pf="0"
+             data-pp-games="0" data-pp-matches="0"
+             data-pa="0"
+             data-pap-games="0" data-pap-matches="0"
+             data-diff="0"
+             data-avg-games="0" data-avg-matches="0"
+             data-winpct-games="0" data-winpct-matches="0">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank w-5 sm:w-6">4</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #98002E 50%, #F9A01B);">H</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">HEAT</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Daniel & Joseph</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-dim)]">0.0</span>
+            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular text-[var(--text-dim)]">0%</span>
+          </a>
+
+          <!-- Row: Celtics -->
+          <a href="#" class="standings-row flex items-center group"
+             data-rank="5" data-team="Celtics"
+             data-w-games="1" data-w-matches="0"
+             data-l-games="2" data-l-matches="1"
+             data-pf="49"
+             data-pp-games="16.3" data-pp-matches="49.0"
+             data-pa="50"
+             data-pap-games="16.7" data-pap-matches="50.0"
+             data-diff="-1"
+             data-avg-games="-0.3" data-avg-matches="-1.0"
+             data-winpct-games="33" data-winpct-matches="0">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank w-5 sm:w-6">5</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #007A33 60%, #BA9653);">C</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">CELTICS</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Jacob & Daniel</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">49</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">16.3</span><span class="val-matches">49.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">50</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">16.7</span><span class="val-matches">50.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg">-1</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-0.3</span><span class="val-matches">-1.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
+          </a>
+
+          <!-- Row: Bucks -->
+          <a href="#" class="standings-row flex items-center group"
+             data-rank="6" data-team="Bucks"
+             data-w-games="1" data-w-matches="0"
+             data-l-games="2" data-l-matches="1"
+             data-pf="40"
+             data-pp-games="13.3" data-pp-matches="40.0"
+             data-pa="59"
+             data-pap-games="19.7" data-pap-matches="59.0"
+             data-diff="-19"
+             data-avg-games="-6.3" data-avg-matches="-19.0"
+             data-winpct-games="33" data-winpct-matches="0">
+            <div class="frozen-col flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3.5">
+              <span class="rank w-5 sm:w-6">6</span>
+              <div class="w-[140px] sm:w-[180px] min-w-0 flex items-center gap-2 sm:gap-3">
+                <div class="logo" style="width:32px; height:32px; font-size: 14px; background: linear-gradient(135deg, #00471B 60%, #EEE1C6); color: #00471B;">B</div>
+                <div class="min-w-0">
+                  <div class="display font-black text-base leading-none group-hover:text-[var(--accent)] transition">BUCKS</div>
+                  <div class="text-[11px] text-[var(--text-muted)] truncate">Daniel & Nathan</div>
+                </div>
+              </div>
+            </div>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular text-[var(--text-muted)]"><span class="val-games">1</span><span class="val-matches">0</span></span>
+            <span class="w-10 text-center shrink-0 py-3.5 display font-bold text-lg tabular"><span class="val-games">2</span><span class="val-matches">1</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular">40</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular"><span class="val-games">13.3</span><span class="val-matches">40.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]">59</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular text-[var(--text-muted)]"><span class="val-games">19.7</span><span class="val-matches">59.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg">-19</span>
+            <span class="w-14 text-right shrink-0 py-3.5 display font-bold tabular diff-neg"><span class="val-games">-6.3</span><span class="val-matches">-19.0</span></span>
+            <span class="w-14 text-right shrink-0 py-3.5 pr-3 sm:pr-4 display font-bold tabular"><span class="val-games">33%</span><span class="val-matches">0%</span></span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column legend / tiebreakers -->
+    <div class="mt-4 flex flex-col gap-2 text-[11px] text-[var(--text-dim)]">
+      <div class="flex flex-wrap gap-x-5 gap-y-1">
+        <span><span class="text-[var(--text-muted)] font-bold">W/L</span> Wins / Losses</span>
+        <span><span class="text-[var(--text-muted)] font-bold">PF</span> Points For</span>
+        <span><span class="text-[var(--text-muted)] font-bold">PPG/PPM</span> Points per Game/Match</span>
+        <span><span class="text-[var(--text-muted)] font-bold">PA</span> Points Against</span>
+        <span><span class="text-[var(--text-muted)] font-bold">PAPG/PAPM</span> Points Against per Game/Match</span>
+        <span><span class="text-[var(--text-muted)] font-bold">+/-</span> Point Differential</span>
+        <span><span class="text-[var(--text-muted)] font-bold">AVG/G, AVG/M</span> Avg Point Diff per Game/Match</span>
+        <span><span class="text-[var(--text-muted)] font-bold">Win%</span> Win Percentage</span>
+      </div>
+      <div>Click any column header to sort. Tiebreakers: head-to-head matches, then point differential.</div>
+    </div>
+  </section>
+
+  <!-- ========================== FOOTER ========================== -->
+  <footer class="border-t border-[var(--border)] mt-12">
+    <div class="max-w-6xl mx-auto px-5 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg flex items-center justify-center"
+             style="background: radial-gradient(circle at 30% 30%, #ff6b2b, #a3471d 60%, #541e0c);">
+          <span class="display font-black text-[11px] text-white leading-none">LBL</span>
+        </div>
+        <div class="leading-tight">
+          <div class="display font-black text-sm tracking-wider">LOCALS BASKETBALL LEAGUE</div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season 1</div>
+        </div>
+      </div>
+      <div class="text-[11px] text-[var(--text-dim)] uppercase tracking-wider font-semibold">
+        Jacob · Daniel · Joseph · Nathan
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      const scopeToggle = document.getElementById('scopeToggle');
+      const viewToggle = document.getElementById('viewToggle');
+      const table = document.getElementById('standingsTable');
+
+      // ------- Sort state -------
+      let sort = { key: 'rank', dir: 'asc' };
+      const VIEW_DEPENDENT = new Set(['w', 'l', 'pp', 'pap', 'avg', 'winpct']);
+
+      function attrForKey(key, view) {
+        return VIEW_DEPENDENT.has(key) ? `data-${key}-${view}` : `data-${key}`;
+      }
+
+      function readNumber(row, key, view) {
+        return parseFloat(row.getAttribute(attrForKey(key, view)));
+      }
+
+      function compareRows(a, b, key, dir, view) {
+        let cmp;
+        if (key === 'team') {
+          const aName = a.getAttribute('data-team') || '';
+          const bName = b.getAttribute('data-team') || '';
+          cmp = aName.localeCompare(bName);
+        } else {
+          cmp = readNumber(a, key, view) - readNumber(b, key, view);
+        }
+        if (cmp === 0) {
+          // Stable tiebreaker: rank order.
+          cmp = parseFloat(a.getAttribute('data-rank')) - parseFloat(b.getAttribute('data-rank'));
+        }
+        return dir === 'asc' ? cmp : -cmp;
+      }
+
+      function applySort() {
+        const view = table.getAttribute('data-mode');
+        const rows = Array.from(table.querySelectorAll('.standings-row'));
+        rows.sort((a, b) => compareRows(a, b, sort.key, sort.dir, view));
+        rows.forEach(r => table.appendChild(r));
+
+        // Header indicators.
+        table.querySelectorAll('.sortable').forEach(h => {
+          h.classList.remove('sorted-asc', 'sorted-desc');
+          if (h.getAttribute('data-sort') === sort.key) {
+            h.classList.add('sorted-' + sort.dir);
+          }
+        });
+      }
+
+      // ------- Header clicks -------
+      table.querySelectorAll('.sortable').forEach(h => {
+        h.addEventListener('click', (e) => {
+          e.preventDefault();
+          const key = h.getAttribute('data-sort');
+          if (sort.key === key) {
+            sort.dir = sort.dir === 'asc' ? 'desc' : 'asc';
+          } else {
+            sort.key = key;
+            sort.dir = 'asc';
+          }
+          applySort();
+        });
+      });
+
+      // ------- Scope toggle (cosmetic) -------
+      scopeToggle.querySelectorAll('.seg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-mode');
+          scopeToggle.setAttribute('data-mode', mode);
+          scopeToggle.querySelectorAll('.seg-btn').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+          });
+        });
+      });
+
+      // ------- View toggle (Games / Matches) -------
+      viewToggle.querySelectorAll('.seg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-mode');
+          viewToggle.setAttribute('data-mode', mode);
+          table.setAttribute('data-mode', mode);
+          viewToggle.querySelectorAll('.seg-btn').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+          });
+          // Re-sort so rankings reflect the newly active values.
+          applySort();
+        });
+      });
+
+      // Initial sort to apply default indicator on the # header.
+      applySort();
+    })();
+  </script>
+</body>
+</html>
