@@ -36,7 +36,9 @@ export default function Scorecard({
     played, decided, winnerKey, t1Games = 0, t2Games = 0, matchup_id,
   } = series;
   const week = weekNumber ?? series.week;
-  const seriesNum = seriesNumber ?? series.seriesNumber ?? series.matchup_id;
+  // Spec: never derive Series N from matchup_id. Callers must pass either
+  // `seriesNumber` directly or a series object that already carries one.
+  const seriesNum = seriesNumber ?? series.seriesNumber ?? '?';
 
   const isDnp = status === 'dnp';
   const isUpcoming = !isDnp && !played;

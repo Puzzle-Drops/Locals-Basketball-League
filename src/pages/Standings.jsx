@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CURRENT_SEASON, SEASONS, TEAMS } from '../lib/data.js';
 import {
-  computeSeason, computeCareer, decorateDuo, standings as canonicalStandings, fmt1,
+  computeSeason, computeCareer, decorateDuo, standings as canonicalStandings,
+  fmt1, playedGames,
 } from '../lib/stats.js';
 import { splitKey } from '../lib/constants.js';
 import TeamLogo from '../components/TeamLogo.jsx';
@@ -90,9 +91,7 @@ export default function Standings() {
     });
   }
 
-  const totalGames = computed.seriesIndex
-    .filter((s) => s.played)
-    .reduce((sum, s) => sum + s.games.length, 0);
+  const totalGames = playedGames(computed.seriesIndex).length;
   const seriesComplete = computed.seriesIndex.filter((s) => s.decided).length;
 
   return (
@@ -278,8 +277,8 @@ function Row({ row }) {
         {row.isDnp ? 0 : (row.diff > 0 ? `+${row.diff}` : row.diff)}
       </Cell>
       <Cell className="w-14 text-right" cls={diffCls}>
-        <span className="val-games">{signed(row.avg_games, row.isDnp)}</span>
-        <span className="val-series">{signed(row.avg_series, row.isDnp)}</span>
+        <span className="val-games">{signedAvg(row.avg_games, row.isDnp)}</span>
+        <span className="val-series">{signedAvg(row.avg_series, row.isDnp)}</span>
       </Cell>
       <Cell className="w-16 text-right pr-3 sm:pr-4" cls={dimCls}>
         <span className="val-games">{Math.round(row.winpct_games)}%</span>
@@ -289,9 +288,12 @@ function Row({ row }) {
   );
 }
 
-function signed(n, isDnp) {
+// Local helper -- formats a per-N average with explicit sign and fmt1 decimal,
+// special-casing DNP / zero to render as "0.0".
+function signedAvg(n, isDnp) {
   if (isDnp || n === 0) return '0.0';
-  return n > 0 ? `+${fmt1(n)}` : fmt1(n);
+  const f = fmt1(n);
+  return n > 0 ? `+${f}` : f;
 }
 
 function Cell({ children, className = '', cls = '' }) {

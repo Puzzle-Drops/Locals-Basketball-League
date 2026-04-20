@@ -78,8 +78,6 @@ export default function GameDetail() {
   const clincher = clincherInfo(series, g.game);
 
   // Play-order series number within its week
-  const seriesIdx = season ? null : null; // placeholder
-  // Resolve series number from data: find this series in its week's series array
   const weekSeries = found.week?.series ?? [];
   const seriesNum = weekSeries.findIndex((s) => s.matchup_id === series.matchup_id) + 1;
 

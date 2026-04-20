@@ -85,8 +85,11 @@ export default function TeamDetail() {
   const computed = scope === 'season' ? seasonComputed : careerComputed;
 
   const duo = decorateDuo(key, computed.duoStats[key]);
-  const seasonStandings = standings(seasonComputed.duoStats, seasonComputed.h2h);
-  const seasonRank = seasonStandings.findIndex((d) => d.key === key) + 1;
+  // Rank pill follows the active scope so career-mode pulls career standings
+  // (currently identical to season since only one season exists, but it'll
+  // matter once Season 2 lands).
+  const scopedStandings = standings(computed.duoStats, computed.h2h);
+  const scopedRank = scopedStandings.findIndex((d) => d.key === key) + 1;
 
   // Game log: all series involving this team
   const teamSeries = computed.seriesIndex.filter(
@@ -153,12 +156,12 @@ export default function TeamDetail() {
 
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                {seasonRank > 0 && (
+                {scopedRank > 0 && (
                   <Pill variant="team">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z" />
                     </svg>
-                    #{seasonRank} Rank
+                    #{scopedRank} Rank
                   </Pill>
                 )}
                 <Pill>Season {CURRENT_SEASON.season}</Pill>
@@ -272,7 +275,7 @@ export default function TeamDetail() {
         <div className="flex items-end justify-between mb-6">
           <div>
             <div className="stat-label mb-1">
-              {playedTeamSeries.length} {playedTeamSeries.length === 1 ? 'Series' : 'Series'} Played
+              {playedTeamSeries.length} Series Played
             </div>
             <h2 className="display font-black text-3xl tracking-wide">GAME LOG</h2>
           </div>

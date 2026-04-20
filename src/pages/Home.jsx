@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CURRENT_SEASON, TEAMS, leagueLogo } from '../lib/data.js';
-import { computeSeason, standings, decoratePlayer, fmt1 } from '../lib/stats.js';
+import { computeSeason, standings, decoratePlayer, fmt1, playedGames } from '../lib/stats.js';
 import {
   PLAYERS, splitKey, teamGradient, scheduledSeriesForWeek, TOTAL_WEEKS,
 } from '../lib/constants.js';
@@ -40,10 +40,10 @@ export default function Home() {
   const progressPct = Math.round((decidedSeries / totalSeries) * 100);
 
   // Hero stats
-  const playedGames = computed.seriesIndex.flatMap((s) => s.games ?? []);
-  const totalPoints = playedGames.reduce((sum, g) => sum + g.team1_score + g.team2_score, 0);
-  const avgMargin = playedGames.length
-    ? playedGames.reduce((sum, g) => sum + Math.abs(g.team1_score - g.team2_score), 0) / playedGames.length
+  const games = playedGames(computed.seriesIndex);
+  const totalPoints = games.reduce((sum, g) => sum + g.team1_score + g.team2_score, 0);
+  const avgMargin = games.length
+    ? games.reduce((sum, g) => sum + Math.abs(g.team1_score - g.team2_score), 0) / games.length
     : 0;
 
   // Latest results: all series in current week, in play order.
@@ -99,7 +99,7 @@ export default function Home() {
                 <div className="h-full bg-[var(--accent)]" style={{ width: `${progressPct}%` }} />
               </div>
               <div className="grid grid-cols-3 gap-3 text-center">
-                <HeroStat value={playedGames.length} label="Games" />
+                <HeroStat value={games.length} label="Games" />
                 <HeroStat value={totalPoints} label="Points" />
                 <HeroStat value={fmt1(avgMargin)} label="Avg Margin" />
               </div>
@@ -200,7 +200,7 @@ export default function Home() {
             <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between">
               <span className="stat-label">Player +/-</span>
               <span className="text-[10px] text-[var(--text-dim)] font-bold uppercase tracking-wider">
-                {playedGames.length} Games
+                {games.length} Games
               </span>
             </div>
             {playerRows.map((p, i) => (
@@ -235,7 +235,29 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* MORE TO EXPLORE */}
+      <section className="max-w-6xl mx-auto px-5 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <ExploreLink to="/playoffs" eyebrow="The Bracket" title="PLAYOFFS" />
+          <ExploreLink to="/rules" eyebrow="Reference" title="RULES" />
+        </div>
+      </section>
     </>
+  );
+}
+
+function ExploreLink({ to, eyebrow, title }) {
+  return (
+    <Link to={to} className="card p-5 flex items-center justify-between group">
+      <div>
+        <div className="stat-label mb-1">{eyebrow}</div>
+        <div className="display font-black text-2xl tracking-wide group-hover:text-[var(--accent)] transition">{title}</div>
+      </div>
+      <svg className="text-[var(--text-dim)] group-hover:text-[var(--accent)] transition" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </Link>
   );
 }
 

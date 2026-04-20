@@ -156,6 +156,8 @@ Public functions:
 - `decoratePlayer(name, raw)` adds player rates (`plusMinus`, `seriesWinPct`, `gameWinPct`, `ppg`, `papg`, `pps`).
 - `partnerBreakdown(player, duoStats)` returns `{ entries, best, worst }` keyed by game win%.
 - `fmt1(n)` returns a string with 1 decimal place (used for halved player points).
+- `signed(n)` returns `+5` for positives, `-3` for negatives, `0` for zero. Use in score / +/- displays.
+- `playedGames(seriesIndex)` flattens every game from played series (excludes DNP and upcoming). Use for hero counts, totals, and per-game averages.
 
 If you change a public signature, update every page that calls it.
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { CURRENT_SEASON, TEAMS } from '../lib/data.js';
-import { computeSeason, standings as canonicalStandings } from '../lib/stats.js';
+import { computeSeason, standings as canonicalStandings, signed } from '../lib/stats.js';
 import { splitKey, TOTAL_WEEKS } from '../lib/constants.js';
 import { resolveCoinflip } from '../lib/coinflip.js';
 import TeamLogo from '../components/TeamLogo.jsx';
@@ -371,7 +371,3 @@ function TrophyIcon() {
   );
 }
 
-function signed(n) {
-  if (n > 0) return `+${n}`;
-  return `${n}`;
-}

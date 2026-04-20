@@ -382,3 +382,15 @@ export function standings(duoStats, h2h, { mode = "games" } = {}) {
 export function fmt1(n) {
   return (Math.round(n * 10) / 10).toFixed(1);
 }
+
+// Format a number with an explicit sign prefix. Negatives carry their own
+// sign; positives get a `+`; zero shows as `0`.
+export function signed(n) {
+  return n > 0 ? `+${n}` : `${n}`;
+}
+
+// Flat list of every game from played series (excludes DNP and upcoming).
+// Pages reuse this for hero counts, totals, and avg-margin calcs.
+export function playedGames(seriesIndex) {
+  return seriesIndex.flatMap((s) => (s.played ? s.games : []));
+}
