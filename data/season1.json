@@ -31,6 +31,40 @@
           "matchup_id": 3,
           "team1_key": "Jacob-Nathan",
           "team2_key": "Daniel-Joseph",
+          "status": "completed",
+          "games": [
+            { "game": 1, "date": "2026-04-26", "team1_score": 15, "team2_score": 21, "vod_url": "https://youtu.be/Sy011qsnUuo" },
+            { "game": 2, "date": "2026-04-26", "team1_score": 21, "team2_score": 8,  "vod_url": "https://youtu.be/CVUwIQINPYY" },
+            { "game": 3, "date": "2026-04-26", "team1_score": 17, "team2_score": 23, "vod_url": "https://youtu.be/qYY4is5oJCc" }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "series": [
+        {
+          "matchup_id": 2,
+          "team1_key": "Jacob-Daniel",
+          "team2_key": "Joseph-Nathan",
+          "status": "completed",
+          "games": [
+            { "game": 1, "date": "2026-04-26", "team1_score": 5,  "team2_score": 21, "vod_url": "https://youtu.be/-LpDY9SIJoM" },
+            { "game": 2, "date": "2026-04-26", "team1_score": 18, "team2_score": 21, "vod_url": "https://youtu.be/kDMTsepXOPA" },
+            { "game": 3, "date": "2026-04-26", "team1_score": 19, "team2_score": 21, "vod_url": "https://youtu.be/hzAADPYRegQ" }
+          ]
+        },
+        {
+          "matchup_id": 3,
+          "team1_key": "Jacob-Nathan",
+          "team2_key": "Daniel-Joseph",
+          "status": "upcoming",
+          "games": []
+        },
+        {
+          "matchup_id": 1,
+          "team1_key": "Jacob-Joseph",
+          "team2_key": "Daniel-Nathan",
           "status": "upcoming",
           "games": []
         }
