@@ -58,15 +58,22 @@
           "matchup_id": 3,
           "team1_key": "Jacob-Nathan",
           "team2_key": "Daniel-Joseph",
-          "status": "upcoming",
-          "games": []
+          "status": "completed",
+          "games": [
+            { "game": 1, "team1_score": 11, "team2_score": 21, "vod_url": "" },
+            { "game": 2, "team1_score": 22, "team2_score": 19, "vod_url": "" },
+            { "game": 3, "team1_score": 22, "team2_score": 11, "vod_url": "" }
+          ]
         },
         {
           "matchup_id": 1,
           "team1_key": "Jacob-Joseph",
           "team2_key": "Daniel-Nathan",
-          "status": "upcoming",
-          "games": []
+          "status": "partial",
+          "games": [
+            { "game": 1, "team1_score": 14, "team2_score": 21, "vod_url": "" },
+            { "game": 2, "team1_score": 21, "team2_score": 19, "vod_url": "" }
+          ]
         }
       ]
     }
