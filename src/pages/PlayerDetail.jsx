@@ -1,10 +1,14 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CURRENT_SEASON, SEASONS, TEAMS } from '../lib/data.js';
-import { computeSeason, computeCareer, decoratePlayer, fmt1 } from '../lib/stats.js';
+import { getSeason, TEAMS } from '../lib/data.js';
+import { decoratePlayer, fmt1 } from '../lib/stats.js';
 import {
-  PLAYERS, PLAYER_DUOS, partnerOf, scheduledSeriesForWeek, TOTAL_WEEKS,
+  ALL_PLAYERS, duosForPlayer, partnerOf, scheduledSeriesForWeek, TOTAL_WEEKS,
 } from '../lib/constants.js';
+import {
+  SCOPE_OPTIONS, CAREER, computedForScope, defaultScopeForPlayer, scopeLabel,
+  seasonForScope,
+} from '../lib/scope.js';
 import PlayerAvatar from '../components/PlayerAvatar.jsx';
 import TeamLogo from '../components/TeamLogo.jsx';
 import Pill from '../components/Pill.jsx';
@@ -37,12 +41,12 @@ function playerOnDuoStats(player, duoKey, duoStats) {
 // 2v2 -> they're always one of the 4 on the court), so this typically
 // returns the full week of 3 series in play order.
 function nextWeekSeriesForPlayer(season, player, computed) {
-  const playerDuos = new Set(PLAYER_DUOS[player]);
+  const playerDuos = new Set(duosForPlayer(player, computed.duoKeys));
   const playedMap = new Set(
     computed.seriesIndex.filter((s) => s.played).map((s) => `${s.week}-${s.matchup_id}`)
   );
   for (let w = 1; w <= TOTAL_WEEKS; w++) {
-    const sched = scheduledSeriesForWeek(w);
+    const sched = scheduledSeriesForWeek(season, w);
     const upcoming = sched.filter((s) => {
       if (playedMap.has(`${w}-${s.matchup_id}`)) return false;
       if (!playerDuos.has(s.team1_key) && !playerDuos.has(s.team2_key)) return false;
@@ -59,26 +63,45 @@ function nextWeekSeriesForPlayer(season, player, computed) {
 
 export default function PlayerDetail() {
   const { name } = useParams();
-  const valid = PLAYERS.includes(name);
+  const valid = ALL_PLAYERS.includes(name);
 
-  const seasonComputed = useMemo(() => computeSeason(CURRENT_SEASON), []);
-  const careerComputed = useMemo(() => computeCareer(SEASONS), []);
-  const [scope, setScope] = useState('season');
+  // Daniel only played Season 1 and Joe only Season 2, so the page opens on the
+  // most recent season this player actually appeared in.
+  const [scope, setScope] = useState(() =>
+    valid ? defaultScopeForPlayer(name) : CAREER
+  );
+
+  const computed = useMemo(() => computedForScope(scope), [scope]);
+  const scopeSeason = seasonForScope(scope);
+  // The season the "Up Next" preview and current records come from. Career
+  // scope has no schedule of its own, so it falls back to the player's season.
+  const activeSeason = scopeSeason ?? seasonForScope(defaultScopeForPlayer(name));
+  const activeComputed = useMemo(
+    () => computedForScope(`s${activeSeason?.season}`),
+    [activeSeason]
+  );
 
   if (!valid) return <div className="max-w-6xl mx-auto px-5 py-12">Unknown player.</div>;
 
-  const computed = scope === 'season' ? seasonComputed : careerComputed;
-  const player = decoratePlayer(name, computed.playerStats[name]);
+  const raw = computed.playerStats[name];
+  if (!raw) {
+    return (
+      <div className="max-w-6xl mx-auto px-5 py-12 text-[var(--text-muted)]">
+        {name} didn't play in {scopeLabel(scope)}.
+      </div>
+    );
+  }
+  const player = decoratePlayer(name, raw);
 
   // Rank players by +/- to derive Season MVP / #N pills
-  const allPlayers = PLAYERS
+  const allPlayers = computed.players
     .map((p) => decoratePlayer(p, computed.playerStats[p]))
     .sort((a, b) => b.plusMinus - a.plusMinus);
   const rank = allPlayers.findIndex((p) => p.name === name) + 1;
   const isMvp = rank === 1 && player.gamesPlayed > 0;
 
   // 3 partnerships, sorted: played first by win%, then by +/-, unplayed last
-  const partnerships = PLAYER_DUOS[name].map((duoKey) => ({
+  const partnerships = duosForPlayer(name, computed.duoKeys).map((duoKey) => ({
     ...playerOnDuoStats(name, duoKey, computed.duoStats),
     partner: partnerOf(name, duoKey),
   })).sort((a, b) => {
@@ -90,26 +113,29 @@ export default function PlayerDetail() {
   });
 
   // Player game log: any series where one of this player's duos plays
-  const playerDuoSet = new Set(PLAYER_DUOS[name]);
+  const playerDuoSet = new Set(duosForPlayer(name, computed.duoKeys));
   const playerSeries = computed.seriesIndex
     .filter((s) => playerDuoSet.has(s.team1_key) || playerDuoSet.has(s.team2_key))
     .filter((s) => s.played)
-    .sort((a, b) => a.week - b.week || a.matchup_id - b.matchup_id);
+    .sort((a, b) => a.season - b.season || a.week - b.week || a.matchup_id - b.matchup_id);
 
   function seriesNumberFor(s) {
-    const week = CURRENT_SEASON.weeks.find((w) => w.week === s.week);
+    const season = getSeason(s.season);
+    const week = season?.weeks.find((w) => w.week === s.week);
     if (!week) return s.matchup_id;
     return week.series.findIndex((x) => x.matchup_id === s.matchup_id) + 1;
   }
 
   // Up next: every series the player has in the next active week
-  const upcoming = nextWeekSeriesForPlayer(CURRENT_SEASON, name, seasonComputed);
+  const upcoming = activeSeason
+    ? nextWeekSeriesForPlayer(activeSeason, name, activeComputed)
+    : null;
   function recordFor(key) {
-    const d = seasonComputed.duoStats[key];
-    return `${d.gamesWon}-${d.gamesLost}`;
+    const d = activeComputed.duoStats[key];
+    return d ? `${d.gamesWon}-${d.gamesLost}` : '0-0';
   }
 
-  const playerDuos = PLAYER_DUOS[name];
+  const playerDuos = duosForPlayer(name, computed.duoKeys);
 
   return (
     <>
@@ -142,7 +168,7 @@ export default function PlayerDetail() {
                   </Pill>
                 )}
                 {player.gamesPlayed > 0 && <Pill>#{rank} Player</Pill>}
-                <Pill>Season {CURRENT_SEASON.season}</Pill>
+                <Pill>{scopeLabel(scope)}</Pill>
               </div>
               <h1 className="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide">
                 {name.toUpperCase()}
@@ -180,10 +206,7 @@ export default function PlayerDetail() {
           <Seg
             value={scope}
             onChange={setScope}
-            options={[
-              { value: 'season', label: `Season ${CURRENT_SEASON.season}` },
-              { value: 'career', label: 'Career' },
-            ]}
+            options={SCOPE_OPTIONS}
           />
         </div>
       </section>
@@ -230,7 +253,7 @@ export default function PlayerDetail() {
       <section className="max-w-6xl mx-auto px-5 pt-12">
         <div className="flex items-end justify-between mb-6">
           <div>
-            <div className="stat-label mb-1">3 Partnerships</div>
+            <div className="stat-label mb-1">{partnerships.length} Partnerships</div>
             <h2 className="display font-black text-3xl tracking-wide">MY TEAMS</h2>
           </div>
         </div>

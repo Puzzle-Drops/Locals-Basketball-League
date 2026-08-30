@@ -1,8 +1,11 @@
 {
-  "Jacob-Daniel":  "Celtics",
-  "Jacob-Joseph":  "Lakers",
-  "Jacob-Nathan":  "Warriors",
-  "Daniel-Joseph": "Heat",
+  "Jacob-Daniel": "Celtics",
+  "Jacob-Joey": "Lakers",
+  "Jacob-Nathan": "Warriors",
+  "Daniel-Joey": "Heat",
   "Daniel-Nathan": "Bucks",
-  "Joseph-Nathan": "Suns"
+  "Joey-Nathan": "Suns",
+  "Joe-Jacob": "Bulls",
+  "Joe-Joey": "Grizzlies",
+  "Joe-Nathan": "Thunder"
 }

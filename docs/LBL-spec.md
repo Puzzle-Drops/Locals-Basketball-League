@@ -3,7 +3,18 @@
 The official tracker for the Locals Basketball League.
 
 ## Players
-Listed in order of age (oldest to youngest): **Jacob, Daniel, Joseph, Nathan**.
+
+The roster is four players, but it can change between seasons. Each season's JSON
+carries its own `roster`, and team keys are ordered by age across everyone who has
+ever played: **Joe, Jacob, Daniel, Joey, Nathan** (oldest to youngest).
+
+| Season | Roster (age order) |
+|--------|--------------------|
+| 1      | Jacob, Daniel, Joey, Nathan |
+| 2      | Joe, Jacob, Joey, Nathan |
+
+Season 2 replaced Daniel with **Joe Monnin**. The player recorded through Season 1 as
+"Joseph" is **Joey Monnin**, renamed everywhere so the two aren't confused.
 
 ---
 
@@ -36,10 +47,21 @@ Top 4 teams advance to the playoffs. The Games/Series toggle on the Standings pa
 
 ## Weekly Rotation
 
-Three unique pairings (each plays one 3-game series per week):
-- **Pairing A**: Jacob & Joseph vs Daniel & Nathan (`matchup_id: 1`)
-- **Pairing B**: Jacob & Daniel vs Joseph & Nathan (`matchup_id: 2`)
-- **Pairing C**: Jacob & Nathan vs Daniel & Joseph (`matchup_id: 3`)
+Three unique pairings (each plays one 3-game series per week). A `matchup_id` is a
+fixed pairing of roster **slots**, not of names, so the same three matchups survive a
+roster change. `season.roster` is stored in slot order -
+`[Jacob, <Daniel's slot>, <Joseph's slot>, Nathan]` - which is why Season 2 lists Joe
+second even though he is the oldest player.
+
+- **Pairing A** (`matchup_id: 1`): slot0 + slot2 vs slot1 + slot3
+- **Pairing B** (`matchup_id: 2`): slot0 + slot1 vs slot2 + slot3
+- **Pairing C** (`matchup_id: 3`): slot0 + slot3 vs slot1 + slot2
+
+| matchup_id | Season 1 | Season 2 |
+|------------|----------|----------|
+| 1 | Jacob & Joey vs Daniel & Nathan | Jacob & Joey vs Joe & Nathan |
+| 2 | Jacob & Daniel vs Joey & Nathan | Joe & Jacob vs Joey & Nathan |
+| 3 | Jacob & Nathan vs Daniel & Joey | Jacob & Nathan vs Joe & Joey |
 
 Weekly play order (rotates so no pairing is always rested or always tired):
 
@@ -59,21 +81,36 @@ The UI labels each series as `Series 1`, `Series 2`, or `Series 3` based on **pl
 
 - `matchup_id` in the JSON is a fixed identifier for a specific pairing.
 - The display label `Series N` is derived from the series' index in its week (`index + 1`).
-- Example: Pairing A (Jacob+Joseph vs Daniel+Nathan) is labeled "Series 1" in Week 1 (first in play order), but "Series 3" in Week 2 (third in play order).
+- Example: Pairing A (Jacob+Joey vs Daniel+Nathan) is labeled "Series 1" in Week 1 (first in play order), but "Series 3" in Week 2 (third in play order).
 
 Never derive "Series N" from `matchup_id`. It's the array index within the week, period.
 
 ---
 
 ## Duos (Teams)
-Six permanent duos. Each has a random NBA team name assigned once and locked across all seasons.
+
+Six duos per season (4 choose 2). A team name is locked to a *partnership* for as long
+as that partnership exists. When the roster changes, the duos that no longer exist keep
+their name in the history and the new duos get new franchises - so `teams.json` is the
+union across every season, currently nine entries.
+
+**Season 1**
 
 1. Jacob & Daniel: *Celtics*
-2. Jacob & Joseph: *Lakers*
+2. Jacob & Joey: *Lakers*
 3. Jacob & Nathan: *Warriors*
-4. Daniel & Joseph: *Heat*
+4. Daniel & Joey: *Heat*
 5. Daniel & Nathan: *Bucks*
-6. Joseph & Nathan: *Suns*
+6. Joey & Nathan: *Suns*
+
+**Season 2** (Joe replaced Daniel, so Joe's three duos are new franchises)
+
+1. Joe & Jacob: *Bulls*
+2. Jacob & Joey: *Lakers*
+3. Jacob & Nathan: *Warriors*
+4. Joe & Joey: *Grizzlies*
+5. Joe & Nathan: *Thunder*
+6. Joey & Nathan: *Suns*
 
 ---
 
@@ -132,12 +169,10 @@ Each G1/G2/G3 game cell on scorecards displays a small play-icon link to that ga
 ---
 
 ## Playoffs
-**Season 1 Playoffs: TBD.** Decision to be made before the regular season ends. Options on the table:
-- Simulated bracket based on regular-season point differential and/or +/-
-- Actual bracket played out
-- Hybrid (e.g. top seed picks partner, lower seeds battle first)
-
-Until decided, the Playoffs page on the site just shows "TBD."
+Top 4 teams by regular-season game wins make the bracket (#1 vs #4 on the left, #2 vs #3
+on the right). Bracket matchups are not played out - they resolve on regular-season point
+differential, higher +/- advances, with a coinflip if the two are identical. The bracket
+renders as a live projection during the season and locks once all 9 series are played.
 
 ---
 
@@ -148,13 +183,14 @@ Until decided, the Playoffs page on the site just shows "TBD."
 ```json
 {
   "season": 1,
+  "roster": ["Jacob", "Daniel", "Joey", "Nathan"],
   "weeks": [
     {
       "week": 1,
       "series": [
         {
           "matchup_id": 1,
-          "team1_key": "Jacob-Joseph",
+          "team1_key": "Jacob-Joey",
           "team2_key": "Daniel-Nathan",
           "status": "completed",
           "games": [
@@ -166,7 +202,7 @@ Until decided, the Playoffs page on the site just shows "TBD."
         {
           "matchup_id": 2,
           "team1_key": "Jacob-Daniel",
-          "team2_key": "Joseph-Nathan",
+          "team2_key": "Joey-Nathan",
           "status": "completed",
           "games": [
             { "game": 1, "date": "2026-04-19", "team1_score": 17, "team2_score": 23, "vod_url": "https://google.com" },
@@ -177,7 +213,7 @@ Until decided, the Playoffs page on the site just shows "TBD."
         {
           "matchup_id": 3,
           "team1_key": "Jacob-Nathan",
-          "team2_key": "Daniel-Joseph",
+          "team2_key": "Daniel-Joey",
           "status": "dnp",
           "games": []
         }
@@ -188,21 +224,25 @@ Until decided, the Playoffs page on the site just shows "TBD."
 ```
 
 **Conventions:**
-- **Team keys** use age-ordered player names joined by hyphen. Older player always first (`Jacob-Daniel`, `Daniel-Joseph`, `Joseph-Nathan`, etc.).
+- **Team keys** use age-ordered player names joined by hyphen. Older player always first (`Jacob-Daniel`, `Daniel-Joey`, `Joe-Nathan`, etc.). Age order spans every season's roster: Joe, Jacob, Daniel, Joey, Nathan.
+- **Roster** is required per season and stored in *slot* order (see Weekly Rotation), not age order. Display order is derived from it by age.
 - **Date** is optional per-game, purely cosmetic. Leave it out or set `null` if you don't care. Nothing depends on it. "Week" is the logical unit.
 - **Status**: `"completed"` | `"partial"` | `"dnp"` | `"upcoming"` (scheduled but not played yet, same stat treatment as DNP -- no wins, no points -- but rendered neutrally in the UI rather than with the amber DNP styling)
 - **Series labels** are derived from the series' index in the week, not from `matchup_id`.
 
-**Separate `teams.json`** holds the permanent duo to nickname map:
+**Separate `teams.json`** holds the duo to nickname map, unioned across every season:
 
 ```json
 {
   "Jacob-Daniel":  "Celtics",
-  "Jacob-Joseph":  "Lakers",
+  "Jacob-Joey":    "Lakers",
   "Jacob-Nathan":  "Warriors",
-  "Daniel-Joseph": "Heat",
+  "Daniel-Joey":   "Heat",
   "Daniel-Nathan": "Bucks",
-  "Joseph-Nathan": "Suns"
+  "Joey-Nathan":   "Suns",
+  "Joe-Jacob":     "Bulls",
+  "Joe-Joey":      "Grizzlies",
+  "Joe-Nathan":    "Thunder"
 }
 ```
 
@@ -218,7 +258,7 @@ Branded as **Locals Basketball League (LBL)** throughout.
 - **Schedule**: season grid showing all 9 series and their status
 - **Game Detail**: box score + VOD embed if linked
 - **Rules**: static page rendering the League Rules section above
-- **Playoffs**: currently displays "TBD"
+- **Playoffs**: live bracket projection, locks when the season completes
 
 Mobile-first. Polished visuals. Static site.
 

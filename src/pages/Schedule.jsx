@@ -1,12 +1,14 @@
-import { useMemo } from 'react';
-import { CURRENT_SEASON } from '../lib/data.js';
+import { useMemo, useState } from 'react';
+import { SEASONS } from '../lib/data.js';
 import { computeSeason } from '../lib/stats.js';
 import { scheduledSeriesForWeek, TOTAL_WEEKS } from '../lib/constants.js';
 import Scorecard from '../components/Scorecard.jsx';
 import Pill from '../components/Pill.jsx';
+import Seg from '../components/Seg.jsx';
+import TeamLogo from '../components/TeamLogo.jsx';
 
 // For each week 1..N, return its 3 series in play order. Uses real data from
-// season1.json when present, falls back to the spec rotation otherwise.
+// the season JSON when present, falls back to the spec rotation otherwise.
 function buildFullSchedule(season, computed) {
   const out = [];
   for (let w = 1; w <= TOTAL_WEEKS; w++) {
@@ -20,7 +22,7 @@ function buildFullSchedule(season, computed) {
       });
       out.push({ week: w, seriesList });
     } else {
-      const sched = scheduledSeriesForWeek(w);
+      const sched = scheduledSeriesForWeek(season, w);
       out.push({ week: w, seriesList: sched });
     }
   }
@@ -47,8 +49,13 @@ function summarizeWeek(weekEntry) {
 }
 
 export default function Schedule() {
-  const computed = useMemo(() => computeSeason(CURRENT_SEASON), []);
-  const schedule = useMemo(() => buildFullSchedule(CURRENT_SEASON, computed), [computed]);
+  // Every season stays browsable, not just the current one - Season 1's roster
+  // (and three of its six franchises) no longer exists in Season 2.
+  const [seasonNum, setSeasonNum] = useState(SEASONS[SEASONS.length - 1].season);
+  const season = SEASONS.find((s) => s.season === seasonNum);
+
+  const computed = useMemo(() => computeSeason(season), [season]);
+  const schedule = useMemo(() => buildFullSchedule(season, computed), [season, computed]);
 
   const allSeries = schedule.flatMap((w) => w.seriesList);
   const totalSeries = allSeries.length;
@@ -72,8 +79,25 @@ export default function Schedule() {
           <div className="absolute inset-0 grid-lines opacity-60 pointer-events-none" />
 
           <div className="relative">
-            <div className="stat-label mb-2">Season {CURRENT_SEASON.season} · 2026</div>
-            <h1 className="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-5">SCHEDULE</h1>
+            <div className="stat-label mb-2">Season {season.season} · 2026</div>
+            <h1 className="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-4">SCHEDULE</h1>
+
+            {SEASONS.length > 1 && (
+              <div className="mb-5">
+                <Seg
+                  value={seasonNum}
+                  onChange={setSeasonNum}
+                  options={SEASONS.map((s) => ({ value: s.season, label: `Season ${s.season}` }))}
+                  className="w-56"
+                />
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-1.5 mb-5">
+              {computed.duoKeys.map((k) => (
+                <TeamLogo key={k} duoKey={k} size={26} />
+              ))}
+            </div>
 
             <div className="flex flex-col gap-2 mb-5">
               <ProgressStat value={totalSeries} label="Series" />

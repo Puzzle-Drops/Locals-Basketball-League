@@ -1,14 +1,18 @@
-import { TEAMS } from '../lib/data.js';
-import { DUO_KEYS, splitKey } from '../lib/constants.js';
+import { CURRENT_SEASON, TEAMS } from '../lib/data.js';
+import { duoKeysFor, pairingsFor, playersFor, splitKey } from '../lib/constants.js';
 import TeamLogo from '../components/TeamLogo.jsx';
 import Pill from '../components/Pill.jsx';
 
+// The rules page describes the league as it stands now, so everything below is
+// derived from the current season's roster.
+const DUO_KEYS = duoKeysFor(CURRENT_SEASON);
+const ROSTER = playersFor(CURRENT_SEASON);
+
 // Three legal pairings (a duo can't play another duo that shares a player).
-const PAIRINGS = [
-  { letter: 'A', team1: 'Jacob-Joseph', team2: 'Daniel-Nathan' },
-  { letter: 'B', team1: 'Jacob-Daniel', team2: 'Joseph-Nathan' },
-  { letter: 'C', team1: 'Jacob-Nathan', team2: 'Daniel-Joseph' },
-];
+const LETTERS = ['A', 'B', 'C'];
+const PAIRINGS = Object.entries(pairingsFor(CURRENT_SEASON)).map(
+  ([id, [team1, team2]], i) => ({ letter: LETTERS[i], matchupId: Number(id), team1, team2 })
+);
 
 export default function Rules() {
   return (
@@ -24,9 +28,13 @@ export default function Rules() {
               How the Locals Basketball League works, from a single possession to the full season.
             </p>
 
+            <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--text-dim)] font-semibold mt-4">
+              Season {CURRENT_SEASON.season} roster · {ROSTER.join(' · ')}
+            </div>
+
             <div className="mt-6 flex flex-col gap-2">
-              <HeroStat value={4} label="Players" />
-              <HeroStat value={6} label="Teams" />
+              <HeroStat value={ROSTER.length} label="Players" />
+              <HeroStat value={DUO_KEYS.length} label="Teams" />
               <HeroStat value={9} label="Series / Season" />
               <HeroStat value={27} label="Games / Season" />
             </div>
@@ -77,7 +85,7 @@ export default function Rules() {
       <Section number="03" title="THE SIX DUOS">
         <div className="prose-body max-w-2xl mb-6">
           <p>
-            Four players, six possible partnerships <span className="text-[var(--text-dim)]">(4 choose 2)</span>. Each duo is assigned a permanent NBA team name that sticks with them across every season.
+            Four players, six possible partnerships <span className="text-[var(--text-dim)]">(4 choose 2)</span>. Each duo carries its own NBA team name. Names stay with a partnership for as long as that partnership exists; when the roster changes, the new duos get new franchises.
           </p>
         </div>
 

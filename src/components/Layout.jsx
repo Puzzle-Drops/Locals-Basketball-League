@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
-import { leagueLogo } from '../lib/data.js';
+import { leagueLogo, CURRENT_SEASON } from '../lib/data.js';
+import { playersFor } from '../lib/constants.js';
+
+const ROSTER = playersFor(CURRENT_SEASON).join(' · ');
 
 const NAV = [
   { to: '/', label: 'Home', end: true },
@@ -49,7 +52,7 @@ export default function Layout() {
           <div className="flex items-center gap-2">
             <span className="hidden sm:flex pill accent items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
-              Season 1
+              Season {CURRENT_SEASON.season}
             </span>
             <button
               type="button"
@@ -106,11 +109,11 @@ export default function Layout() {
             <img src={leagueLogo()} alt="LBL" className="h-8 w-8 rounded-lg object-contain" />
             <div className="leading-tight">
               <div className="display font-black text-sm tracking-wider">LOCALS BASKETBALL LEAGUE</div>
-              <div className="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season 1</div>
+              <div className="text-[10px] uppercase tracking-[0.16em] text-[var(--text-dim)]">Est. 2026 · Season {CURRENT_SEASON.season}</div>
             </div>
           </div>
           <div className="text-[11px] text-[var(--text-dim)] uppercase tracking-wider font-semibold">
-            Jacob · Daniel · Joseph · Nathan
+            {ROSTER}
           </div>
         </div>
       </footer>

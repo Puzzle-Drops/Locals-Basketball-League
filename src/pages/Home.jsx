@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { CURRENT_SEASON, TEAMS, leagueLogo } from '../lib/data.js';
 import { computeSeason, standings, decoratePlayer, fmt1, playedGames } from '../lib/stats.js';
 import {
-  PLAYERS, splitKey, teamGradient, scheduledSeriesForWeek, TOTAL_WEEKS,
+  splitKey, teamGradient, scheduledSeriesForWeek, TOTAL_WEEKS,
 } from '../lib/constants.js';
 import Scorecard from '../components/Scorecard.jsx';
 import Seg from '../components/Seg.jsx';
@@ -56,14 +56,14 @@ export default function Home() {
     });
 
   // Player leaders by +/-
-  const playerRows = PLAYERS
+  const playerRows = computed.players
     .map((p) => decoratePlayer(p, computed.playerStats[p]))
     .sort((a, b) => b.plusMinus - a.plusMinus);
   const mvp = playerRows[0];
 
   // Next week preview
   const nextWeekNum = currentWeek + 1;
-  const nextWeekSeries = nextWeekNum <= TOTAL_WEEKS ? scheduledSeriesForWeek(nextWeekNum) : [];
+  const nextWeekSeries = nextWeekNum <= TOTAL_WEEKS ? scheduledSeriesForWeek(CURRENT_SEASON, nextWeekNum) : [];
 
   return (
     <>

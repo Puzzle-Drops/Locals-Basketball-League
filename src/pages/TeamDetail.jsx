@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CURRENT_SEASON, SEASONS, TEAMS } from '../lib/data.js';
+import { getSeason, TEAMS } from '../lib/data.js';
+import { decorateDuo, standings, fmt1 } from '../lib/stats.js';
 import {
-  computeSeason, computeCareer, decorateDuo, standings, fmt1,
-} from '../lib/stats.js';
-import {
-  DUO_KEYS, splitKey, partnerOf, scheduledSeriesForWeek, TOTAL_WEEKS,
+  splitKey, partnerOf, scheduledSeriesForWeek, TOTAL_WEEKS,
   TEAM_COLORS, teamGradient,
 } from '../lib/constants.js';
+import {
+  SCOPE_OPTIONS, CAREER, computedForScope, defaultScopeForTeam, scopeLabel,
+  seasonForScope,
+} from '../lib/scope.js';
 import TeamLogo from '../components/TeamLogo.jsx';
 import PlayerAvatar from '../components/PlayerAvatar.jsx';
 import Pill from '../components/Pill.jsx';
@@ -53,7 +55,7 @@ function nextSeriesForTeam(season, teamKey, computed) {
       .map((s) => `${s.week}-${s.matchup_id}`)
   );
   for (let w = 1; w <= TOTAL_WEEKS; w++) {
-    const sched = scheduledSeriesForWeek(w);
+    const sched = scheduledSeriesForWeek(season, w);
     for (const s of sched) {
       if (playedMap.has(`${w}-${s.matchup_id}`)) continue;
       if (s.team1_key !== teamKey && s.team2_key !== teamKey) continue;
@@ -70,24 +72,43 @@ function nextSeriesForTeam(season, teamKey, computed) {
 
 export default function TeamDetail() {
   const { key } = useParams();
-  const validKey = DUO_KEYS.includes(key);
+  const validKey = Boolean(TEAMS[key]);
 
-  const seasonComputed = useMemo(() => computeSeason(CURRENT_SEASON), []);
-  const careerComputed = useMemo(() => computeCareer(SEASONS), []);
-  const [scope, setScope] = useState('season');
+  // Three franchises are Season 1 only (Celtics, Heat, Bucks) and three are
+  // Season 2 only (Bulls, Grizzlies, Thunder), so open on a season this duo
+  // actually played in rather than always the current one.
+  const [scope, setScope] = useState(() =>
+    validKey ? defaultScopeForTeam(key) : CAREER
+  );
   const [rosterMode, setRosterMode] = useState('on-team');
+
+  const computed = useMemo(() => computedForScope(scope), [scope]);
+  const scopeSeason = seasonForScope(scope);
+  // Career scope has no schedule of its own; "Up Next" falls back to the most
+  // recent season this duo appears in.
+  const activeSeason = scopeSeason ?? seasonForScope(defaultScopeForTeam(key));
+  const activeComputed = useMemo(
+    () => computedForScope(`s${activeSeason?.season}`),
+    [activeSeason]
+  );
 
   if (!validKey) return <div className="max-w-6xl mx-auto px-5 py-12">Unknown team.</div>;
 
   const colors = TEAM_COLORS[key];
   const teamName = TEAMS[key];
   const players = splitKey(key);
-  const computed = scope === 'season' ? seasonComputed : careerComputed;
 
-  const duo = decorateDuo(key, computed.duoStats[key]);
-  // Rank pill follows the active scope so career-mode pulls career standings
-  // (currently identical to season since only one season exists, but it'll
-  // matter once Season 2 lands).
+  const rawDuo = computed.duoStats[key];
+  if (!rawDuo) {
+    return (
+      <div className="max-w-6xl mx-auto px-5 py-12 text-[var(--text-muted)]">
+        {teamName} didn't play in {scopeLabel(scope)}.
+      </div>
+    );
+  }
+
+  const duo = decorateDuo(key, rawDuo);
+  // Rank pill follows the active scope so career mode pulls career standings.
   const scopedStandings = standings(computed.duoStats, computed.h2h);
   const scopedRank = scopedStandings.findIndex((d) => d.key === key) + 1;
 
@@ -99,14 +120,14 @@ export default function TeamDetail() {
 
   // Group series by week to derive Series N play-order labels
   function seriesNumberFor(s) {
-    const week = CURRENT_SEASON.weeks.find((w) => w.week === s.week);
+    const week = getSeason(s.season)?.weeks.find((w) => w.week === s.week);
     if (!week) return s.matchup_id;
     const idx = week.series.findIndex((x) => x.matchup_id === s.matchup_id);
     return idx + 1;
   }
 
   // H2H rows: 5 opponents (everyone except this team)
-  const h2hRows = DUO_KEYS.filter((k) => k !== key).map((opponentKey) => {
+  const h2hRows = computed.duoKeys.filter((k) => k !== key).map((opponentKey) => {
     const rec = computed.h2h[key][opponentKey];
     return {
       key: opponentKey,
@@ -117,11 +138,16 @@ export default function TeamDetail() {
   }).sort((a, b) => Number(b.played) - Number(a.played) || a.key.localeCompare(b.key));
 
   // Up Next
-  const upcoming = nextSeriesForTeam(CURRENT_SEASON, key, seasonComputed);
-  const upcomingRecords = upcoming ? {
-    team1: `${seasonComputed.duoStats[upcoming.team1_key].gamesWon}-${seasonComputed.duoStats[upcoming.team1_key].gamesLost}`,
-    team2: `${seasonComputed.duoStats[upcoming.team2_key].gamesWon}-${seasonComputed.duoStats[upcoming.team2_key].gamesLost}`,
-  } : null;
+  const upcoming = activeSeason
+    ? nextSeriesForTeam(activeSeason, key, activeComputed)
+    : null;
+  const record = (k) => {
+    const d = activeComputed.duoStats[k];
+    return d ? `${d.gamesWon}-${d.gamesLost}` : '0-0';
+  };
+  const upcomingRecords = upcoming
+    ? { team1: record(upcoming.team1_key), team2: record(upcoming.team2_key) }
+    : null;
 
   // Team-color CSS vars + pill ring/soft tints
   const teamStyle = colors ? {
@@ -164,7 +190,7 @@ export default function TeamDetail() {
                     #{scopedRank} Rank
                   </Pill>
                 )}
-                <Pill>Season {CURRENT_SEASON.season}</Pill>
+                <Pill>{scopeLabel(scope)}</Pill>
               </div>
               <h1 className="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide">
                 {teamName?.toUpperCase()}
@@ -199,10 +225,7 @@ export default function TeamDetail() {
           <Seg
             value={scope}
             onChange={setScope}
-            options={[
-              { value: 'season', label: `Season ${CURRENT_SEASON.season}` },
-              { value: 'career', label: 'Career' },
-            ]}
+            options={SCOPE_OPTIONS}
           />
         </div>
       </section>

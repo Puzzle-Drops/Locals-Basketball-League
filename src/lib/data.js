@@ -1,10 +1,11 @@
-// Static data wiring. Add future seasons by importing season2.json, etc.,
+// Static data wiring. Add future seasons by importing season3.json, etc.,
 // and pushing into SEASONS in chronological order.
 
 import season1 from '@data/season1.json';
+import season2 from '@data/season2.json';
 import teamsMap from '@data/teams.json';
 
-export const SEASONS = [season1];
+export const SEASONS = [season1, season2];
 export const TEAMS = teamsMap;
 
 export const CURRENT_SEASON = SEASONS[SEASONS.length - 1];

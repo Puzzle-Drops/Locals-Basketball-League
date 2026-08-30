@@ -1,5 +1,11 @@
 {
   "season": 1,
+  "roster": [
+    "Jacob",
+    "Daniel",
+    "Joey",
+    "Nathan"
+  ],
   "coinflips": {},
   "weeks": [
     {
@@ -7,35 +13,89 @@
       "series": [
         {
           "matchup_id": 1,
-          "team1_key": "Jacob-Joseph",
+          "team1_key": "Jacob-Joey",
           "team2_key": "Daniel-Nathan",
           "status": "completed",
           "games": [
-            { "game": 1, "date": "2026-04-19", "team1_score": 21, "team2_score": 0,  "vod_url": "https://youtu.be/4AwVhgC2et0" },
-            { "game": 2, "date": "2026-04-19", "team1_score": 17, "team2_score": 21, "vod_url": "https://youtu.be/kOcG2QrsXFk" },
-            { "game": 3, "date": "2026-04-19", "team1_score": 21, "team2_score": 19, "vod_url": "https://youtu.be/ADT1K8C4Exg" }
+            {
+              "game": 1,
+              "date": "2026-04-19",
+              "team1_score": 21,
+              "team2_score": 0,
+              "vod_url": "https://youtu.be/4AwVhgC2et0"
+            },
+            {
+              "game": 2,
+              "date": "2026-04-19",
+              "team1_score": 17,
+              "team2_score": 21,
+              "vod_url": "https://youtu.be/kOcG2QrsXFk"
+            },
+            {
+              "game": 3,
+              "date": "2026-04-19",
+              "team1_score": 21,
+              "team2_score": 19,
+              "vod_url": "https://youtu.be/ADT1K8C4Exg"
+            }
           ]
         },
         {
           "matchup_id": 2,
           "team1_key": "Jacob-Daniel",
-          "team2_key": "Joseph-Nathan",
+          "team2_key": "Joey-Nathan",
           "status": "completed",
           "games": [
-            { "game": 1, "date": "2026-04-19", "team1_score": 17, "team2_score": 23, "vod_url": "https://youtu.be/qK6A1XlK68g" },
-            { "game": 2, "date": "2026-04-19", "team1_score": 22, "team2_score": 5,  "vod_url": "https://youtu.be/6UClIHxMfiU" },
-            { "game": 3, "date": "2026-04-19", "team1_score": 10, "team2_score": 22, "vod_url": "https://youtu.be/4toHhgf6_KA" }
+            {
+              "game": 1,
+              "date": "2026-04-19",
+              "team1_score": 17,
+              "team2_score": 23,
+              "vod_url": "https://youtu.be/qK6A1XlK68g"
+            },
+            {
+              "game": 2,
+              "date": "2026-04-19",
+              "team1_score": 22,
+              "team2_score": 5,
+              "vod_url": "https://youtu.be/6UClIHxMfiU"
+            },
+            {
+              "game": 3,
+              "date": "2026-04-19",
+              "team1_score": 10,
+              "team2_score": 22,
+              "vod_url": "https://youtu.be/4toHhgf6_KA"
+            }
           ]
         },
         {
           "matchup_id": 3,
           "team1_key": "Jacob-Nathan",
-          "team2_key": "Daniel-Joseph",
+          "team2_key": "Daniel-Joey",
           "status": "completed",
           "games": [
-            { "game": 1, "date": "2026-04-26", "team1_score": 15, "team2_score": 21, "vod_url": "https://youtu.be/Sy011qsnUuo" },
-            { "game": 2, "date": "2026-04-26", "team1_score": 21, "team2_score": 8,  "vod_url": "https://youtu.be/CVUwIQINPYY" },
-            { "game": 3, "date": "2026-04-26", "team1_score": 17, "team2_score": 23, "vod_url": "https://youtu.be/qYY4is5oJCc" }
+            {
+              "game": 1,
+              "date": "2026-04-26",
+              "team1_score": 15,
+              "team2_score": 21,
+              "vod_url": "https://youtu.be/Sy011qsnUuo"
+            },
+            {
+              "game": 2,
+              "date": "2026-04-26",
+              "team1_score": 21,
+              "team2_score": 8,
+              "vod_url": "https://youtu.be/CVUwIQINPYY"
+            },
+            {
+              "game": 3,
+              "date": "2026-04-26",
+              "team1_score": 17,
+              "team2_score": 23,
+              "vod_url": "https://youtu.be/qYY4is5oJCc"
+            }
           ]
         }
       ]
@@ -46,33 +106,159 @@
         {
           "matchup_id": 2,
           "team1_key": "Jacob-Daniel",
-          "team2_key": "Joseph-Nathan",
+          "team2_key": "Joey-Nathan",
           "status": "completed",
           "games": [
-            { "game": 1, "date": "2026-04-26", "team1_score": 5,  "team2_score": 21, "vod_url": "https://youtu.be/-LpDY9SIJoM" },
-            { "game": 2, "date": "2026-04-26", "team1_score": 18, "team2_score": 21, "vod_url": "https://youtu.be/kDMTsepXOPA" },
-            { "game": 3, "date": "2026-04-26", "team1_score": 19, "team2_score": 21, "vod_url": "https://youtu.be/hzAADPYRegQ" }
+            {
+              "game": 1,
+              "date": "2026-04-26",
+              "team1_score": 5,
+              "team2_score": 21,
+              "vod_url": "https://youtu.be/-LpDY9SIJoM"
+            },
+            {
+              "game": 2,
+              "date": "2026-04-26",
+              "team1_score": 18,
+              "team2_score": 21,
+              "vod_url": "https://youtu.be/kDMTsepXOPA"
+            },
+            {
+              "game": 3,
+              "date": "2026-04-26",
+              "team1_score": 19,
+              "team2_score": 21,
+              "vod_url": "https://youtu.be/hzAADPYRegQ"
+            }
           ]
         },
         {
           "matchup_id": 3,
           "team1_key": "Jacob-Nathan",
-          "team2_key": "Daniel-Joseph",
+          "team2_key": "Daniel-Joey",
           "status": "completed",
           "games": [
-            { "game": 1, "team1_score": 11, "team2_score": 21, "vod_url": "" },
-            { "game": 2, "team1_score": 22, "team2_score": 19, "vod_url": "" },
-            { "game": 3, "team1_score": 22, "team2_score": 11, "vod_url": "" }
+            {
+              "game": 1,
+              "team1_score": 11,
+              "team2_score": 21,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 22,
+              "team2_score": 19,
+              "vod_url": ""
+            },
+            {
+              "game": 3,
+              "team1_score": 22,
+              "team2_score": 11,
+              "vod_url": ""
+            }
           ]
         },
         {
           "matchup_id": 1,
-          "team1_key": "Jacob-Joseph",
+          "team1_key": "Jacob-Joey",
           "team2_key": "Daniel-Nathan",
+          "status": "completed",
+          "games": [
+            {
+              "game": 1,
+              "team1_score": 14,
+              "team2_score": 21,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 21,
+              "team2_score": 19,
+              "vod_url": ""
+            },
+            {
+              "game": 3,
+              "team1_score": 21,
+              "team2_score": 19,
+              "vod_url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "series": [
+        {
+          "matchup_id": 3,
+          "team1_key": "Jacob-Nathan",
+          "team2_key": "Daniel-Joey",
+          "status": "completed",
+          "games": [
+            {
+              "game": 1,
+              "team1_score": 15,
+              "team2_score": 21,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 21,
+              "team2_score": 16,
+              "vod_url": ""
+            },
+            {
+              "game": 3,
+              "team1_score": 19,
+              "team2_score": 21,
+              "vod_url": ""
+            }
+          ]
+        },
+        {
+          "matchup_id": 1,
+          "team1_key": "Jacob-Joey",
+          "team2_key": "Daniel-Nathan",
+          "status": "completed",
+          "games": [
+            {
+              "game": 1,
+              "team1_score": 22,
+              "team2_score": 20,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 22,
+              "team2_score": 20,
+              "vod_url": ""
+            },
+            {
+              "game": 3,
+              "team1_score": 9,
+              "team2_score": 22,
+              "vod_url": ""
+            }
+          ]
+        },
+        {
+          "matchup_id": 2,
+          "team1_key": "Jacob-Daniel",
+          "team2_key": "Joey-Nathan",
           "status": "partial",
           "games": [
-            { "game": 1, "team1_score": 14, "team2_score": 21, "vod_url": "" },
-            { "game": 2, "team1_score": 21, "team2_score": 19, "vod_url": "" }
+            {
+              "game": 1,
+              "team1_score": 22,
+              "team2_score": 5,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 12,
+              "team2_score": 21,
+              "vod_url": ""
+            }
           ]
         }
       ]

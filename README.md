@@ -1,6 +1,6 @@
 # Locals Basketball League (LBL)
 
-Static tracker for the Locals Basketball League - a 2v2 league between Jacob, Daniel, Joseph, and Nathan. Standings, teams, players, schedule, stats, and VOD links.
+Static tracker for the Locals Basketball League - a 2v2 league between Jacob, Joe, Joey, and Nathan (Daniel played Season 1; Joe replaced him in Season 2). Standings, teams, players, schedule, stats, and VOD links.
 
 Source of truth for rules, data model, and conventions: [`docs/LBL-spec.md`](docs/LBL-spec.md). Project context for Claude Code: [`CLAUDE.md`](CLAUDE.md).
 

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { CURRENT_SEASON, TEAMS } from '../lib/data.js';
 import { computeSeason, standings as canonicalStandings, signed } from '../lib/stats.js';
-import { splitKey, TOTAL_WEEKS } from '../lib/constants.js';
+import { splitKey, TOTAL_WEEKS, SERIES_PER_WEEK } from '../lib/constants.js';
 import { resolveCoinflip } from '../lib/coinflip.js';
 import TeamLogo from '../components/TeamLogo.jsx';
 import Pill from '../components/Pill.jsx';
@@ -40,7 +40,11 @@ export default function Playoffs() {
   );
 
   const allSeries = computed.seriesIndex;
-  const seasonComplete = allSeries.length > 0 && allSeries.every((s) => s.played);
+  // A season is only final once every scheduled series exists in the data and
+  // has been played - not just once the weeks recorded so far are all played.
+  const scheduledSeries = TOTAL_WEEKS * SERIES_PER_WEEK;
+  const seasonComplete =
+    allSeries.length >= scheduledSeries && allSeries.every((s) => s.played);
   const currentWeek = currentWeekFor(CURRENT_SEASON);
 
   // Decorate each rank with seed, record string, etc.

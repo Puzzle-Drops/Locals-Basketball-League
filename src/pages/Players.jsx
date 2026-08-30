@@ -2,14 +2,13 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { CURRENT_SEASON } from '../lib/data.js';
 import { computeSeason, decoratePlayer, fmt1 } from '../lib/stats.js';
-import { PLAYERS } from '../lib/constants.js';
 import PlayerAvatar from '../components/PlayerAvatar.jsx';
 import Pill from '../components/Pill.jsx';
 
 export default function Players() {
   const computed = useMemo(() => computeSeason(CURRENT_SEASON), []);
   const rows = useMemo(
-    () => PLAYERS
+    () => computed.players
       .map((p) => decoratePlayer(p, computed.playerStats[p]))
       .sort((a, b) => b.plusMinus - a.plusMinus),
     [computed]

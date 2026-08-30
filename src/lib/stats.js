@@ -21,7 +21,7 @@
 // The standings page exposes a Games/Series toggle, but it's display-only
 // (it swaps the rendered W/L and per-N stats). Ranking never changes.
 
-import { DUO_KEYS, PLAYERS, PLAYER_DUOS, partnerOf, splitKey } from './constants.js';
+import { byAge, duoKeysFor, duosForPlayer, partnerOf, playersFor, splitKey } from './constants.js';
 
 // ---------- helpers ----------
 
@@ -54,12 +54,12 @@ function blankPlayerStats() {
   };
 }
 
-function emptyH2H() {
+function emptyH2H(duoKeys) {
   // For each duo, a map of opponentKey -> { seriesW, seriesL, gamesW, gamesL, pf, pa }
   const out = {};
-  for (const k of DUO_KEYS) {
+  for (const k of duoKeys) {
     out[k] = {};
-    for (const other of DUO_KEYS) {
+    for (const other of duoKeys) {
       if (other === k) continue;
       out[k][other] = { seriesW: 0, seriesL: 0, gamesW: 0, gamesL: 0, pf: 0, pa: 0 };
     }
@@ -103,13 +103,15 @@ function classifySeries(series) {
 //   playerStats: { [name]: PlayerStats }
 //   seriesIndex: flat list of series with metadata for logs
 export function computeSeason(season) {
-  const duoStats = Object.fromEntries(DUO_KEYS.map((k) => [k, blankDuoStats()]));
-  const h2h = emptyH2H();
-  const playerStats = Object.fromEntries(PLAYERS.map((p) => [p, blankPlayerStats()]));
+  const duoKeys = duoKeysFor(season);
+  const players = playersFor(season);
+  const duoStats = Object.fromEntries(duoKeys.map((k) => [k, blankDuoStats()]));
+  const h2h = emptyH2H(duoKeys);
+  const playerStats = Object.fromEntries(players.map((p) => [p, blankPlayerStats()]));
   const seriesIndex = [];
 
   // Per-player streak tracking: iterate games in order.
-  const playerStreak = Object.fromEntries(PLAYERS.map((p) => [p, 0]));
+  const playerStreak = Object.fromEntries(players.map((p) => [p, 0]));
 
   for (const week of season.weeks ?? []) {
     for (const series of week.series ?? []) {
@@ -204,14 +206,14 @@ export function computeSeason(season) {
     }
   }
 
-  return { duoStats, h2h, playerStats, seriesIndex };
+  return { duoStats, h2h, playerStats, seriesIndex, duoKeys, players };
 }
 
 // Merge per-season duoStats dicts into a single career totals dict.
-function mergeDuoStats(listOfDicts) {
-  const out = Object.fromEntries(DUO_KEYS.map((k) => [k, blankDuoStats()]));
+function mergeDuoStats(listOfDicts, duoKeys) {
+  const out = Object.fromEntries(duoKeys.map((k) => [k, blankDuoStats()]));
   for (const dict of listOfDicts) {
-    for (const k of DUO_KEYS) {
+    for (const k of duoKeys) {
       const s = out[k]; const a = dict[k];
       if (!a) continue;
       for (const f of Object.keys(s)) s[f] += a[f];
@@ -220,10 +222,10 @@ function mergeDuoStats(listOfDicts) {
   return out;
 }
 
-function mergePlayerStats(listOfDicts) {
-  const out = Object.fromEntries(PLAYERS.map((p) => [p, blankPlayerStats()]));
+function mergePlayerStats(listOfDicts, players) {
+  const out = Object.fromEntries(players.map((p) => [p, blankPlayerStats()]));
   for (const dict of listOfDicts) {
-    for (const p of PLAYERS) {
+    for (const p of players) {
       const s = out[p]; const a = dict[p];
       if (!a) continue;
       s.seriesWon += a.seriesWon;
@@ -245,11 +247,11 @@ function mergePlayerStats(listOfDicts) {
   return out;
 }
 
-function mergeH2H(listOfDicts) {
-  const out = emptyH2H();
+function mergeH2H(listOfDicts, duoKeys) {
+  const out = emptyH2H(duoKeys);
   for (const dict of listOfDicts) {
-    for (const k of DUO_KEYS) {
-      for (const other of DUO_KEYS) {
+    for (const k of duoKeys) {
+      for (const other of duoKeys) {
         if (other === k) continue;
         const dst = out[k][other]; const src = dict[k]?.[other];
         if (!src) continue;
@@ -266,13 +268,17 @@ function mergeH2H(listOfDicts) {
 }
 
 // Given one or more seasons, return career-level aggregates + per-season breakdown.
+// Rosters change between seasons, so career scope spans the union of every
+// duo and every player that has appeared, not one fixed six-duo list.
 export function computeCareer(seasons) {
   const perSeason = seasons.map((s) => ({ season: s.season, ...computeSeason(s) }));
-  const duoStats = mergeDuoStats(perSeason.map((p) => p.duoStats));
-  const playerStats = mergePlayerStats(perSeason.map((p) => p.playerStats));
-  const h2h = mergeH2H(perSeason.map((p) => p.h2h));
+  const duoKeys = [...new Set(perSeason.flatMap((p) => p.duoKeys))];
+  const players = byAge(new Set(perSeason.flatMap((p) => p.players)));
+  const duoStats = mergeDuoStats(perSeason.map((p) => p.duoStats), duoKeys);
+  const playerStats = mergePlayerStats(perSeason.map((p) => p.playerStats), players);
+  const h2h = mergeH2H(perSeason.map((p) => p.h2h), duoKeys);
   const seriesIndex = perSeason.flatMap((p) => p.seriesIndex);
-  return { duoStats, playerStats, h2h, seriesIndex, perSeason };
+  return { duoStats, playerStats, h2h, seriesIndex, duoKeys, players, perSeason };
 }
 
 // ---------- derived views ----------
@@ -353,7 +359,8 @@ export function sortDuosWithTiebreakers(decoratedDuos, h2h) {
 // Best/worst partner per player (by game win%). Returns { best, worst } or nulls
 // if the player has no decided games yet.
 export function partnerBreakdown(player, perSeasonOrCareerDuoStats) {
-  const entries = PLAYER_DUOS[player].map((duoKey) => {
+  const duoKeys = duosForPlayer(player, Object.keys(perSeasonOrCareerDuoStats));
+  const entries = duoKeys.map((duoKey) => {
     const s = perSeasonOrCareerDuoStats[duoKey];
     const partner = partnerOf(player, duoKey);
     const wp = s.gamesPlayed ? s.gamesWon / s.gamesPlayed : null;
@@ -374,7 +381,7 @@ export function partnerBreakdown(player, perSeasonOrCareerDuoStats) {
 // the UI's display toggle has a single source of truth, but ranking is
 // always by game wins regardless of mode.
 export function standings(duoStats, h2h, { mode = "games" } = {}) {
-  const decorated = DUO_KEYS.map((k) => ({ ...decorateDuo(k, duoStats[k]), mode }));
+  const decorated = Object.keys(duoStats).map((k) => ({ ...decorateDuo(k, duoStats[k]), mode }));
   return sortDuosWithTiebreakers(decorated, h2h);
 }
 

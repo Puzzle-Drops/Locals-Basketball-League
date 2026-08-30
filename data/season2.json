@@ -1,0 +1,95 @@
+{
+  "season": 2,
+  "roster": [
+    "Jacob",
+    "Joe",
+    "Joey",
+    "Nathan"
+  ],
+  "coinflips": {},
+  "weeks": [
+    {
+      "week": 1,
+      "series": [
+        {
+          "matchup_id": 2,
+          "team1_key": "Joe-Jacob",
+          "team2_key": "Joey-Nathan",
+          "status": "completed",
+          "games": [
+            {
+              "game": 1,
+              "team1_score": 8,
+              "team2_score": 21,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 19,
+              "team2_score": 21,
+              "vod_url": ""
+            },
+            {
+              "game": 3,
+              "team1_score": 15,
+              "team2_score": 22,
+              "vod_url": ""
+            }
+          ]
+        },
+        {
+          "matchup_id": 3,
+          "team1_key": "Jacob-Nathan",
+          "team2_key": "Joe-Joey",
+          "status": "completed",
+          "games": [
+            {
+              "game": 1,
+              "team1_score": 23,
+              "team2_score": 11,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 21,
+              "team2_score": 16,
+              "vod_url": ""
+            },
+            {
+              "game": 3,
+              "team1_score": 4,
+              "team2_score": 21,
+              "vod_url": ""
+            }
+          ]
+        },
+        {
+          "matchup_id": 1,
+          "team1_key": "Jacob-Joey",
+          "team2_key": "Joe-Nathan",
+          "status": "completed",
+          "games": [
+            {
+              "game": 1,
+              "team1_score": 21,
+              "team2_score": 4,
+              "vod_url": ""
+            },
+            {
+              "game": 2,
+              "team1_score": 21,
+              "team2_score": 19,
+              "vod_url": ""
+            },
+            {
+              "game": 3,
+              "team1_score": 21,
+              "team2_score": 16,
+              "vod_url": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

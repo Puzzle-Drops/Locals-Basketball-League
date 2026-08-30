@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CURRENT_SEASON, SEASONS, TEAMS } from '../lib/data.js';
+import { TEAMS } from '../lib/data.js';
 import {
-  computeSeason, computeCareer, decorateDuo, standings as canonicalStandings,
-  fmt1, playedGames,
+  decorateDuo, standings as canonicalStandings, fmt1, playedGames,
 } from '../lib/stats.js';
 import { splitKey } from '../lib/constants.js';
+import {
+  SCOPE_OPTIONS, DEFAULT_SCOPE, computedForScope, scopeLabel, seasonForScope,
+} from '../lib/scope.js';
 import TeamLogo from '../components/TeamLogo.jsx';
 import Seg from '../components/Seg.jsx';
 
@@ -55,14 +57,12 @@ function compareRows(a, b, key, dir, view) {
 }
 
 export default function Standings() {
-  const seasonComputed = useMemo(() => computeSeason(CURRENT_SEASON), []);
-  const careerComputed = useMemo(() => computeCareer(SEASONS), []);
-
-  const [scope, setScope] = useState('season');
+  const [scope, setScope] = useState(DEFAULT_SCOPE);
   const [view, setView] = useState('games');
   const [sort, setSort] = useState(DEFAULT_SORT);
 
-  const computed = scope === 'season' ? seasonComputed : careerComputed;
+  const computed = useMemo(() => computedForScope(scope), [scope]);
+  const season = seasonForScope(scope);
 
   // Canonical ranking (game wins -> h2h series -> point diff)
   const canonicalRows = useMemo(
@@ -101,11 +101,11 @@ export default function Standings() {
         <div className="max-w-6xl mx-auto px-5 pt-10 pb-8 relative overflow-hidden">
           <div className="absolute inset-0 grid-lines opacity-60 pointer-events-none" />
           <div className="relative">
-            <div className="stat-label mb-2">Season {CURRENT_SEASON.season} · 2026</div>
+            <div className="stat-label mb-2">{scopeLabel(scope)}{season ? ' · 2026' : ' · All Seasons'}</div>
             <h1 className="display font-black text-5xl md:text-6xl leading-[0.95] tracking-wide mb-5">STANDINGS</h1>
 
             <div className="flex flex-col gap-2">
-              <HeroStat value={6} label="Teams" />
+              <HeroStat value={computed.duoKeys.length} label="Teams" />
               <HeroStat value={totalGames} label="Games Played" />
               <HeroStat value={seriesComplete} label="Series Complete" />
             </div>
@@ -120,11 +120,8 @@ export default function Standings() {
             <Seg
               value={scope}
               onChange={setScope}
-              options={[
-                { value: 'season', label: `Season ${CURRENT_SEASON.season}` },
-                { value: 'career', label: 'Career' },
-              ]}
-              className="w-48"
+              options={SCOPE_OPTIONS}
+              className="w-56"
             />
           </ControlGroup>
           <ControlGroup label="View">

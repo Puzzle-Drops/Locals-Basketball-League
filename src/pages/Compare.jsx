@@ -4,7 +4,7 @@ import { CURRENT_SEASON, TEAMS } from '../lib/data.js';
 import {
   computeSeason, decorateDuo, decoratePlayer, fmt1, signed,
 } from '../lib/stats.js';
-import { PLAYERS, DUO_KEYS, splitKey } from '../lib/constants.js';
+import { splitKey } from '../lib/constants.js';
 import Seg from '../components/Seg.jsx';
 import TeamLogo from '../components/TeamLogo.jsx';
 import PlayerAvatar from '../components/PlayerAvatar.jsx';
@@ -50,8 +50,8 @@ export default function Compare() {
   const computed = useMemo(() => computeSeason(CURRENT_SEASON), []);
   const [type, setType] = useState('players');
 
-  const playerOptions = PLAYERS.map((p) => ({ id: p, label: p }));
-  const teamOptions = DUO_KEYS.map((k) => ({ id: k, label: TEAMS[k] }));
+  const playerOptions = computed.players.map((p) => ({ id: p, label: p }));
+  const teamOptions = computed.duoKeys.map((k) => ({ id: k, label: TEAMS[k] }));
   const options = type === 'players' ? playerOptions : teamOptions;
 
   const [leftId, setLeftId] = useState(playerOptions[0].id);
